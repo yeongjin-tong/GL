@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-public class Sym_3W4P : ElectricalComponent
+public class Sym_3P4W : ElectricalComponent
 {
     // 이 부품의 ON/OFF 상태를 관리 (기존 Switch와 유사)
     public bool isOn = true;

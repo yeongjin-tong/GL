@@ -34,6 +34,8 @@ public class WireManager : MonoBehaviour
     // ✨ 가상 접점의 위치
     private Vector3 junctionPoint;
 
+    private int junctionIndex = 0;
+
     private void Start()
     {
         gridManager = GridManager.Instance;
@@ -59,7 +61,14 @@ public class WireManager : MonoBehaviour
         if (currentWire != null)
         {
             UpdateWirePreview(currentWire);
+
+            if(Input.GetMouseButtonDown(1))
+            {
+                Destroy(currentWire.gameObject);
+                ResetState();
+            }
         }
+
     }
 
     // InputManager의 방송을 수신하여 처리하는 함수
@@ -71,14 +80,10 @@ public class WireManager : MonoBehaviour
             RectTransformUtility.ScreenPointToLocalPointInRectangle((RectTransform)content_2D, Input.mousePosition, Camera.main, out Vector2 localMousePos);
             Vector2 snappedLocalPos = gridManager.SnapToGrid(localMousePos);
 
+            AddPointToWire(currentWire);
+
             if (junctionPreview != null)
             {
-                // 스냅된 위치를 새로운 경유지로 추가
-                AddPointToWire(currentWire);
-            }
-            else
-            {
-                AddPointToWire(currentWire);
                 Destroy(junctionPreview);
             }
                 return;
@@ -133,17 +138,10 @@ public class WireManager : MonoBehaviour
         ElectricalComponent comp1 = startPoint.parentComponent;
         ElectricalComponent comp2 = endPoint.parentComponent;
 
-        myWire.firstPoint = startPoint;
-        myWire.lastPoint = endPoint;
-        myWire.componentA = comp1;
-        myWire.componentB = comp2;
+        myWire.connectedPoints.Add(endPoint);
 
-        if (comp1 != null && comp2 != null)
-        {
-            //서로를 다음 부품으로 등록 (양방향 연결)
-            comp1.AddConnection(startPoint, endPoint);
-            comp2.AddConnection(endPoint, startPoint);
-        }
+        // CircuitGraph에 연결 등록
+        CircuitGraph.Instance.RegisterConnection(startPoint.parentComponent, endPoint.parentComponent);
 
         ColliderSetting();
     }
@@ -247,239 +245,10 @@ public class WireManager : MonoBehaviour
         }
     }
 
-    private List<Vector3> OptimizePath(List<Vector3> path)
-    {
-        if (path.Count < 3) return path;
-        List<Vector3> optimizedPath = new List<Vector3> { path[0] };
-        for (int i = 1; i < path.Count - 1; i++)
-        {
-            Vector3 prevDir = (path[i] - path[i - 1]).normalized;
-            Vector3 nextDir = (path[i + 1] - path[i]).normalized;
-            if (Vector3.Distance(prevDir, nextDir) > 0.01f)
-            {
-                optimizedPath.Add(path[i]);
-            }
-        }
-        optimizedPath.Add(path.Last());
-        return optimizedPath;
-    }
-
     private void AddPointToWire(LineRenderer lr)
     {
         clickIndex = lr.positionCount - 1;
     }
-
-    // 미리보기를 위한 'ㄷ'자 경로 계산 함수
-    private List<Vector3> Calculate_C_Path_ForPreview(ConnectionPoint startPoint, Vector3 endPos)
-    {
-        Vector3 startPos = PosToV3(startPoint.transform.position);
-        Vector3 startStub = GetStubPoint(startPoint, startPos);
-
-        Vector3 midPoint1, midPoint2;
-
-        // 시작점이 끝점보다 왼쪽에 있으면 오른쪽으로, 오른쪽에 있으면 왼쪽으로 우회
-        float xOffsetDirection = (startPos.x < endPos.x) ? 1f : -1f;
-        float boundaryX = startPoint.parentCollider.bounds.center.x + (startPoint.parentCollider.bounds.extents.x * xOffsetDirection);
-        float detourX = boundaryX + (clearance * xOffsetDirection);
-
-        midPoint1 = new Vector3(detourX, startStub.y, 0);
-        midPoint2 = new Vector3(detourX, endPos.y, 0);
-
-        return new List<Vector3> { startPos, startStub, midPoint1, midPoint2, endPos };
-    }
-
-    // 사용자의 모든 규칙을 적용한 최종 경로 결정 함수
-    private List<Vector3> GenerateOptimalPath(ConnectionPoint startPoint, ConnectionPoint endPoint)
-    {
-        Vector3 startPos = PosToV3(startPoint.transform.position);
-        Vector3 endPos = PosToV3(endPoint.transform.position);
-        var startDir = startPoint.pointDirection;
-        var endDir = endPoint.pointDirection;
-        const float alignmentThreshold = 0.01f;
-
-        bool isAligned = Mathf.Abs(startPos.x - endPos.x) < alignmentThreshold;
-        bool isD1Above = startPos.y > endPos.y;
-
-        // --- 규칙 1: 2점 직선 연결 (가장 높은 우선순위) ---
-        if (isAligned)
-        {
-            if ((isD1Above && startDir == ConnectionPoint.Direction.Down && endDir == ConnectionPoint.Direction.Up) ||
-                (!isD1Above && startDir == ConnectionPoint.Direction.Up && endDir == ConnectionPoint.Direction.Down))
-                return new List<Vector3> { startPos, endPos };
-        }
-
-        // --- 규칙 2: 6점 우회 연결 ---
-        bool requiresCPath = false;
-        // Case A: 일직선이지만, 2점 직선 연결 조건이 아닐 때 (예: Up->Up)
-        if (isAligned)
-        {
-            requiresCPath = true;
-        }
-        // Case B: 일직선이 아니면서, 포트가 서로 등을 돌린 형태일 때
-        else
-        {
-            if ((isD1Above && startDir == ConnectionPoint.Direction.Up && endDir == ConnectionPoint.Direction.Down) ||
-                (!isD1Above && startDir == ConnectionPoint.Direction.Down && endDir == ConnectionPoint.Direction.Up))
-                requiresCPath = true;
-        }
-
-        if (requiresCPath)
-        {
-            return Calculate_C_Path(startPoint, endPoint);
-        }
-
-        // --- 규칙 3: 그 외 모든 경우는 기본 4점 'L'자 연결 ---
-        // (이제 Down -> Down 연결은 이 규칙을 따르게 됩니다)
-        return Calculate_L_Path(startPoint, endPos, endPoint);
-    }
-
-    // --- 경로 계산을 위한 헬퍼 함수들 ---
-
-    //  부품을 우회하는 4점 'L'자 경로 계산 (오른쪽 그림과 같이 수정)
-    private List<Vector3> Calculate_L_Path(ConnectionPoint startPoint, Vector3 endPosVec3, ConnectionPoint endPoint = null)
-    {
-        Vector3 startPos = PosToV3(startPoint.transform.position);
-        Vector3 endPos = (endPoint != null) ? PosToV3(endPoint.transform.position) : PosToV3(endPosVec3);
-
-        List<Vector3> path = new List<Vector3>();
-        path.Add(startPos);
-        // 1. 시작 포트에서 clearance만큼 수직으로 뻗어나오는 stub
-        Vector3 startStub = GetStubPoint(startPoint, startPos);
-        path.Add(startStub);
-        // 2. 최종 도착 지점의 stub (마우스 위치일 경우 endPosVec3 그대로 사용)
-        Vector3 actualEndStub = (endPoint != null) ? GetStubPoint(endPoint, endPos) : PosToV3(endPosVec3);
-
-        // 3. 부품을 우회하기 위한 중간 지점 계산
-        // 시작 포트의 수직선과 도착 포트의 수평선이 만나는 지점을 찾습니다.
-        // X축 기준으로 정렬되어 있지 않다면, X축으로 먼저 이동합니다.
-        float targetX = (startPoint.pointDirection == ConnectionPoint.Direction.Up || startPoint.pointDirection == ConnectionPoint.Direction.Down)
-            ? actualEndStub.x
-            : startStub.x;
-
-        float targetY = (startPoint.pointDirection == ConnectionPoint.Direction.Up || startPoint.pointDirection == ConnectionPoint.Direction.Down)
-            ? startStub.y
-            : actualEndStub.y;
-
-        // 부품의 바깥쪽으로 경로를 유도하기 위한 추가 조정
-        if (startPoint.pointDirection == ConnectionPoint.Direction.Down && startStub.x != actualEndStub.x)
-        {
-            // D1.Down -> D2.Down 일 때 (오른쪽 그림처럼 아래로 크게 우회)
-            float maxBottomY = Mathf.Min(startPoint.parentCollider.bounds.min.y, (endPoint != null ? endPoint.parentCollider.bounds.min.y : startStub.y - clearance)) - clearance;
-
-            
-            if (endPoint != null && endPoint.pointDirection == ConnectionPoint.Direction.Up)        // Down - Up 매칭
-            {
-                // 기본 L자 코너
-                path.Add(new Vector3(actualEndStub.x, startStub.y, 0));
-                path.Add(actualEndStub);
-            }
-            else
-            {
-                // 경로가 X축으로 먼저 꺾이도록 조정 (아래로 내려갔다가 횡 이동)
-                path.Remove(startStub);
-                path.Add(new Vector3(startStub.x, maxBottomY, 0)); // 스위치 아래로
-                path.Add(new Vector3(actualEndStub.x, maxBottomY, 0)); // 전구 아래까지
-                path.Add(new Vector3(actualEndStub.x, endPos.y, 0)); // 전구 포트까지
-            }
-        }
-        else if (startPoint.pointDirection == ConnectionPoint.Direction.Up && startStub.x != actualEndStub.x)
-        {
-            // D1.Up -> D2.Up 일 때 (위쪽으로 크게 우회)
-            float maxTopY = Mathf.Max(startPoint.parentCollider.bounds.max.y, (endPoint != null ? endPoint.parentCollider.bounds.max.y : startStub.y + clearance)) + clearance;
-
-            if (endPoint != null && endPoint.pointDirection == ConnectionPoint.Direction.Down)      // Up - Down 매칭
-            {
-                // 기본 L자 코너
-                path.Add(new Vector3(actualEndStub.x, startStub.y, 0));
-                path.Add(actualEndStub);
-            }
-            else
-            {
-                // 경로가 X축으로 먼저 꺾이도록 조정 (위로 올라갔다가 횡 이동)
-                path.Remove(startStub);
-                path.Add(new Vector3(startStub.x, maxTopY, 0)); // 첫번째 심볼 최대지점
-                path.Add(new Vector3(actualEndStub.x, maxTopY, 0)); // 두번째 심볼 위까지
-                path.Add(new Vector3(actualEndStub.x, endPos.y, 0)); // 두번째 심볼 최소지점까지
-            } 
-        }
-        else
-        {
-            // 일반적인 L자 형태
-            if (Mathf.Abs(startStub.x - actualEndStub.x) < 0.01f || Mathf.Abs(startStub.y - actualEndStub.y) < 0.01f)
-            {
-                // 거의 직선인 경우
-                path.Add(actualEndStub);
-            }
-            else
-            {
-                // 기본 L자 코너
-                path.Add(new Vector3(actualEndStub.x, startStub.y, 0));
-                path.Add(actualEndStub);
-            }
-        }
-
-        // 최종 도착점
-        if (endPoint != null)
-        {
-            
-            path.Add(endPos);
-        }
-
-        return path.Distinct().ToList(); // 중복 포인트 제거
-    }
-
-    // 6점 'ㄷ'자 우회 경로 계산 (바깥쪽으로 크게 우회하는 로직으로 수정)
-    private List<Vector3> Calculate_C_Path(ConnectionPoint startPoint, ConnectionPoint endPoint)
-    {
-        Vector3 startPos = PosToV3(startPoint.transform.position);
-        Vector3 endPos = PosToV3(endPoint.transform.position);
-        Vector3 startStub = GetStubPoint(startPoint, startPos);
-        Vector3 endStub = GetStubPoint(endPoint, endPos);
-
-        Vector3 midPoint1, midPoint2;
-
-        bool isVertical = (startPoint.pointDirection == ConnectionPoint.Direction.Up ||
-                           startPoint.pointDirection == ConnectionPoint.Direction.Down);
-
-        // 우회 방향 결정 (시작점이 끝점보다 왼쪽에 있으면 오른쪽으로, 오른쪽에 있으면 왼쪽으로 우회)
-        float xOffsetDirection = (startPos.x < endPos.x) ? 1f : -1f;
-        // 우회 방향 결정 (시작점이 끝점보다 아래에 있으면 위쪽으로, 위에 있으면 아래쪽으로 우회)
-        float yOffsetDirection = (startPos.y < endPos.y) ? 1f : -1f;
-
-        if (isVertical) // 포트가 위/아래 방향일 때 (좌/우로 우회)
-        {
-            // 두 부품의 좌우 경계 중 더 바깥쪽 X좌표를 찾고, 거기에 clearance를 더해 우회 지점 설정
-            float boundaryX1 = startPoint.parentCollider.bounds.center.x + startPoint.parentCollider.bounds.extents.x * xOffsetDirection;
-            float boundaryX2 = endPoint.parentCollider.bounds.center.x + endPoint.parentCollider.bounds.extents.x * xOffsetDirection;
-            float detourX = (xOffsetDirection > 0) ? Mathf.Max(boundaryX1, boundaryX2) : Mathf.Min(boundaryX1, boundaryX2);
-
-            midPoint1 = new Vector3(detourX + (clearance * xOffsetDirection), startStub.y, 0);
-            midPoint2 = new Vector3(detourX + (clearance * xOffsetDirection), endStub.y, 0);
-        }
-        else // 포트가 좌/우 방향일 때 (위/아래로 우회)
-        {
-            // 두 부품의 상하 경계 중 더 바깥쪽 Y좌표를 찾고, 거기에 clearance를 더해 우회 지점 설정
-            float boundaryY1 = startPoint.parentCollider.bounds.center.y + startPoint.parentCollider.bounds.extents.y * yOffsetDirection;
-            float boundaryY2 = endPoint.parentCollider.bounds.center.y + endPoint.parentCollider.bounds.extents.y * yOffsetDirection;
-            float detourY = (yOffsetDirection > 0) ? Mathf.Max(boundaryY1, boundaryY2) : Mathf.Min(boundaryY1, boundaryY2);
-
-            midPoint1 = new Vector3(startStub.x, detourY + (clearance * yOffsetDirection), 0);
-            midPoint2 = new Vector3(endStub.x, detourY + (clearance * yOffsetDirection), 0);
-        }
-
-        return new List<Vector3> { startPos, startStub, midPoint1, midPoint2, endStub, endPos };
-    }
-
-    private Vector3 GetStubPoint(ConnectionPoint point, Vector3 basePos)
-    {
-        switch (point.pointDirection)
-        {
-            case ConnectionPoint.Direction.Up: return basePos + Vector3.up * clearance;
-            case ConnectionPoint.Direction.Down: return basePos + Vector3.down * clearance;
-            default: return basePos;
-        }
-    }
-
 
     private void ResetState() { firstPoint = null; currentWire = null; clickIndex = 0; }
     private LineRenderer CreateWire()
@@ -505,29 +274,35 @@ public class WireManager : MonoBehaviour
         wireObject.AddComponent<EdgeCollider2D>();
         myWire = wireObject.AddComponent<Wire>();
 
-        CircuitSolver.Instance.allWires.Add(myWire);
+        myWire.connectedPoints.Add(firstPoint);
         return lr;
     }
 
-    /// <summary>
-    /// 현재 그리던 선을 기존의 다른 전선에 연결합니다.
-    /// </summary>
+
     private void ConnectToExistingWire(LineRenderer drawingWire, Transform targetWireTransform, Vector3 clickPosition)
     {
-        LineRenderer targetWire = targetWireTransform.GetComponent<LineRenderer>();
-        if (targetWire == null) return;
+        Wire targetWire = targetWireTransform.GetComponent<Wire>();
+        LineRenderer targetLineRenderer = targetWireTransform.GetComponent<LineRenderer>();
 
-        // 1. 클릭된 위치에서 가장 가까운 기존 전선의 점(vertex) 찾기
-        float minDistance = float.MaxValue;
+        if (targetWire == null || targetLineRenderer == null) return;
+
+        // 1. 분기점이 될 위치를 계산하고 그리드에 스냅합니다.
+        Vector2 localClickPos = WorldToLocal(clickPosition);
+        Vector2 snappedJunctionPos = gridManager.SnapToGrid(localClickPos);
+
+        // 2a. 기존 전선의 전체 경로와 끝점 정보를 '복사'해둡니다.
+        Vector3[] originalPathPoints = new Vector3[targetLineRenderer.positionCount];
+        targetLineRenderer.GetPositions(originalPathPoints);
+        ConnectionPoint originalPointA = targetWire.connectedPoints[0];
+        ConnectionPoint originalPointB = targetWire.connectedPoints[1];
+
+        // 2b. 경로에서 분기점에 가장 가까운 점의 인덱스를 찾습니다.
         int closestSegmentIndex = -1;
-        Vector3 closestPointOnLine = Vector3.zero;
-
-        for (int i = 0; i < targetWire.positionCount - 1; i++)
+        float minDistance = float.MaxValue;
+        for (int i = 0; i < originalPathPoints.Length - 1; i++)
         {
-            // LineRenderer의 로컬 좌표를 월드 좌표로 변환하여 계산
-            Vector3 p1 = targetWire.transform.TransformPoint(targetWire.GetPosition(i));
-            Vector3 p2 = targetWire.transform.TransformPoint(targetWire.GetPosition(i + 1));
-
+            Vector3 p1 = targetLineRenderer.transform.TransformPoint(originalPathPoints[i]);
+            Vector3 p2 = targetLineRenderer.transform.TransformPoint(originalPathPoints[i + 1]);
             Vector3 pointOnSegment = FindNearestPointOnLineSegment(p1, p2, clickPosition);
             float distance = Vector3.Distance(clickPosition, pointOnSegment);
 
@@ -535,37 +310,50 @@ public class WireManager : MonoBehaviour
             {
                 minDistance = distance;
                 closestSegmentIndex = i;
-                closestPointOnLine = pointOnSegment;
             }
         }
 
-        if (closestSegmentIndex != -1)
-        {
-            // 2. 그리던 선의 끝점을 가장 가까운 지점(로컬 좌표로 변환)으로 설정하여 연결 완료
-            Vector3 finalLocalPos = drawingWire.transform.InverseTransformPoint(closestPointOnLine);
-            drawingWire.SetPosition(drawingWire.positionCount - 1, finalLocalPos);
+        // 3. 분기점(Junction) 오브젝트를 생성합니다.
+        junctionIndex++;
+        var junctionObj = junctionPreview;
+        junctionObj.name = "Junction_" + junctionIndex;
+        junctionObj.transform.SetParent(content_2D, false);
+        junctionObj.GetComponent<RectTransform>().anchoredPosition = snappedJunctionPos;
+        var junctionComp = junctionObj.AddComponent<Junction>();
+        var junctionPoint = junctionObj.AddComponent<ConnectionPoint>();
+        junctionPoint.parentComponent = junctionComp;
 
-            //drawingWire.name = $"Wire_{startPoint.transform.parent.name}_to_{endPoint.transform.parent.name}";
-            drawingWire.gameObject.tag = "Wire";
+        // 4. 기존 전선과 임시 전선을 파괴합니다.
+        Destroy(targetWire.gameObject);
+        Wire drawingWireInfo = drawingWire.GetComponent<Wire>();
+        ConnectionPoint newPointC = drawingWireInfo.connectedPoints[0];
+        Destroy(drawingWire.gameObject);
+        junctionPreview = null;
 
-            // 3. 기존 전선에 새로운 점을 삽입하여 T자 형태 만들기
-            Vector3 newPointInLocalSpace = targetWire.transform.InverseTransformPoint(closestPointOnLine);
+        // 5. 복사해둔 경로를 분할하여 새 전선 3개를 생성합니다.
 
-            List<Vector3> points = new List<Vector3>();
-            Vector3[] existingPoints = new Vector3[targetWire.positionCount];
-            targetWire.GetPositions(existingPoints);
-            points.AddRange(existingPoints);
+        // 5a. 새 전선 1 (A -> Junction): 원본 경로의 앞부분을 계승합니다.
+        List<Vector3> pathForA = originalPathPoints.Take(closestSegmentIndex + 1).ToList();
+        pathForA.Add(snappedJunctionPos);
+        CreateWireWithPath(originalPointA, junctionPoint, pathForA);
 
-            points.Insert(closestSegmentIndex + 1, newPointInLocalSpace);
+        // 5b. 새 전선 2 (B -> Junction): 원본 경로의 뒷부분을 계승합니다.
+        List<Vector3> pathForB = originalPathPoints.Skip(closestSegmentIndex + 1).ToList();
+        pathForB.Insert(0, snappedJunctionPos);
+        CreateWireWithPath(originalPointB, junctionPoint, pathForB);
 
-            //targetWire.positionCount = points.Count;
-            //targetWire.SetPositions(points.ToArray());
+        // 5c. 새 전선 3 (C -> Junction): '방금까지 그리던' 경로를 계승합니다.
+        LineRenderer drawingLineRenderer = drawingWire.GetComponent<LineRenderer>();
+        Vector3[] drawingPathPoints = new Vector3[drawingLineRenderer.positionCount];
+        drawingLineRenderer.GetPositions(drawingPathPoints);
 
-            ColliderSetting();
+        List<Vector3> pathForC = drawingPathPoints.ToList();
+        // 경로의 마지막 지점(마우스 커서 위치)을 최종 분기점 위치로 교체합니다.
+        pathForC[pathForC.Count - 1] = snappedJunctionPos;
 
-            // TODO: ElectricalComponent의 연결 정보(connections)도 업데이트하는 로직 필요
-        }
+        CreateWireWithPath(newPointC, junctionPoint, pathForC);
     }
+
 
     // 선분(p1-p2) 위의 점 중 clickPosition에서 가장 가까운 점을 찾는 함수
     private Vector3 FindNearestPointOnLineSegment(Vector3 p1, Vector3 p2, Vector3 clickPosition)
@@ -578,8 +366,6 @@ public class WireManager : MonoBehaviour
 
         return p1 + lineDirection * projectionLength;
     }
-
-    private Vector3 PosToV3(Vector3 v) => new Vector3(v.x, v.y, 0);
 
     private Vector2 WorldToLocal(Vector3 worldPos)
     {
@@ -630,5 +416,40 @@ public class WireManager : MonoBehaviour
 
         // 가장 가까운 전선과의 거리가 스냅 반경 안에 있을 때만 true 반환
         return minDistance < junctionSnapRadius;
+    }
+
+    /// <summary>
+    /// 지정된 경로(points)를 사용하여 새로운 Wire를 생성하는 헬퍼 함수입니다.
+    /// </summary>
+    private void CreateWireWithPath(ConnectionPoint startPoint, ConnectionPoint endPoint, List<Vector3> pathPoints)
+    {
+        // 1. 새 Wire 오브젝트 생성
+        var wireObject = new GameObject($"Wire_{startPoint.parentComponent.name}_to_{endPoint.parentComponent.name}");
+        wireObject.transform.SetParent(content_2D, false);
+        wireObject.tag = "Wire";
+
+        // 2. LineRenderer 설정 및 경로 적용
+        var lr = wireObject.AddComponent<LineRenderer>();
+        lr.useWorldSpace = false;
+        lr.startWidth = wireWidth; lr.endWidth = wireWidth;
+        lr.material = new Material(Shader.Find("Legacy Shaders/Particles/Alpha Blended Premultiply"));
+        lr.startColor = lineColor; lr.endColor = lineColor;
+        lr.sortingOrder = 1;
+
+        lr.positionCount = pathPoints.Count;
+        lr.SetPositions(pathPoints.ToArray());
+
+        // 3. Wire 컴포넌트 설정
+        var newWire = wireObject.AddComponent<Wire>();
+        newWire.connectedPoints.Add(startPoint);
+        newWire.connectedPoints.Add(endPoint);
+
+        // 4. EdgeCollider2D 설정
+        var edgeCollider = wireObject.AddComponent<EdgeCollider2D>();
+        Vector2[] colliderPoints = pathPoints.Select(p => new Vector2(p.x, p.y)).ToArray();
+        edgeCollider.points = colliderPoints;
+
+        // 5. CircuitGraph에 최종 연결 등록
+        CircuitGraph.Instance.RegisterConnection(startPoint.parentComponent, endPoint.parentComponent);
     }
 }

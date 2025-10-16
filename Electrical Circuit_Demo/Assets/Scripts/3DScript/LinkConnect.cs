@@ -7,7 +7,6 @@ using UnityEngine.UI;
 public class LinkConnect : MonoBehaviour
 {
     public Button linkBtn;
-    // public GameObject content3d; // ObjectManager에서 관리하므로 더 이상 필요 없을 수 있습니다.
 
     private void Start()
     {
@@ -77,21 +76,33 @@ public class LinkConnect : MonoBehaviour
         var comp3D = obj_3d.GetComponent<ElectricalComponent>();
         if (comp2D == null || comp3D == null) return false;
 
-        // ✨ 연결된 전선의 개수를 connections.Count로 비교합니다.
-        if (comp2D.connections.Count != comp3D.connections.Count)
+        // 2. CircuitGraph에 각 부품이 속한 '연결 그룹(Net)'을 물어봅니다.
+        HashSet<ElectricalComponent> net2D = CircuitGraph.Instance.GetNetFor(comp2D);
+        HashSet<ElectricalComponent> net3D = CircuitGraph.Instance.GetNetFor(comp3D);
+
+        // 3. 그룹 상태를 비교합니다.
+        // Case A: 둘 다 아무것과도 연결되지 않은 경우 -> 일치
+        if (net2D == null && net3D == null)
+        {
+            return true;
+        }
+        // Case B: 하나는 연결됐는데 다른 하나는 안된 경우 -> 불일치
+        if (net2D == null || net3D == null)
+        {
+            return false;
+        }
+        // Case C: 두 그룹의 멤버 수가 다른 경우 -> 불일치
+        if (net2D.Count != net3D.Count)
         {
             return false;
         }
 
-        if (comp2D.connections.Count == 0)
-        {
-            return true;
-        }
+        // 4. 두 그룹의 멤버들의 태그 목록을 만들어 비교합니다.
+        //    (순서에 상관없이 내용물이 같은지 확인하기 위해 정렬 후 비교)
+        var connectedTags2D = net2D.Select(c => c.tag).OrderBy(tag => tag).ToList();
+        var connectedTags3D = net3D.Select(c => c.tag).OrderBy(tag => tag).ToList();
 
-        // ✨ connections 리스트에서 연결된 부품들의 태그 목록을 만들어 비교합니다.
-        var connectedTags2D = comp2D.connections.Select(c => c.connectedComponent.tag).OrderBy(tag => tag).ToList();
-        var connectedTags3D = comp3D.connections.Select(c => c.connectedComponent.tag).OrderBy(tag => tag).ToList();
-
+        // 5. 두 태그 목록이 정확히 일치하는지 확인하여 결과를 반환합니다.
         return connectedTags2D.SequenceEqual(connectedTags3D);
     }
 
