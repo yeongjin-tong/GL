@@ -15927,6 +15927,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1697371288}
   - component: {fileID: 1697371289}
+  - component: {fileID: 1697371290}
   m_Layer: 0
   m_Name: InputManager
   m_TagString: Untagged
@@ -15962,6 +15963,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   uiRaycaster: {fileID: 1624511021}
+--- !u!114 &1697371290
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1697371287}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40739b98beddf1d4badc829539781291, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  selectionColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
 --- !u!1 &1699093195
 GameObject:
   m_ObjectHideFlags: 0

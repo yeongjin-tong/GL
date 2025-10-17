@@ -5,6 +5,8 @@ using System.Net;
 
 public class WireManager : MonoBehaviour
 {
+    public static WireManager Instance { get; private set; }
+
     [Tooltip("Wire 생성 위치")]
     public Transform content_2D;
 
@@ -35,6 +37,12 @@ public class WireManager : MonoBehaviour
     private Vector3 junctionPoint;
 
     private int junctionIndex = 0;
+
+    void Awake()
+    {
+        if (Instance != null) { Destroy(gameObject); return; }
+        Instance = this;
+    }
 
     private void Start()
     {
@@ -451,5 +459,142 @@ public class WireManager : MonoBehaviour
 
         // 5. CircuitGraph에 최종 연결 등록
         CircuitGraph.Instance.RegisterConnection(startPoint.parentComponent, endPoint.parentComponent);
+    }
+
+    /// <summary>
+    /// 움직인 부품에 연결된 모든 전선을 다시 그립니다.
+    /// </summary>
+    public void RedrawWiresForComponent(ElectricalComponent movedComponent)
+    {
+        if (movedComponent == null) return;
+
+        // FindObjectsOfType은 무거우므로, allWires 리스트를 직접 관리하는 것이 더 효율적입니다.
+        Wire[] allWires = FindObjectsOfType<Wire>();
+
+        foreach (var wire in allWires)
+        {
+            if (wire.ConnectedComponents.Contains(movedComponent))
+            {
+                RedrawWire(wire);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 주어진 Wire의 경로를 연결된 포트의 현재 위치에 맞춰 다시 계산하고 그립니다.
+    /// (StraightenPath를 사용하도록 수정)
+    /// </summary>
+    public void RedrawWire(Wire wireToRedraw)
+    {
+        LineRenderer lr = wireToRedraw.GetComponent<LineRenderer>();
+        if (lr == null) return;
+
+        // 1. 현재 LineRenderer의 경로(사용자가 그린 모양)를 그대로 가져옵니다.
+        Vector3[] currentPath = new Vector3[lr.positionCount];
+        lr.GetPositions(currentPath);
+
+        // 2. 시작점과 끝점의 현재 위치를 반영하여 경로를 업데이트합니다.
+        if (wireToRedraw.connectedPoints.Count > 0)
+        {
+            currentPath[0] = WorldToLocal(wireToRedraw.connectedPoints.First().transform.position);
+            currentPath[currentPath.Length - 1] = WorldToLocal(wireToRedraw.connectedPoints.Last().transform.position);
+        }
+
+        // 3. StraightenPath 함수로 경로를 보기 좋게 직선화합니다.
+        List<Vector3> straightenedPath = StraightenPath(currentPath);
+
+        // 4. 직선화된 새 경로를 LineRenderer와 EdgeCollider에 적용합니다.
+        lr.positionCount = straightenedPath.Count;
+        lr.SetPositions(straightenedPath.ToArray());
+
+        currentWire = lr;
+        ColliderSetting();
+        currentWire = null;
+    }
+
+    /// <summary>
+    /// 사용자가 그린 자유로운 경로를 직각/직선 경로로 변환(직선화)합니다.
+    /// </summary>
+    /// <param name="originalPath">LineRenderer에서 가져온 원본 경로</param>
+    /// <returns>직선화된 새로운 경로</returns>
+    private List<Vector3> StraightenPath(Vector3[] originalPath)
+    {
+        if (originalPath == null || originalPath.Length < 2)
+        {
+            return originalPath?.ToList() ?? new List<Vector3>();
+        }
+
+        List<Vector3> newPath = new List<Vector3>();
+        newPath.Add(originalPath[0]); // 시작점은 그대로 추가
+
+        // 경로의 각 점들을 순회하며 코너점 생성
+        for (int i = 0; i < originalPath.Length - 1; i++)
+        {
+            Vector3 currentPoint = newPath.Last(); // 새 경로의 마지막 점
+            Vector3 nextPoint = originalPath[i + 1];    // 원본 경로의 다음 목표점
+
+            // 현재 점과 목표점의 x, y 차이 계산
+            float deltaX = Mathf.Abs(currentPoint.x - nextPoint.x);
+            float deltaY = Mathf.Abs(currentPoint.y - nextPoint.y);
+
+            // 이전 경로의 방향을 확인하여 꺾이는 방향 결정 (옵션)
+            Vector3 lastSegmentDir = (newPath.Count > 1) ? (newPath.Last() - newPath[newPath.Count - 2]).normalized : Vector3.zero;
+
+            // 기본적으로 수평/수직 중 더 많이 움직인 쪽으로 먼저 이동
+            // (더 자연스러운 경로를 위해 이전 경로 방향을 고려)
+            if ((deltaX > deltaY && lastSegmentDir.y == 0) || (deltaY <= deltaX && lastSegmentDir.x != 0)) // 수평으로 먼저 이동
+            {
+                if (Mathf.Abs(currentPoint.x - nextPoint.x) > 0.01f)
+                    newPath.Add(new Vector3(nextPoint.x, currentPoint.y, 0));
+            }
+            else // 수직으로 먼저 이동
+            {
+                if (Mathf.Abs(currentPoint.y - nextPoint.y) > 0.01f)
+                    newPath.Add(new Vector3(currentPoint.x, nextPoint.y, 0));
+            }
+
+            newPath.Add(nextPoint); // 최종 목표점 추가
+        }
+
+        // 생성된 경로에서 불필요한 점들(일직선 위의 점)을 제거하여 최적화
+        return OptimizePath(newPath);
+    }
+
+    /// <summary>
+    /// 주어진 경로(path)에서 일직선상에 있는 불필요한 중간 점들을 제거합니다.
+    /// </summary>
+    /// <param name="path">최적화할 점들의 리스트</param>
+    /// <returns>최적화된 점들의 리스트</returns>
+    private List<Vector3> OptimizePath(List<Vector3> path)
+    {
+        // 점이 3개 미만이면 최적화할 필요가 없음
+        if (path.Count < 3)
+        {
+            return path;
+        }
+
+        List<Vector3> optimizedPath = new List<Vector3>();
+        optimizedPath.Add(path[0]); // 첫 번째 점은 항상 포함
+
+        // 1번 인덱스부터 마지막에서 두 번째 점까지 순회 (중간점들만 검사)
+        for (int i = 1; i < path.Count - 1; i++)
+        {
+            // 이전 점에서 현재 점으로의 방향 벡터
+            Vector3 prevDir = (path[i] - path[i - 1]).normalized;
+            // 현재 점에서 다음 점으로의 방향 벡터
+            Vector3 nextDir = (path[i + 1] - path[i]).normalized;
+
+            // 두 방향 벡터의 거리를 계산하여 방향이 다른지(꺾이는 지점인지) 확인
+            // 거리가 0에 가까우면 같은 방향(일직선)을 의미
+            if (Vector3.Distance(prevDir, nextDir) > 0.01f)
+            {
+                // 방향이 다를 경우, 현재 점은 꺾이는 지점이므로 경로에 추가
+                optimizedPath.Add(path[i]);
+            }
+        }
+
+        optimizedPath.Add(path.Last()); // 마지막 점은 항상 포함
+
+        return optimizedPath;
     }
 }

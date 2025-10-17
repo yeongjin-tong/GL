@@ -28,7 +28,6 @@ public class ButtonController : MonoBehaviour
 
 
     private bool pinisOn;
-    private GameObject deleteObj;
     public Transform space_2d;
     public GameObject helpPanel;
     [Header("3D 화면")]
@@ -42,8 +41,7 @@ public class ButtonController : MonoBehaviour
 
     private void Awake()
     {
-        initBtn.onClick.AddListener(ObjectInit);
-        
+        initBtn.onClick.AddListener(ObjectInit_2d);
         selectBtn_3d.onClick.AddListener(() => ModeSelect(1) );
         selectBtn_2d.onClick.AddListener(() => ModeSelect(2) );
         window_2dBtn.onClick.AddListener(WindowScreen_2d);
@@ -63,92 +61,18 @@ public class ButtonController : MonoBehaviour
         SimulationBtnAdd();
     }
 
-    private void OnEnable()
-    {
-        if (InputManager.Instance != null)
-        {
-            InputManager.Instance.OnPhysicsObjectClicked += HandlePhysicsClick;
-            InputManager.Instance.OnDeleteKeyPressed += HandleDeleteKey;
-        }
-    }
-
-    private void OnDisable()
-    {
-        if (InputManager.Instance != null)
-        {
-            InputManager.Instance.OnPhysicsObjectClicked -= HandlePhysicsClick;
-            InputManager.Instance.OnDeleteKeyPressed -= HandleDeleteKey;
-        }
-    }
-
     private void Start()
     {
         ModeSelect(0);
-
         pinisOn = false;
     }
 
-    // ✨ 물리 오브젝트 클릭 방송을 수신하여 처리
-    private void HandlePhysicsClick(Collider2D hit)
+    private void ObjectInit_2d()
     {
-        // 모든 오브젝트 아웃라인 초기화
-        DeselectAll();
-
-        if (hit != null)
+        
+        foreach(Transform chird in space_2d)
         {
-            // 부품 또는 전선이 클릭된 경우
-            if (hit.gameObject.name.Contains("Clone") || hit.gameObject.CompareTag("Wire")) // 전선 태그(Wire) 추가
-            {
-                SelectObject(hit.gameObject);
-            }
-        }
-        else // 허공 클릭 시
-        {
-            deleteObj = null;
-        }
-    }
-
-    // ✨ Delete 키 입력 방송을 수신하여 처리
-    private void HandleDeleteKey()
-    {
-        if (deleteObj != null)
-        {
-            Destroy(deleteObj);
-            deleteObj = null;
-        }
-    }
-
-    private void DeselectAll()
-    {
-        GameObject[] allObjects = FindObjectsOfType<GameObject>();
-        foreach (GameObject obj in allObjects)
-        {
-            if (obj.name.Contains("Clone"))
-            {
-                if (obj.GetComponent<Outline>() != null) obj.GetComponent<Outline>().enabled = false;
-            }
-            if (obj.CompareTag("Wire"))
-            {
-                if (obj.GetComponent<LineRenderer>() != null)
-                {
-                    obj.GetComponent<LineRenderer>().startColor = Color.gray;
-                    obj.GetComponent<LineRenderer>().endColor = Color.gray;
-                }
-            }
-        }
-    }
-
-    private void SelectObject(GameObject objToSelect)
-    {
-        deleteObj = objToSelect;
-        if (deleteObj.GetComponent<Outline>() != null)
-        {
-            deleteObj.GetComponent<Outline>().enabled = true;
-        }
-        if (deleteObj.GetComponent<LineRenderer>() != null)
-        {
-            deleteObj.GetComponent<LineRenderer>().startColor = Color.yellow;
-            deleteObj.GetComponent<LineRenderer>().endColor = Color.yellow;
+            Destroy(chird.gameObject);
         }
     }
 
