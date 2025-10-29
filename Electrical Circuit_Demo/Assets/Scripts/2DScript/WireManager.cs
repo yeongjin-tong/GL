@@ -29,14 +29,16 @@ public class WireManager : MonoBehaviour
     [Tooltip("전선 분기점에 표시될 프리팹 (예: 작은 원 모양의 스프라이트)")]
     public GameObject junctionPrefab;
     [Tooltip("분기점 스냅이 작동할 반경")]
-    public float junctionSnapRadius = 0.5f;
+    public float junctionSnapRadius = 0.2f;
 
-    // ✨ 현재 화면에 표시된 가상 접점 오브젝트
+    //  현재 화면에 표시된 가상 접점 오브젝트
     private GameObject junctionPreview;
-    // ✨ 가상 접점의 위치
+    //  가상 접점의 위치
     private Vector3 junctionPoint;
 
     private int junctionIndex = 0;
+    // 가장 가까운 전선으로 감지된 오브젝트의 Transform
+    private Transform nearestWireForPreview;
 
     void Awake()
     {
@@ -82,6 +84,14 @@ public class WireManager : MonoBehaviour
     // InputManager의 방송을 수신하여 처리하는 함수
     private void HandlePhysicsClick(Collider2D hit)
     {
+        if (isDrawing() && junctionPreview != null && nearestWireForPreview != null)
+        {
+            Debug.Log("Junction preview 클릭! 병렬 연결을 시작합니다.");
+            ConnectToExistingWire(currentWire, nearestWireForPreview, GetMouseWorldPosition());
+            ResetState();
+            return; // 여기서 함수를 종료하여 아래 로직이 실행되지 않도록 함
+        }
+
         if (hit == null && firstPoint != null)
         {
             // 마우스 위치를 로컬 좌표로 변환하고 그리드에 스냅
@@ -181,17 +191,15 @@ public class WireManager : MonoBehaviour
         Vector2 snappedLocalPos = gridManager.SnapToGrid(localMousePos);
 
         // 1. 마우스 주변에 가장 가까운 전선 위의 점을 찾습니다. (월드 좌표 기준)
-        bool foundJunctionPointOnWire = FindNearestPointOnAllWires(mouseWorld, out junctionPoint);
+        bool foundJunctionPointOnWire = FindNearestPointOnAllWires(mouseWorld, out junctionPoint, out nearestWireForPreview);
 
         // 2. 만약 가까운 전선을 찾았다면
         if (foundJunctionPointOnWire)
         {
-            // ✨ --- 이 부분이 핵심 수정 로직입니다 --- ✨
             // 2a. 찾은 월드 좌표(junctionPoint)를 UI 로컬 좌표로 변환합니다.
             Vector2 localJunctionPoint = WorldToLocal(junctionPoint);
             // 2b. 변환된 로컬 좌표를 그리드에 스냅하여 최종 접점 위치를 결정합니다.
             Vector2 snappedJunctionPos = gridManager.SnapToGrid(localJunctionPoint);
-            // ✨ --- 여기까지 수정 --- ✨
 
             // 가상 접점 오브젝트가 없다면 새로 생성
             if (junctionPreview == null)
@@ -216,12 +224,11 @@ public class WireManager : MonoBehaviour
                 Destroy(junctionPreview);
                 junctionPreview = null;
             }
+            nearestWireForPreview = null;
         }
 
-        // ✨ 마지막으로 고정된 지점을 가져옴
         Vector3 lastFixedPoint = wire.GetPosition(clickIndex);
 
-        // ✨ 마지막 고정 지점과 스냅된 마우스 위치를 기준으로 L자 경로 계산
         //    (이전 경로의 방향을 고려하여 꺾이는 방향 결정)
         Vector3 previousSegment = (wire.positionCount > 2) ? (lastFixedPoint - wire.GetPosition(wire.positionCount - 3)) : Vector3.zero;
 
@@ -262,17 +269,17 @@ public class WireManager : MonoBehaviour
     private LineRenderer CreateWire()
     {
         var wireObject = new GameObject("Wire_Preview");
-        //wireObject.transform.parent = content_2D;
         wireObject.transform.SetParent(content_2D, false); // ✨ 월드 좌표 유지 없이 부모 설정
         wireObject.transform.localPosition = Vector3.zero;
 
         var lr = wireObject.AddComponent<LineRenderer>();
         lr.useWorldSpace = false;
 
-        // ✨ 시작점을 로컬 좌표로 변환하여 설정
         Vector2 startLocalPos = WorldToLocal(firstPoint.transform.position);
+        Vector2 snappedStartPos = gridManager.SnapToGrid(startLocalPos);
+
         lr.positionCount = 2; // 시작점 + 미리보기 끝점
-        lr.SetPosition(0, startLocalPos);
+        lr.SetPosition(0, snappedStartPos);
 
         lr.startWidth = wireWidth; lr.endWidth = wireWidth;         
         lr.material = new Material(Shader.Find("Legacy Shaders/Particles/Alpha Blended Premultiply"));
@@ -294,9 +301,27 @@ public class WireManager : MonoBehaviour
 
         if (targetWire == null || targetLineRenderer == null) return;
 
-        // 1. 분기점이 될 위치를 계산하고 그리드에 스냅합니다.
-        Vector2 localClickPos = WorldToLocal(clickPosition);
-        Vector2 snappedJunctionPos = gridManager.SnapToGrid(localClickPos);
+        Vector2 snappedJunctionPos;
+        Vector3 worldPositionToSplit; // 분할 지점을 찾기 위한 월드 좌표
+
+        // 1. junctionPreview가 존재한다면, clickPosition을 무시하고
+        //    junctionPreview의 '이미 스냅된' 로컬 좌표를 사용합니다.
+        if (junctionPreview != null)
+        {
+            snappedJunctionPos = junctionPreview.GetComponent<RectTransform>().anchoredPosition;
+            // 로컬 좌표를 다시 월드 좌표로 변환하여 '가장 가까운 선분'을 찾는 데 사용합니다.
+            worldPositionToSplit = junctionPreview.transform.position;
+        }
+        else
+        {
+            // 2. junctionPreview가 없다면 (fallback, 예: 전선을 직접 클릭), 
+            //    기존처럼 clickPosition을 기반으로 위치를 계산합니다.
+            Vector2 localClickPos = WorldToLocal(clickPosition);
+            snappedJunctionPos = gridManager.SnapToGrid(localClickPos);
+            worldPositionToSplit = clickPosition; // fallback은 그냥 마우스 월드 클릭 좌표
+        }
+
+        // --- (이하 로직은 'snappedJunctionPos'와 'worldPositionToSplit'를 사용) ---
 
         // 2a. 기존 전선의 전체 경로와 끝점 정보를 '복사'해둡니다.
         Vector3[] originalPathPoints = new Vector3[targetLineRenderer.positionCount];
@@ -304,15 +329,16 @@ public class WireManager : MonoBehaviour
         ConnectionPoint originalPointA = targetWire.connectedPoints[0];
         ConnectionPoint originalPointB = targetWire.connectedPoints[1];
 
-        // 2b. 경로에서 분기점에 가장 가까운 점의 인덱스를 찾습니다.
+        // 2b. 수정: 'worldPositionToSplit' (스냅된 프리뷰 위치)를 기준으로 가장 가까운 점의 인덱스를 찾습니다.
         int closestSegmentIndex = -1;
         float minDistance = float.MaxValue;
         for (int i = 0; i < originalPathPoints.Length - 1; i++)
         {
             Vector3 p1 = targetLineRenderer.transform.TransformPoint(originalPathPoints[i]);
             Vector3 p2 = targetLineRenderer.transform.TransformPoint(originalPathPoints[i + 1]);
-            Vector3 pointOnSegment = FindNearestPointOnLineSegment(p1, p2, clickPosition);
-            float distance = Vector3.Distance(clickPosition, pointOnSegment);
+            // clickPosition 대신 worldPositionToSplit 사용
+            Vector3 pointOnSegment = FindNearestPointOnLineSegment(p1, p2, worldPositionToSplit);
+            float distance = Vector3.Distance(worldPositionToSplit, pointOnSegment); // ✨ clickPosition 대신 worldPositionToSplit 사용
 
             if (distance < minDistance)
             {
@@ -323,12 +349,13 @@ public class WireManager : MonoBehaviour
 
         // 3. 분기점(Junction) 오브젝트를 생성합니다.
         junctionIndex++;
-        var junctionObj = junctionPreview;
+        //  junctionPreview가 있으면 재활용하고, 없으면 새로 만듭니다.
+        var junctionObj = (junctionPreview != null) ? junctionPreview : Instantiate(junctionPrefab);
         junctionObj.name = "Junction_" + junctionIndex;
         junctionObj.transform.SetParent(content_2D, false);
         junctionObj.GetComponent<RectTransform>().anchoredPosition = snappedJunctionPos;
-        var junctionComp = junctionObj.AddComponent<Junction>();
         var junctionPoint = junctionObj.AddComponent<ConnectionPoint>();
+        var junctionComp = junctionObj.AddComponent<Junction>();
         junctionPoint.parentComponent = junctionComp;
 
         // 4. 기존 전선과 임시 전선을 파괴합니다.
@@ -336,9 +363,10 @@ public class WireManager : MonoBehaviour
         Wire drawingWireInfo = drawingWire.GetComponent<Wire>();
         ConnectionPoint newPointC = drawingWireInfo.connectedPoints[0];
         Destroy(drawingWire.gameObject);
-        junctionPreview = null;
+        junctionPreview = null; // ✨ junctionObj로 재활용되었거나, 어쨌든 비워야 함
 
         // 5. 복사해둔 경로를 분할하여 새 전선 3개를 생성합니다.
+        // (이하 모든 로직은 이미 'snappedJunctionPos'를 사용하므로 올바르게 동작합니다)
 
         // 5a. 새 전선 1 (A -> Junction): 원본 경로의 앞부분을 계승합니다.
         List<Vector3> pathForA = originalPathPoints.Take(closestSegmentIndex + 1).ToList();
@@ -356,7 +384,6 @@ public class WireManager : MonoBehaviour
         drawingLineRenderer.GetPositions(drawingPathPoints);
 
         List<Vector3> pathForC = drawingPathPoints.ToList();
-        // 경로의 마지막 지점(마우스 커서 위치)을 최종 분기점 위치로 교체합니다.
         pathForC[pathForC.Count - 1] = snappedJunctionPos;
 
         CreateWireWithPath(newPointC, junctionPoint, pathForC);
@@ -393,9 +420,10 @@ public class WireManager : MonoBehaviour
         return currentWire != null;
     }
 
-    private bool FindNearestPointOnAllWires(Vector3 position, out Vector3 nearestPoint)
+    private bool FindNearestPointOnAllWires(Vector3 position, out Vector3 nearestPoint, out Transform nearestWireTransform)
     {
         nearestPoint = Vector3.zero;
+        nearestWireTransform = null;
         float minDistance = float.MaxValue;
 
         // 씬의 모든 Wire 태그를 가진 전선을 찾음
@@ -418,6 +446,8 @@ public class WireManager : MonoBehaviour
                 {
                     minDistance = distance;
                     nearestPoint = pointOnSegment;
+                    nearestWireTransform = wireObject.transform;
+                                
                 }
             }
         }
@@ -429,7 +459,7 @@ public class WireManager : MonoBehaviour
     /// <summary>
     /// 지정된 경로(points)를 사용하여 새로운 Wire를 생성하는 헬퍼 함수입니다.
     /// </summary>
-    private void CreateWireWithPath(ConnectionPoint startPoint, ConnectionPoint endPoint, List<Vector3> pathPoints)
+    public void CreateWireWithPath(ConnectionPoint startPoint, ConnectionPoint endPoint, List<Vector3> pathPoints)
     {
         // 1. 새 Wire 오브젝트 생성
         var wireObject = new GameObject($"Wire_{startPoint.parentComponent.name}_to_{endPoint.parentComponent.name}");
@@ -475,38 +505,82 @@ public class WireManager : MonoBehaviour
         {
             if (wire.ConnectedComponents.Contains(movedComponent))
             {
-                RedrawWire(wire);
+                RedrawWire(wire, movedComponent);
             }
         }
     }
 
     /// <summary>
-    /// 주어진 Wire의 경로를 연결된 포트의 현재 위치에 맞춰 다시 계산하고 그립니다.
-    /// (StraightenPath를 사용하도록 수정)
+    /// (핵심 수정) 사용자의 '자연스러운 드래그' 규칙을 적용하여 선을 다시 그립니다.
     /// </summary>
-    public void RedrawWire(Wire wireToRedraw)
+    public void RedrawWire(Wire wireToRedraw, ElectricalComponent movedComponent)
     {
         LineRenderer lr = wireToRedraw.GetComponent<LineRenderer>();
         if (lr == null) return;
 
-        // 1. 현재 LineRenderer의 경로(사용자가 그린 모양)를 그대로 가져옵니다.
+        // 1. 현재 경로와 점들의 개수를 가져옵니다.
         Vector3[] currentPath = new Vector3[lr.positionCount];
         lr.GetPositions(currentPath);
+        int pointCount = currentPath.Length;
 
-        // 2. 시작점과 끝점의 현재 위치를 반영하여 경로를 업데이트합니다.
-        if (wireToRedraw.connectedPoints.Count > 0)
+        ConnectionPoint movedPoint = wireToRedraw.connectedPoints[1];
+        foreach(var point in wireToRedraw.connectedPoints)
         {
-            currentPath[0] = WorldToLocal(wireToRedraw.connectedPoints.First().transform.position);
-            currentPath[currentPath.Length - 1] = WorldToLocal(wireToRedraw.connectedPoints.Last().transform.position);
+            if(movedComponent == point.parentComponent)
+            {
+                movedPoint = point;
+            }
         }
 
-        // 3. StraightenPath 함수로 경로를 보기 좋게 직선화합니다.
-        List<Vector3> straightenedPath = StraightenPath(currentPath);
+        // 2. 경로가 너무 짧으면(직선이거나 점이 없으면) 이 로직을 적용할 수 없습니다.
+        if (pointCount < 3)
+        {
+            // 이 경우, 그냥 끝점만 업데이트합니다.
+            if (wireToRedraw.connectedPoints[0] == movedPoint)
+                currentPath[0] = WorldToLocal(movedPoint.transform.position);
+            else
+                currentPath[pointCount - 1] = WorldToLocal(movedPoint.transform.position);
 
-        // 4. 직선화된 새 경로를 LineRenderer와 EdgeCollider에 적용합니다.
-        lr.positionCount = straightenedPath.Count;
-        lr.SetPositions(straightenedPath.ToArray());
+            lr.SetPositions(currentPath);
 
+            currentWire = lr;
+            ColliderSetting();
+            currentWire = null;
+            return;
+        }
+
+        // 3. 움직이는 끝점(End)과 팔꿈치(Elbow)의 인덱스를 찾습니다.
+        bool isEndMoving = (wireToRedraw.connectedPoints.Last() == movedPoint);
+        int endIndex = isEndMoving ? (pointCount - 1) : 0;
+        int elbowIndex = isEndMoving ? (pointCount - 2) : 1;
+
+        // 4. 새 끝점(움직인 부품)의 로컬 좌표를 가져옵니다.
+        Vector2 newEndPos = WorldToLocal(movedPoint.transform.position);
+
+        // 5. 팔꿈치 점과 끝점의 원래 위치를 가져옵니다.
+        Vector3 elbowPos = currentPath[elbowIndex];
+        Vector3 oldEndPos = currentPath[endIndex];
+
+        // 6. 마지막 마디(Elbow -> End)가 수직이었는지 수평이었는지 판단합니다.
+        bool isFinalSegmentVertical = Mathf.Abs(elbowPos.x - oldEndPos.x) < 0.1f;
+
+        // 7. ✨ 사용자가 요청한 자연스러운 드래그 규칙을 적용합니다. ✨
+        if (isFinalSegmentVertical)
+        {
+            elbowPos.x = newEndPos.x;
+        }
+        else // 마지막 마디가 수평이었을 경우
+        {
+            elbowPos.y = newEndPos.y;
+        }
+
+        // 8. 계산된 새 위치를 경로에 반영합니다.
+        currentPath[elbowIndex] = elbowPos;
+        currentPath[endIndex] = newEndPos;
+
+        lr.SetPositions((OptimizePath(currentPath.ToList())).ToArray());
+
+        // 9. 콜라이더도 실시간으로 업데이트합니다.
         currentWire = lr;
         ColliderSetting();
         currentWire = null;
@@ -514,49 +588,73 @@ public class WireManager : MonoBehaviour
 
     /// <summary>
     /// 사용자가 그린 자유로운 경로를 직각/직선 경로로 변환(직선화)합니다.
+    /// (새로운 점을 추가하지 않고, 기존 점들의 X/Y 위치만 수정합니다)
     /// </summary>
     /// <param name="originalPath">LineRenderer에서 가져온 원본 경로</param>
     /// <returns>직선화된 새로운 경로</returns>
     private List<Vector3> StraightenPath(Vector3[] originalPath)
     {
-        if (originalPath == null || originalPath.Length < 2)
+        // 1. 경로가 너무 짧으면(코너가 없으면) 수정할 수 없으므로 원본 반환
+        if (originalPath == null || originalPath.Length < 3)
         {
             return originalPath?.ToList() ?? new List<Vector3>();
         }
 
-        List<Vector3> newPath = new List<Vector3>();
-        newPath.Add(originalPath[0]); // 시작점은 그대로 추가
+        // 2. 원본을 복사하여 새 경로 리스트를 생성. 이 리스트의 점들을 '수정'할 것입니다.
+        List<Vector3> newPath = originalPath.ToList();
 
-        // 경로의 각 점들을 순회하며 코너점 생성
-        for (int i = 0; i < originalPath.Length - 1; i++)
+        // 3. 첫 번째 세그먼트(P0 -> P1)가 수직/수평 중 어느 쪽에 더 가까운지 판단
+        float deltaX = Mathf.Abs(newPath[1].x - newPath[0].x);
+        float deltaY = Mathf.Abs(newPath[1].y - newPath[0].y);
+
+        // true: 수직 이동, false: 수평 이동
+        bool lastMoveWasVertical = (deltaY > deltaX);
+
+        // 4. 모든 '중간 점'(P1 ~ Pn-2)들을 순회하며 위치 수정
+        for (int i = 1; i < newPath.Count - 1; i++)
         {
-            Vector3 currentPoint = newPath.Last(); // 새 경로의 마지막 점
-            Vector3 nextPoint = originalPath[i + 1];    // 원본 경로의 다음 목표점
+            Vector3 pPrev = newPath[i - 1]; // 이전 점 (수정 완료됨)
+            Vector3 pCurrent = newPath[i];  // 현재 수정할 점
 
-            // 현재 점과 목표점의 x, y 차이 계산
-            float deltaX = Mathf.Abs(currentPoint.x - nextPoint.x);
-            float deltaY = Mathf.Abs(currentPoint.y - nextPoint.y);
-
-            // 이전 경로의 방향을 확인하여 꺾이는 방향 결정 (옵션)
-            Vector3 lastSegmentDir = (newPath.Count > 1) ? (newPath.Last() - newPath[newPath.Count - 2]).normalized : Vector3.zero;
-
-            // 기본적으로 수평/수직 중 더 많이 움직인 쪽으로 먼저 이동
-            // (더 자연스러운 경로를 위해 이전 경로 방향을 고려)
-            if ((deltaX > deltaY && lastSegmentDir.y == 0) || (deltaY <= deltaX && lastSegmentDir.x != 0)) // 수평으로 먼저 이동
+            // 4a. 마지막 코너(Pn-1)가 아닌 일반 코너일 경우
+            if (i < newPath.Count - 2)
             {
-                if (Mathf.Abs(currentPoint.x - nextPoint.x) > 0.01f)
-                    newPath.Add(new Vector3(nextPoint.x, currentPoint.y, 0));
+                if (lastMoveWasVertical) // 이전 이동이 '수직'이었으면
+                {
+                    // 이번 이동은 '수평'이 되어야 함
+                    pCurrent.y = pPrev.y;
+                    lastMoveWasVertical = false;
+                }
+                else // 이전 이동이 '수평'이었으면
+                {
+                    // 이번 이동은 '수직'이 되어야 함
+                    pCurrent.x = pPrev.x;
+                    lastMoveWasVertical = true;
+                }
             }
-            else // 수직으로 먼저 이동
+            // 4b. 마지막 코너(Pn-1)일 경우 (특별 처리)
+            else
             {
-                if (Mathf.Abs(currentPoint.y - nextPoint.y) > 0.01f)
-                    newPath.Add(new Vector3(currentPoint.x, nextPoint.y, 0));
+                Vector3 pNext = newPath[i + 1]; // 고정된 마지막 점
+                if (lastMoveWasVertical) // 이전 이동이 '수직'이었으면
+                {
+                    // 이번 코너는 수직(이전 기준) -> 수평(다음 기준) 코너가 되어야 함
+                    pCurrent.x = pPrev.x; // 수직 정렬
+                    pCurrent.y = pNext.y; // 수평 정렬
+                }
+                else // 이전 이동이 '수평'이었으면
+                {
+                    // 이번 코너는 수평(이전 기준) -> 수직(다음 기준) 코너가 되어야 함
+                    pCurrent.y = pPrev.y; // 수평 정렬
+                    pCurrent.x = pNext.x; // 수직 정렬
+                }
             }
 
-            newPath.Add(nextPoint); // 최종 목표점 추가
+            // 5. 수정된 위치를 리스트에 반영
+            newPath[i] = pCurrent;
         }
 
-        // 생성된 경로에서 불필요한 점들(일직선 위의 점)을 제거하여 최적화
+        // 6. 경로 수정 완료 후, 혹시 모를 일직선 점들을 제거합니다.
         return OptimizePath(newPath);
     }
 

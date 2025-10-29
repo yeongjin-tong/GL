@@ -3,7 +3,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(Switch))]
-public class UISwitchController : MonoBehaviour
+public class Switch_2d : MonoBehaviour
 {
     public Sprite[] state;
     private Switch selfSwitch;

@@ -1,29 +1,56 @@
+// RelayCoil.cs (새 스크립트 파일)
+using TMPro;
 using UnityEngine;
 
 public class RelayCoil : ElectricalComponent
 {
-    [Tooltip("이 코일과 연결된 스위치 부분을 인스펙터에서 지정합니다.")]
-    public RelaySwitch linkedSwitch;
+    [Tooltip("이 코일이 제어할 릴레이 스위치들의 ID입니다.")]
+    public string relayID;
 
-    // 코일에 전원이 들어왔을 때
+    /// <summary>
+    /// CircuitSolver에 의해 isLive와 isGrounded가 모두 true일 때 호출됩니다.
+    /// </summary>
     public override void PowerOn()
     {
-        base.PowerOn(); // isPowered = true;
-        if (linkedSwitch != null)
+        base.PowerOn();
+        ControlLinkedSwitches(true);
+    }
+
+    /// <summary>
+    /// CircuitSolver에 의해 전원이 끊겼을 때 호출됩니다.
+    /// </summary>
+    public override void PowerOff()
+    {
+        base.PowerOff();
+        ControlLinkedSwitches(false);
+    }
+
+    public override void OnSimulationStart()
+    {
+        foreach(TextMeshProUGUI tmp in gameObject.GetComponentsInChildren<TextMeshProUGUI>())
         {
-            // 연결된 스위치에게 켜지라고 명령
-            linkedSwitch.TurnOnByCoil();
+            if(tmp.name == "name_text")
+            {
+                relayID = tmp.text;
+            }
         }
     }
 
-    // 코일의 전원이 꺼졌을 때
-    public override void PowerOff()
+    /// <summary>
+    /// 이 코일과 연결된 모든 릴레이 스위치를 찾아 상태를 변경합니다.
+    /// </summary>
+    private void ControlLinkedSwitches(bool newState)
     {
-        base.PowerOff(); // isPowered = false;
-        if (linkedSwitch != null)
+        // 씬에 있는 모든 릴레이 스위치를 찾습니다.
+        RelaySwitch[] allSwitches = FindObjectsOfType<RelaySwitch>();
+
+        foreach (var sw in allSwitches)
         {
-            // 연결된 스위치에게 꺼지라고 명령
-            linkedSwitch.TurnOffByCoil();
+            // ID가 일치하는 스위치만 제어합니다.
+            if (sw.relayID == this.relayID)
+            {
+                sw.SetContactState(newState);
+            }
         }
     }
 }

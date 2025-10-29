@@ -53,7 +53,7 @@ public class SymbolPaletteController : MonoBehaviour
                         textObj.transform.localPosition = new Vector3(0f, 0f, 0f);
                         break;
                     case NamePosition.Right:
-                        textObj.transform.localPosition = new Vector3(75f, 0f, 0f);
+                        textObj.transform.localPosition = new Vector3(50f, 0f, 0f);
                         break;
                 }
                 

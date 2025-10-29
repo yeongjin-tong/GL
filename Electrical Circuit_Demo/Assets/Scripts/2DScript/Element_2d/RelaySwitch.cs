@@ -1,42 +1,42 @@
-﻿using UnityEngine;
+﻿// RelayContact.cs (새 스크립트 파일)
+using System;
+using TMPro;
+using UnityEngine;
 
-// ✨ 기존 Switch 스크립트를 상속받아 모든 기능을 물려받음
-public class RelaySwitch : Switch
+public class RelaySwitch : ElectricalComponent
 {
-    
-    // Awake나 Start에서 isOn의 초기값을 false로 설정하여 항상 꺼진 상태로 시작
-    void Awake()
+    [Tooltip("이 접점을 제어할 코일의 ID입니다.")]
+    public string relayID;
+
+    [Tooltip("접점의 현재 ON/OFF 상태. true = ON (Closed)")]
+    public bool isOn = false; // 기본값은 '열림' (꺼짐)
+
+    // 시각적 표현(UI 등)을 위한 이벤트
+    public event Action<bool> OnStateChanged;
+
+    /// <summary>
+    /// RelayCoil이 이 함수를 호출하여 스위치 상태를 강제로 변경합니다.
+    /// </summary>
+    public void SetContactState(bool newState)
     {
-        isOn = false;
+        // 이미 같은 상태이거나, 시뮬레이션 중이 아니면 무시 (무한 루프 방지)
+        if (isOn == newState || !SimulationManager.isSimulating) return;
+
+        isOn = newState;
+        OnStateChanged?.Invoke(isOn); // 시각 효과를 위해 이벤트 방송
+
+        // ✨ 중요: 상태가 바뀌었으니 회로 재분석 요청
+        CircuitSolver.Instance?.AnalyzeCircuit();
     }
 
-    // 사용자가 클릭하지 못하도록 OnMouseDown을 비워버림
-    void OnMouseDown()
+    public override void OnSimulationStart()
     {
-        // 릴레이 스위치는 코일로만 제어되므로 클릭에 반응하지 않음
-    }
-
-    // 코일로부터 켜지라는 명령을 받는 함수
-    public void TurnOnByCoil()
-    {
-        if (isOn) return; // 이미 켜져있으면 무시
-
-        isOn = true;
-
-        // 스위치가 켜졌으므로, 회로 전체를 다시 분석하도록 요청
-        if (CircuitSolver.Instance != null)
-            CircuitSolver.Instance.AnalyzeCircuit();
-    }
-
-    // 코일로부터 꺼지라는 명령을 받는 함수
-    public void TurnOffByCoil()
-    {
-        if (!isOn) return; // 이미 꺼져있으면 무시
-
-        isOn = false;
-
-        // 스위치가 꺼졌으므로, 회로 전체를 다시 분석하도록 요청
-        if (CircuitSolver.Instance != null)
-            CircuitSolver.Instance.AnalyzeCircuit();
+        foreach (TextMeshProUGUI tmp in gameObject.GetComponentsInChildren<TextMeshProUGUI>())
+        {
+            if (tmp.name == "name_text")
+            {
+                relayID = tmp.text;
+            }
+        }
     }
 }

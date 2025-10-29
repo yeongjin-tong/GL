@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class SimulationManager : MonoBehaviour
@@ -22,23 +24,32 @@ public class SimulationManager : MonoBehaviour
                 isSimulating = true;
                 break;
         }
-
+        
         // 시뮬레이션이 켜질 때
         if (isSimulating)
         {
+            ObjectManager.Instance.CleanUpList();
+
+            foreach(GameObject component in ObjectManager.Instance.objects_2d)
+            {
+                if(component.GetComponent<ElectricalComponent>() != null)
+                {
+                    component.GetComponent<ElectricalComponent>().OnSimulationStart();
+                }
+            }
+
             // 이전과 동일하게 회로를 분석해서 켤 부품들을 찾습니다.
             CircuitSolver.Instance.AnalyzeCircuit();
         }
         // 시뮬레이션이 꺼질 때 (수정된 로직)
         else
         {
-            // 씬에 있는 모든 전기 부품을 강제로 찾습니다.
-            ElectricalComponent[] allComponents = FindObjectsOfType<ElectricalComponent>();
-
-            // 각 부품의 PowerOff() 함수를 직접 호출하여 확실하게 끕니다.
-            foreach (var component in allComponents)
+            foreach (GameObject component in ObjectManager.Instance.objects_2d)
             {
-                component.OnSimulationStop();
+                if (component.GetComponent<ElectricalComponent>() != null)
+                {
+                    component.GetComponent<ElectricalComponent>().OnSimulationStop();
+                }
             }
 
             // 모든 전선의 색상을 리셋하도록 추가

@@ -1,5 +1,8 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.UI;
+using System.Linq;
+using System.Collections;
 
 public class SymbolController : MonoBehaviour
 {
@@ -119,20 +122,58 @@ public class SymbolController : MonoBehaviour
 
     private void HandleDeleteKey()
     {
-        if (selectedObject != null)
-        {
-            // TODO: 부품 삭제 시, 연결된 모든 전선도 함께 삭제하는 로직 추가 필요
-            //       (WireManager에 관련 함수를 만들어서 호출하는 것을 추천)
+        if (selectedObject == null) return;
 
-            // CircuitGraph에서 해당 부품 정보 제거
+        Wire wireToDelete = selectedObject.GetComponent<Wire>();
+
+        if (wireToDelete != null)
+        {
+            List<Junction> connectedJunctions = new List<Junction>();
+            foreach(var point in wireToDelete.connectedPoints)
+            {
+                if(point.parentComponent is Junction junction)
+                {
+                    connectedJunctions.Add(junction);
+                }
+            }
+
+            Destroy(selectedObject);
+            selectedObject = null;
+
+            if (connectedJunctions.Count > 0)
+            {
+                StartCoroutine(DelayedCheckAndHeal(connectedJunctions));
+            }
+        }
+        else
+        {
             var comp = selectedObject.GetComponent<ElectricalComponent>();
             if (comp != null)
             {
                 CircuitGraph.Instance.RemoveComponent(comp);
             }
-
             Destroy(selectedObject);
             selectedObject = null;
+        }
+    }
+
+    // ✨ --- 새로 추가할 코루틴 함수 --- ✨
+    /// <summary>
+    /// 지정된 Junction들에 대해 한 프레임 뒤에 CheckAndHeal을 호출합니다.
+    /// </summary>
+    private IEnumerator DelayedCheckAndHeal(List<Junction> junctionsToCheck)
+    {
+        // yield return null; // 다음 프레임까지 기다립니다.
+        yield return new WaitForEndOfFrame(); // 현재 프레임 렌더링 끝까지 기다립니다 (더 확실)
+
+        // 이제 삭제될 전선이 완전히 제거된 시점입니다.
+        foreach (var junction in junctionsToCheck)
+        {
+            // Junction이 다른 동작에 의해 이미 파괴되었을 수도 있으므로 null 체크
+            if (junction != null)
+            {
+                junction.CheckAndHeal();
+            }
         }
     }
 
