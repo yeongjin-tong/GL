@@ -30,13 +30,13 @@ public class Switch3D : MonoBehaviour
     private void OnMouseDown()
     {
         // 마스터 스위치의 Toggle 함수를 호출
-        selfSwitch.Toggle();
+        selfSwitch.SetState(!selfSwitch.isOn, true);
     }
 
     private void OnMouseUp()
     {
         // 마스터 스위치의 Toggle 함수를 호출
-        selfSwitch.Toggle();
+        selfSwitch.SetState(!selfSwitch.isOn, true);
     }
 
     private void UpdateVisuals(bool isOn)

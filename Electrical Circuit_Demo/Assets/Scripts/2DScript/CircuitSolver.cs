@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
-using System.Collections;
-using Unity.VisualScripting;
 
 public class CircuitSolver : MonoBehaviour
 {
     public static CircuitSolver Instance { get; private set; }
+    private bool isAnalyzing = false; // 재귀 호출 방지 플래그
 
     void Awake()
     {
@@ -14,35 +13,83 @@ public class CircuitSolver : MonoBehaviour
         else Instance = this;
     }
 
-    // CircuitSolver.cs의 AnalyzeCircuit 함수 (최종 수정안)
-
     /// <summary>
-    /// 회로 분석을 시작하는 메인 함수입니다. (탐색 경계 수정)
+    /// 회로 분석 메인 함수 (ConnectionPoint 기반 경로 탐색)
     /// </summary>
     public void AnalyzeCircuit()
     {
-        // 1. 모든 부품 및 전선 상태 초기화
+        if (isAnalyzing) return;
+        isAnalyzing = true;
+
+        // 1. 초기화
         ElectricalComponent[] allComponents = FindObjectsOfType<ElectricalComponent>();
+        foreach (var component in allComponents) { component.Reset(); component.isPowered = false; }
+        Wire[] allWires = FindObjectsOfType<Wire>();
+        foreach (var wire in allWires) { wire.ResetColor(); }
+
+        // --- ✨ 핵심 수정: ConnectionPoint를 저장 ---
+        // 2. '진입 포트'와 '도착 포트' 찾기
+        var entryPoints = new List<ConnectionPoint>(); // Live 신호가 회로로 들어오는 첫 '포트'
+        var groundTerminals = new List<ConnectionPoint>(); // Ground 신호의 종착 '포트'
+        FindEntryAndGroundPoints(allWires, entryPoints, groundTerminals);
+
+        // 3. 모든 '완성된 경로' 찾기 (DFS)
+        //    경로를 List<ConnectionPoint>로 저장
+        var allCompletePaths = new List<List<ConnectionPoint>>();
+        foreach (var startPoint in entryPoints)
+        {
+            FindAllPaths(startPoint, groundTerminals, allWires, allCompletePaths);
+        }
+
+        // --- ✨ 핵심 수정: 'Powered Ports' 해시셋 생성 ---
+        // 4. 완성된 경로에 포함된 *모든 포트*를 HashSet에 저장합니다.
+        var poweredPorts = new HashSet<ConnectionPoint>();
+        foreach (var path in allCompletePaths)
+        {
+            foreach (var point in path)
+            {
+                poweredPorts.Add(point);
+            }
+        }
+
+        // 5. 'isPowered' 변수 및 PowerOn/Off 호출
         foreach (var component in allComponents)
         {
-            component.Reset();
-            component.isPowered = false; // isPowered도 확실하게 초기화
-        }
-        Wire[] allWires = FindObjectsOfType<Wire>();
-        foreach (var wire in allWires)
-        {
-            wire.ResetColor();
+            // 부품에 속한 포트 중 하나라도 poweredPorts에 포함되면 켠 것으로 간주
+            // (더 정확하게는 isLive/isGrounded를 포트 기준으로 설정해야 하지만,
+            //  일단 PowerOn/Off는 부품 단위로 처리)
+            bool isComponentPowered = component.GetComponentsInChildren<ConnectionPoint>().Any(p => poweredPorts.Contains(p));
+
+            if (isComponentPowered)
+            {
+                // ✨ isLive/isGrounded도 함께 설정 (릴레이 등을 위해)
+                component.isLive = true;
+                component.isGrounded = true;
+                component.isPowered = true;
+                component.PowerOn();
+            }
+            else
+            {
+                component.isPowered = false; // AnalyzeCircuit 시작 시 이미 초기화됨
+                component.PowerOff();
+            }
         }
 
-        // 2. '진입점(Entry Points)'과 '도착점(End Nodes)'을 명확히 구분하여 찾습니다.
-        var entryPoints = new List<ConnectionPoint>(); // Live 신호가 회로로 들어오는 첫 부품들 - ㄴㄴ 그냥 진입하는 포트
-        var groundTerminals = new List<ElectricalComponent>(); // Ground 신호의 종착점
+        // 7. 시각화
+        UpdateWireColors(allWires, poweredPorts);
 
+        isAnalyzing = false; // 분석 완료
+    }
+
+    /// <summary>
+    /// 전선들을 검사하여 회로의 Live 진입 포트와 Ground 도착 포트를 찾습니다.
+    /// </summary>
+    private void FindEntryAndGroundPoints(Wire[] allWires, List<ConnectionPoint> liveEntryPoints, List<ConnectionPoint> groundTerminals)
+    {
         foreach (var wire in allWires)
         {
             ConnectionPoint sourcePort = null;
             bool isLiveSource = false;
-
             foreach (var point in wire.connectedPoints)
             {
                 var terminal = point.GetComponent<Terminal>();
@@ -50,162 +97,176 @@ public class CircuitSolver : MonoBehaviour
                 {
                     var parentPowerSource = terminal.GetComponentInParent<Sym_3P4W>();
                     if (terminal.type == Terminal.TerminalType.PowerSource && (parentPowerSource == null || parentPowerSource.isOn))
-                    {
-                        sourcePort = point;
-                        isLiveSource = true;
-                    }
+                    { sourcePort = point; isLiveSource = true; }
                     else if (terminal.type == Terminal.TerminalType.PowerGround)
                     {
-                        // Ground 터미널 자체를 도착점으로 지정합니다.
-                        groundTerminals.Add(point.parentComponent);
+                        // ✨ Ground 터미널 '포트' 자체를 도착점으로 추가
+                        if (!groundTerminals.Contains(point))
+                            groundTerminals.Add(point);
                     }
                 }
             }
 
-            // 만약 이 전선이 PowerSource에 연결되어 있다면,
             if (sourcePort != null && isLiveSource)
             {
-                // 전선 건너편에 있는 모든 부품들을 '진입점'으로 등록합니다.
                 foreach (var point in wire.connectedPoints)
                 {
-                    if (point != sourcePort)
-                    {
-                        entryPoints.Add(point);
-                    }
+                    // ✨ 터미널 건너편 '포트'를 진입점으로 추가
+                    if (point != sourcePort && !liveEntryPoints.Contains(point))
+                        liveEntryPoints.Add(point);
                 }
             }
         }
-
-        // 3. 모든 '완성된 경로'를 찾습니다.
-        var allCompletePaths = new List<List<ElectricalComponent>>();
-        // 각각의 '진입점'에서부터 모든 '도착점'까지의 경로를 탐색합니다.
-        foreach (var startNode in entryPoints)
-        {
-            FindAllPaths(startNode, groundTerminals, allWires, allCompletePaths);
-        }
-
-        // --- 여기까지 수정 ---
-
-        // 4. 완성된 경로에 포함된 모든 부품들을 'Powered' 상태로 만듭니다.
-        foreach (var path in allCompletePaths)
-        {
-            foreach (var component in path)
-            {
-                component.isLive = true;
-                component.isGrounded = true;
-                component.isPowered = true;
-            }
-        }
-
-        foreach (var component in allComponents)
-        {
-            if (component.isPowered)
-            {
-                component.PowerOn(); // 릴레이 코일이 여기서 켜집니다.
-            }
-            else
-            {
-                component.PowerOff(); // 릴레이 코일이 여기서 꺼집니다.
-            }
-        }
-
-        // 5. 전선 색상을 업데이트합니다.
-        UpdateWireColors(allWires);
     }
 
     /// <summary>
-    /// DFS(깊이 우선 탐색) 알고리즘을 사용하여 출발점에서 도착점까지의 모든 경로를 찾습니다.
+    /// DFS 알고리즘을 시작하는 함수 (ConnectionPoint 기준)
     /// </summary>
-    private void FindAllPaths(ConnectionPoint startPoint, List<ElectricalComponent> endNodes, Wire[] allWires, List<List<ElectricalComponent>> allCompletePaths)
+    private void FindAllPaths(ConnectionPoint startNode, List<ConnectionPoint> endNodes, Wire[] allWires, List<List<ConnectionPoint>> allCompletePaths)
     {
-        var currentPath = new List<ElectricalComponent>();
-        // visited Set은 사용하지 않습니다.
-
-        // ✨ 시작점을 ConnectionPoint가 아닌 ElectricalComponent로 전달
-        FindPathsRecursive(startPoint.parentComponent, endNodes, allWires, currentPath, allCompletePaths);
+        var currentPath = new List<ConnectionPoint>();
+        FindPathsRecursive(startNode, null, endNodes, allWires, currentPath, allCompletePaths);
     }
 
     /// <summary>
-    /// 재귀적으로 경로를 탐색하는 함수 (ElectricalComponent 기준)
+    /// 재귀적으로 경로를 탐색하는 함수 (ConnectionPoint 기준, 직렬/병렬 탐색 분리)
     /// </summary>
     private void FindPathsRecursive(
-        ElectricalComponent currentNode, // ✨ ConnectionPoint 대신 ElectricalComponent 사용
-        List<ElectricalComponent> endNodes,
+        ConnectionPoint currentPoint,
+        ConnectionPoint previousPoint, // 이전 포트 정보
+        List<ConnectionPoint> endNodes,
         Wire[] allWires,
-        List<ElectricalComponent> currentPath, // visited 대신 이 리스트로 사이클 방지
-        List<List<ElectricalComponent>> allCompletePaths)
+        List<ConnectionPoint> currentPath, // ConnectionPoint 경로
+        List<List<ConnectionPoint>> allCompletePaths)
     {
-        // 1. 현재 노드를 현재 경로에 추가 (사이클 방지용)
-        currentPath.Add(currentNode);
+        // 1. 현재 포트를 경로에 추가 (사이클 방지용)
+        currentPath.Add(currentPoint);
+
+        ElectricalComponent currentComponent = currentPoint.parentComponent;
 
         // 2. 도착점에 도달했는지 확인
-        if (endNodes.Contains(currentNode))
+        if (endNodes.Contains(currentPoint))
         {
-            allCompletePaths.Add(new List<ElectricalComponent>(currentPath)); // 경로 복사해서 저장
-            // 도착했어도 다른 병렬 경로가 있을 수 있으므로, 탐색을 멈추지 않고 Backtrack 준비
+            allCompletePaths.Add(new List<ConnectionPoint>(currentPath));
         }
         else // 도착지가 아니라면 계속 탐색
         {
-            // 3. 현재 노드가 경로를 막는지 확인 (꺼진 스위치/릴레이 접점)
-            if ((currentNode is Switch switchComp && !switchComp.isOn) ||
-                (currentNode is RelaySwitch contactComp && !contactComp.isOn))
+            // 3. 전원 장치(종착역) 확인 - 역류 방지
+            if (currentComponent.GetComponent<Sym_3P4W>() != null)
             {
-                // 막혔으면 여기서 Backtrack (경로에서 제거하고 함수 종료)
-                currentPath.Remove(currentNode);
-                return;
-            }
-            // ✨ 전원 장치(종착역) 확인 추가 - 역류 방지 및 불필요 탐색 중단
-            if (currentNode.GetComponent<Sym_3P4W>() != null)
-            {
-                currentPath.Remove(currentNode);
+                currentPath.Remove(currentPoint);
                 return;
             }
 
-            // 4. 이웃 노드 탐색: 'currentNode'에 연결된 모든 전선을 확인
+            // --- ✨ 4. 탐색 1: 병렬 탐색 (전선을 따라가는 이웃) ---
+            //    (스위치 상태와 *상관없이* 항상 탐색)
             foreach (var wire in allWires)
             {
-                // 이 전선이 'currentNode'를 포함하고 있는지 확인
-                if (wire.ConnectedComponents.Contains(currentNode))
+                // 현재 포트(currentPoint)를 포함하는 전선인지 확인
+                if (wire.connectedPoints.Contains(currentPoint))
                 {
-                    // 그렇다면, 이 전선에 연결된 '다른' 부품들(neighbor)은 모두 이웃임
-                    foreach (var neighbor in wire.ConnectedComponents)
+                    // 이 전선에 연결된 '다른' 포트들(neighborPoint)을 순회
+                    foreach (var neighborPoint in wire.connectedPoints)
                     {
-                        // 자기 자신은 건너뛰기
-                        if (neighbor == currentNode) continue;
+                        if (neighborPoint == currentPoint) continue; // 자기 자신 건너뛰기
 
-                        // ✨ 핵심: currentPath.Contains()로 사이클(무한 루프)만 방지
-                        //        visited가 없으므로 다른 경로가 방문했던 노드도 재방문 가능 (병렬 처리)
-                        if (!currentPath.Contains(neighbor))
+                        // ✨ 핵심: currentPath.Contains()로 사이클 방지
+                        if (!currentPath.Contains(neighborPoint))
                         {
-                            // 재귀 호출하여 이웃 탐색 계속
-                            FindPathsRecursive(neighbor, endNodes, allWires, currentPath, allCompletePaths);
+                            // 재귀 호출 (현재 포트를 '이전 포트'로 전달)
+                            FindPathsRecursive(neighborPoint, currentPoint, endNodes, allWires, currentPath, allCompletePaths);
                         }
                     }
                 }
             }
+
+            // --- ✨ 5. 탐색 2: 직렬 탐색 (부품 내부를 통과하는 이웃) ---
+            //    (스위치 상태에 *영향을 받음*)
+            bool isCurrentSwitchOff = (currentComponent is Switch switchComp && !switchComp.isOn) ||
+                                      (currentComponent is RelaySwitch contactComp && !contactComp.isOn);
+
+            // 스위치가 켜져 있거나, 스위치가 아니거나, 릴레이가 아니어야만 통과
+            if (!isCurrentSwitchOff)
+            {
+                // 현재 부품(currentComponent)에 속한 *다른* 모든 포트를 찾습니다.
+                ConnectionPoint[] allPortsOnComponent = currentComponent.GetComponentsInChildren<ConnectionPoint>();
+
+                foreach (var internalNeighborPort in allPortsOnComponent)
+                {
+                    // 현재 포트(currentPoint)는 이미 처리했으므로 건너뜁니다.
+                    if (internalNeighborPort == currentPoint) continue;
+
+                    // ✨ 핵심: currentPath.Contains()로 사이클 방지
+                    if (!currentPath.Contains(internalNeighborPort))
+                    {
+                        // 재귀 호출 (현재 포트를 '이전 포트'로 전달)
+                        FindPathsRecursive(internalNeighborPort, currentPoint, endNodes, allWires, currentPath, allCompletePaths);
+                    }
+                }
+            }
         }
 
-        // 5. 현재 노드에서 시작하는 모든 탐색이 끝났으므로, 경로에서 현재 노드를 제거 (Backtrack)
-        currentPath.Remove(currentNode);
+        // 6. Backtrack
+        currentPath.Remove(currentPoint);
     }
+
+    // CircuitSolver.cs의 UpdateWireColors 함수 (수정)
 
     /// <summary>
     /// isPowered 상태를 기준으로 전선 색상을 변경합니다.
+    /// (✨ '첫 번째 전선'과 '마지막 전선'을 특별 처리)
     /// </summary>
-    private void UpdateWireColors(Wire[] allWires)
+    private void UpdateWireColors(Wire[] allWires, HashSet<ConnectionPoint> poweredPorts)
     {
         Color liveColor = Color.red;
+
         foreach (var wire in allWires)
         {
-            // 전선에 연결된 모든 부품이 isPowered 상태일 때만 색상 변경
-            if (wire.ConnectedComponents.Count > 0 && wire.ConnectedComponents.All(c => c.isPowered))
+            // 1. 전선에 연결된 모든 포트가 poweredPorts에 있는지 확인 (기본 검사)
+            if (wire.connectedPoints.Count > 0 &&
+                wire.connectedPoints.All(p => poweredPorts.Contains(p)))
+            {
+                wire.SetColor(liveColor);
+                continue; // 이 전선은 칠했으므로 다음 전선으로
+            }
+
+            // --- ✨ 2. '첫 번째/마지막 전선' 특별 검사 ---
+            // (기본 검사에서 실패한 경우에만 실행됨)
+            bool isSourceWire = false;
+            bool isGroundWire = false;
+            bool otherPortIsPowered = false;
+
+            foreach (var point in wire.connectedPoints)
+            {
+                var terminal = point.GetComponent<Terminal>();
+                if (terminal != null)
+                {
+                    // 이 포트가 PowerSource인지 확인
+                    if (terminal.type == Terminal.TerminalType.PowerSource)
+                        isSourceWire = true;
+                    // 이 포트가 PowerGround인지 확인
+                    else if (terminal.type == Terminal.TerminalType.PowerGround)
+                        isGroundWire = true;
+                }
+                // 이 포트가 아닌 '다른' 포트가 poweredPorts에 있는지 확인
+                else if (poweredPorts.Contains(point))
+                {
+                    otherPortIsPowered = true;
+                }
+            }
+
+            // 3. 최종 판정
+            //    (이 선은 Source 선이고, 건너편 포트가 켜져있음)
+            //    || (이 선은 Ground 선이고, 건너편 포트가 켜져있음)
+            if ((isSourceWire || isGroundWire) && otherPortIsPowered)
             {
                 wire.SetColor(liveColor);
             }
             else
             {
-                wire.ResetColor();
+                wire.ResetColor(); // 두 조건 모두 아니면 회색
             }
+            // --- ✨ 특별 검사 끝 ---
         }
     }
 }

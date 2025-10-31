@@ -9,21 +9,10 @@ public class SimulationManager : MonoBehaviour
     public static bool isSimulating = false;
 
     // UI 버튼이 호출할 함수
-    public static void ToggleSimulation(int setNum)
+    public static void ToggleSimulation(bool isPlay)
     {
-        
-        switch(setNum)      // 0 : Stop     1 : Play     2 : Pause
-        {
-            case 0:
-                isSimulating = false;
-                break;
-            case 1:
-                isSimulating = true;
-                break;
-            case 2:
-                isSimulating = true;
-                break;
-        }
+
+        isSimulating = isPlay;
         
         // 시뮬레이션이 켜질 때
         if (isSimulating)
@@ -35,6 +24,7 @@ public class SimulationManager : MonoBehaviour
                 if(component.GetComponent<ElectricalComponent>() != null)
                 {
                     component.GetComponent<ElectricalComponent>().OnSimulationStart();
+                    SymbolController.Instance.DeselectAll();
                 }
             }
 

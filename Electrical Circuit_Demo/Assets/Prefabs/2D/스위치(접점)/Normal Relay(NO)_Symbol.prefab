@@ -327,6 +327,7 @@ GameObject:
   - component: {fileID: 5279202282167706972}
   - component: {fileID: 5424119448605182245}
   - component: {fileID: 5346212084591620469}
+  - component: {fileID: 3134442943600434228}
   m_Layer: 8
   m_Name: Normal Relay(NO)_Symbol
   m_TagString: Switch
@@ -488,6 +489,21 @@ MonoBehaviour:
   state:
   - {fileID: 21300000, guid: 302bbf39f1369ef419e48c78c90700af, type: 3}
   - {fileID: 21300000, guid: fe98407711a6acc4bb5634b0d330fd16, type: 3}
+--- !u!114 &3134442943600434228
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5611926762267563915}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 1, g: 1, b: 0, a: 0.5}
+  m_EffectDistance: {x: 3, y: -3}
+  m_UseGraphicAlpha: 1
 --- !u!1 &7910244926743607341
 GameObject:
   m_ObjectHideFlags: 0

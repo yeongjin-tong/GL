@@ -29,7 +29,6 @@ public class SymbolPaletteController : MonoBehaviour
     // ✨ InputManager의 방송이 울리면 이 함수가 호출됩니다.
     private void HandleSymbolClick(GameObject clickedObject)
     {
-
         // 이미 배치 중인 프리팹이 있거나, 클릭된 오브젝트가 없으면 무시
         if (currentPlacingPrefab != null || clickedObject == null) return;
 
@@ -116,6 +115,14 @@ public class SymbolPaletteController : MonoBehaviour
                     Debug.Log($"{currentPlacingPrefab.name} 배치 완료!");
                 }
 
+                if(currentPlacingPrefab.GetComponent<ElectricalComponent>() != null)
+                {
+                    ElectricalComponent symbol = currentPlacingPrefab.GetComponent<ElectricalComponent>();
+                    SymbolController.Instance.CheckForNearbyConnections(symbol);
+                }
+
+                
+                
 
                 // 4. 배치든 파괴든, 작업이 끝났으므로 상태를 초기화
                 currentPlacingPrefab = null;

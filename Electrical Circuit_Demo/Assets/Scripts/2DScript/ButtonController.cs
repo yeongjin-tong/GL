@@ -65,6 +65,7 @@ public class ButtonController : MonoBehaviour
     {
         ModeSelect(0);
         pinisOn = false;
+        ModeBtnEvent(false);
     }
 
     private void ObjectInit_2d()
@@ -93,33 +94,26 @@ public class ButtonController : MonoBehaviour
     {
         stopBtn.onClick.AddListener(() =>
         {
-            ModeBtnEvent(0);
+            ModeBtnEvent(false);
         });
         playBtn.onClick.AddListener(() =>
         {
-            ModeBtnEvent(1);
-        });
-        pauseBtn.onClick.AddListener(() =>
-        {
-            ModeBtnEvent(2);
+            ModeBtnEvent(true);
         });
     }
 
-    private void ModeBtnEvent(int num)
+    private void ModeBtnEvent(bool isPlay)
     {
-        SimulationManager.ToggleSimulation(num);
-        bool sim = SimulationManager.isSimulating;
+        SimulationManager.ToggleSimulation(isPlay);
         
-        if (sim == false)
+        if (isPlay == false)
         {
             playBtn.interactable = true;
-            pauseBtn.interactable = false;
             stopBtn.interactable = false;
         }
         else
         {
             playBtn.interactable = false;
-            pauseBtn.interactable = true;
             stopBtn.interactable = true;
         }
 

@@ -9,17 +9,19 @@ public class Switch : ElectricalComponent
     // "내 상태가 바뀌었다!"고 외부에 방송하는 이벤트
     public event Action<bool> OnStateChanged;
 
+    // 초기화 방송
+    public event Action OnStateInit;
+
     // 링크된 파트너 스위치를 저장할 변수
     [HideInInspector]
     public Switch linkedPartner;
 
-    /// <summary>
-    /// 외부(사용자 클릭 등)에서 스위치 상태를 반전시킬 때 호출하는 함수.
-    /// </summary>
-    public void Toggle()
+    private bool initState = false;
+
+    private void Awake()
     {
-        // ✨ SetState 함수를 호출하여 상태 변경 로직을 한 곳으로 모음
-        SetState(!isOn, true); // 현재 상태의 반대값으로 변경하고, 파트너에게 알림
+        // 초기화를 해주기 위해 저장하는 초기값
+        initState = isOn;
     }
 
     /// <summary>
@@ -45,5 +47,13 @@ public class Switch : ElectricalComponent
             // 파트너에게는 "너는 나한테 다시 알릴 필요 없어" 라는 의미로 false를 전달
             linkedPartner.SetState(isOn, false);
         }
+    }
+
+    public override void OnSimulationStop()
+    {
+        base.OnSimulationStop();
+        isOn = initState;
+        OnStateChanged?.Invoke(initState);
+        OnStateInit?.Invoke();
     }
 }

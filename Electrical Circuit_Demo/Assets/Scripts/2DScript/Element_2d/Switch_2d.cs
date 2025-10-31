@@ -1,3 +1,4 @@
+using System.Net.NetworkInformation;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -8,6 +9,7 @@ public class Switch_2d : MonoBehaviour
     public Sprite[] state;
     private Switch selfSwitch;
     private Image image;
+    private bool stopState = false;
 
     void Awake()
     {
@@ -17,6 +19,7 @@ public class Switch_2d : MonoBehaviour
         if (selfSwitch != null)
         {
             selfSwitch.OnStateChanged += ClickUIChange;
+            selfSwitch.OnStateInit += InitState;
         }
         
         image = GetComponent<Image>();
@@ -24,14 +27,31 @@ public class Switch_2d : MonoBehaviour
 
     private void OnMouseDown()
     {
-        // 마스터 스위치의 Toggle 함수를 호출
-        selfSwitch.Toggle();
+        if(stopState)
+        {
+            stopState = false;
+        }
+        else
+        {
+            selfSwitch.SetState(!selfSwitch.isOn, true);
+        }
+    }
+
+    private void OnMouseDrag()
+    {
+        if (Input.GetMouseButtonDown(1))
+        {
+            stopState = true;
+
+        }
     }
 
     private void OnMouseUp()
     {
-        // 마스터 스위치의 Toggle 함수를 호출
-        selfSwitch.Toggle();
+        if(!stopState)
+        {
+            selfSwitch.SetState(!selfSwitch.isOn, true);
+        }
     }
 
     private void ClickUIChange(bool isOn)
@@ -49,11 +69,17 @@ public class Switch_2d : MonoBehaviour
         }
     }
 
+    private void InitState()
+    {
+        stopState = false;
+    }
+
     private void OnDestroy()
     {
         if (selfSwitch != null)
         {
             selfSwitch.OnStateChanged -= ClickUIChange;
+            selfSwitch.OnStateInit -= InitState;
         }
     }
     // (상태에 따른 이미지 변경 로직은 Switch.cs의 OnStateChanged 이벤트를 구독하여 구현 가능)

@@ -14,6 +14,17 @@ public class RelaySwitch : ElectricalComponent
     // 시각적 표현(UI 등)을 위한 이벤트
     public event Action<bool> OnStateChanged;
 
+    // 초기화 방송
+    public event Action OnStateInit;
+
+    private bool initState = false;
+
+    private void Awake()
+    {
+        // 초기화를 해주기 위해 저장하는 초기값
+        initState = isOn;
+    }
+
     /// <summary>
     /// RelayCoil이 이 함수를 호출하여 스위치 상태를 강제로 변경합니다.
     /// </summary>
@@ -38,5 +49,13 @@ public class RelaySwitch : ElectricalComponent
                 relayID = tmp.text;
             }
         }
+    }
+
+    public override void OnSimulationStop()
+    {
+        base.OnSimulationStop();
+        isOn = initState;
+        OnStateChanged?.Invoke(initState);
+        OnStateInit?.Invoke();
     }
 }

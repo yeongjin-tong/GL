@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿// SymbolController.cs
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
@@ -21,9 +22,13 @@ public class SymbolController : MonoBehaviour
     private GridManager gridManager;
     private ElectricalComponent draggedComponent;
 
-    // ✨ 2번 조건: '상대적 위치' 드래그를 위한 변수
+    // '상대적 위치' 드래그를 위한 변수
     private Vector3 initialMousePos; // 드래그 시작 시점의 마우스 월드 좌표
     private Vector3 initialObjectPos; // 드래그 시작 시점의 오브젝트 월드 좌표
+
+    [Header("Snapping")]
+    [Tooltip("가상 접점에 자동으로 스냅될 거리(월드 유닛)")]
+    public float junctionSnapRadius = 0.5f;
 
     void Awake()
     {
@@ -54,6 +59,7 @@ public class SymbolController : MonoBehaviour
         }
     }
 
+
     void Update()
     {
         if (SimulationManager.isSimulating) return;
@@ -61,51 +67,142 @@ public class SymbolController : MonoBehaviour
         // --- 드래그 중일 때만 위치 업데이트 ---
         if (isDragging && Input.GetMouseButton(0))
         {
-            // ✨ 2번 조건: '상대적 위치' 계산 로직
+            // (기존 드래그 위치 업데이트 로직)
             Vector3 currentMousePos = GetMouseWorldPos();
-            Vector3 mouseDelta = currentMousePos - initialMousePos; // 마우스가 시작점부터 얼마나 움직였는지 계산
-            Vector3 newPosition = initialObjectPos + mouseDelta; // 오브젝트의 원래 위치에 그 차이만큼만 더해줌
+            Vector3 mouseDelta = currentMousePos - initialMousePos;
+            Vector3 newPosition = initialObjectPos + mouseDelta;
 
-            // 2D UI 환경이므로 RectTransform을 직접 조작하고 그리드에 스냅
             Vector2 localPoint;
             RectTransformUtility.ScreenPointToLocalPointInRectangle(
                 (RectTransform)selectedObject.transform.parent, Camera.main.WorldToScreenPoint(newPosition), Camera.main, out localPoint);
 
             selectedObject.GetComponent<RectTransform>().anchoredPosition = gridManager.SnapToGrid(localPoint);
 
-            // WireManager에게 연결된 전선을 다시 그리라고 요청
             if (draggedComponent != null)
             {
                 WireManager.Instance.RedrawWiresForComponent(draggedComponent);
             }
         }
 
-        // 드래그 종료
-        if (isDragging && Input.GetMouseButtonUp(0))
+        // 드래그 종료 또는 *새 부품 배치* 시
+        if (Input.GetMouseButtonUp(0))
         {
-            isDragging = false;
-            draggedComponent = null;
+            if (isDragging) // Case 1: "드래그" 중이던 기존 부품을 놓았을 때
+            {
+                if (draggedComponent != null)
+                {
+                    CheckForNearbyConnections(draggedComponent);
+                }
+                isDragging = false;
+                draggedComponent = null;
+            }
+            else if (selectedObject != null) // Case 2: "새 부품"을 배치했을 때 (드래그 중이 아님)
+            {
+                ElectricalComponent comp = selectedObject.GetComponent<ElectricalComponent>();
+                if (comp != null)
+                {
+                    // 새로 배치된 부품에 대해 스냅을 확인합니다.
+                    CheckForNearbyConnections(comp);
+                }
+            }
         }
+    }
+
+    /// <summary>
+    /// "Missing 에러"와 "선 모양 유지"를 위해 로직 전면 수정
+    /// </summary>
+    public void CheckForNearbyConnections(ElectricalComponent droppedComp)
+    {
+        var allVirtualJunctions = new List<VirtualJunction>(FindObjectsOfType<VirtualJunction>());
+        if (allVirtualJunctions.Count == 0) return;
+
+        List<ConnectionPoint> compPorts = droppedComp.GetComponentsInChildren<ConnectionPoint>().ToList();
+
+        foreach (var port in compPorts)
+        {
+            VirtualJunction closestVJ = null;
+            float minDistance = float.MaxValue;
+
+            // 1. 이 포트에 가장 가까운 *스냅 반경 내의* 가상 접점을 찾습니다.
+            foreach (var vj in allVirtualJunctions)
+            {
+                if (vj == null) continue; // 이미 처리된 접점일 수 있음
+                float dist = Vector3.Distance(port.transform.position, vj.transform.position);
+                if (dist < junctionSnapRadius && dist < minDistance)
+                {
+                    minDistance = dist;
+                    closestVJ = vj;
+                }
+            }
+
+            // 2. 스냅할 가상 접점(VJ)을 찾았다면
+            if (closestVJ != null)
+            {
+                ConnectionPoint vjPoint = closestVJ.GetComponent<ConnectionPoint>();
+                if (vjPoint == null || vjPoint.parentComponent == null) continue;
+
+                // 3. VJ에 연결된 "originalWire" (예: R -> VJ 선)를 찾습니다.
+                Wire originalWire = FindWireConnectedTo(vjPoint);
+                if (originalWire == null) continue;
+
+                // 4. "originalWire"의 "다른 쪽 끝점"(예: 'R' 포트)을 찾습니다.
+                ConnectionPoint staticPoint = (originalWire.connectedPoints[0] == vjPoint)
+                    ? originalWire.connectedPoints[1]
+                    : originalWire.connectedPoints[0];
+
+                // 5. VJ가 "originalWire" 리스트의 몇 번째 인덱스인지 찾습니다.
+                int vjIndex = originalWire.connectedPoints.IndexOf(vjPoint);
+                if (vjIndex == -1) continue; // 오류 방지
+
+                // 6. [데이터 치유] "originalWire"의 연결점을 VJ에서 새 부품의 'port'로 교체합니다.
+                originalWire.connectedPoints[vjIndex] = port;
+
+                // 7. [회로도 수정] CircuitGraph에서 VJ 부품을 제거하고,
+                CircuitGraph.Instance.RemoveComponent(vjPoint.parentComponent);
+                // 새 연결(예: R <-> RL)을 등록합니다.
+                CircuitGraph.Instance.RegisterConnection(staticPoint.parentComponent, port.parentComponent);
+
+                // 8. [시각적 수정] "originalWire"가 새 부품(droppedComp)을 따라가도록
+                //    RedrawWire를 호출합니다. (이때 "L"자 모양은 유지됩니다)
+                WireManager.Instance.RedrawWire(originalWire, droppedComp);
+
+                // 9. [청소] VJ(검은 점)는 역할을 다했으므로 파괴합니다.
+                Destroy(closestVJ.gameObject);
+
+                // 10. 다른 포트가 이 VJ에 중복 연결하는 것을 방지합니다.
+                allVirtualJunctions.Remove(closestVJ);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 지정된 ConnectionPoint에 연결된 Wire를 찾습니다.
+    /// </summary>
+    private Wire FindWireConnectedTo(ConnectionPoint point)
+    {
+        if (point == null) return null;
+
+        Wire[] allWires = FindObjectsOfType<Wire>();
+        foreach (var wire in allWires)
+        {
+            if (wire.connectedPoints.Contains(point))
+                return wire;
+        }
+        return null;
     }
 
     private void HandlePhysicsClick(Collider2D hit)
     {
-        // ✨ 1번 조건: '선택 후 드래그' 로직
-        // 이미 선택된 오브젝트를 다시 클릭했는지 확인
         if (hit != null && selectedObject != null && hit.gameObject == selectedObject && selectedObject.GetComponent<ElectricalComponent>() != null)
         {
-            // 드래그 시작!
             isDragging = true;
             draggedComponent = selectedObject.GetComponent<ElectricalComponent>();
-
-            // ✨ 2번 조건: 드래그 시작 시점의 위치들을 기록
             initialMousePos = GetMouseWorldPos();
             initialObjectPos = selectedObject.transform.position;
-            return; // 선택 로직은 건너뜀
+            return;
         }
 
-        // --- 일반 선택 로직 ---
-        DeselectAll(); // 일단 모든 선택 효과 해제
+        DeselectAll();
 
         if (hit != null)
         {
@@ -114,7 +211,7 @@ public class SymbolController : MonoBehaviour
                 SelectObject(hit.gameObject);
             }
         }
-        else // 허공 클릭 시
+        else
         {
             selectedObject = null;
         }
@@ -125,51 +222,78 @@ public class SymbolController : MonoBehaviour
         if (selectedObject == null) return;
 
         Wire wireToDelete = selectedObject.GetComponent<Wire>();
+        ElectricalComponent componentToDelete = selectedObject.GetComponent<ElectricalComponent>();
 
         if (wireToDelete != null)
         {
-            List<Junction> connectedJunctions = new List<Junction>();
-            foreach(var point in wireToDelete.connectedPoints)
-            {
-                if(point.parentComponent is Junction junction)
-                {
-                    connectedJunctions.Add(junction);
-                }
-            }
-
-            Destroy(selectedObject);
-            selectedObject = null;
-
-            if (connectedJunctions.Count > 0)
-            {
-                StartCoroutine(DelayedCheckAndHeal(connectedJunctions));
-            }
+            DeleteWire(wireToDelete);
+        }
+        else if (componentToDelete != null)
+        {
+            DeleteComponent(componentToDelete);
         }
         else
         {
-            var comp = selectedObject.GetComponent<ElectricalComponent>();
-            if (comp != null)
-            {
-                CircuitGraph.Instance.RemoveComponent(comp);
-            }
             Destroy(selectedObject);
-            selectedObject = null;
         }
+
+        selectedObject = null;
     }
 
-    // ✨ --- 새로 추가할 코루틴 함수 --- ✨
-    /// <summary>
-    /// 지정된 Junction들에 대해 한 프레임 뒤에 CheckAndHeal을 호출합니다.
-    /// </summary>
+    private void DeleteWire(Wire wireToDelete)
+    {
+        List<Junction> connectedJunctions = new List<Junction>();
+        foreach (var point in wireToDelete.connectedPoints)
+        {
+            if (point.parentComponent is Junction junction)
+            {
+                connectedJunctions.Add(junction);
+            }
+        }
+
+        Destroy(wireToDelete.gameObject);
+
+        if (connectedJunctions.Count > 0)
+        {
+            StartCoroutine(DelayedCheckAndHeal(connectedJunctions));
+        }
+
+        StartCoroutine(DelayedRebuildGraph());
+    }
+
+    private void DeleteComponent(ElectricalComponent componentToDelete)
+    {
+        Wire[] allWires = FindObjectsOfType<Wire>();
+        List<Wire> connectedWires = new List<Wire>();
+        foreach (var wire in allWires)
+        {
+            if (wire.ConnectedComponents.Contains(componentToDelete))
+            {
+                connectedWires.Add(wire);
+            }
+        }
+
+        foreach (Wire wire in connectedWires)
+        {
+            wire.OnComponentDeleted(componentToDelete);
+        }
+
+        CircuitGraph.Instance.RemoveComponent(componentToDelete);
+        Destroy(componentToDelete.gameObject);
+    }
+
+    private IEnumerator DelayedRebuildGraph()
+    {
+        yield return new WaitForEndOfFrame();
+        CircuitGraph.Instance.RebuildGraph();
+    }
+
     private IEnumerator DelayedCheckAndHeal(List<Junction> junctionsToCheck)
     {
-        // yield return null; // 다음 프레임까지 기다립니다.
-        yield return new WaitForEndOfFrame(); // 현재 프레임 렌더링 끝까지 기다립니다 (더 확실)
+        yield return new WaitForEndOfFrame();
 
-        // 이제 삭제될 전선이 완전히 제거된 시점입니다.
         foreach (var junction in junctionsToCheck)
         {
-            // Junction이 다른 동작에 의해 이미 파괴되었을 수도 있으므로 null 체크
             if (junction != null)
             {
                 junction.CheckAndHeal();
@@ -177,16 +301,14 @@ public class SymbolController : MonoBehaviour
         }
     }
 
-    private void DeselectAll()
+    public void DeselectAll()
     {
         if (selectedObject == null) return;
 
-        // 아웃라인 해제
         if (selectedObject.GetComponent<Outline>() != null)
         {
             selectedObject.GetComponent<Outline>().enabled = false;
         }
-        // 전선 색상 원래대로
         if (selectedObject.CompareTag("Wire"))
         {
             var lr = selectedObject.GetComponent<LineRenderer>();
@@ -203,18 +325,16 @@ public class SymbolController : MonoBehaviour
     {
         selectedObject = objToSelect;
 
-        // 아웃라인 활성화
         if (selectedObject.GetComponent<Outline>() != null)
         {
             selectedObject.GetComponent<Outline>().enabled = true;
         }
-        // 전선 색상 변경
         if (selectedObject.CompareTag("Wire"))
         {
             var lr = selectedObject.GetComponent<LineRenderer>();
             if (lr != null)
             {
-                originalWireColor = lr.startColor; // 원래 색상 저장
+                originalWireColor = lr.startColor;
                 lr.startColor = selectionColor;
                 lr.endColor = selectionColor;
             }
