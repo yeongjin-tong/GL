@@ -6,8 +6,8 @@ using UnityEngine.UI;
 // abstract: 이 클래스는 직접 사용할 수 없고, 다른 클래스가 상속해야만 함
 public abstract class ElectricalComponent : MonoBehaviour
 {
-    [Tooltip("이 부품의 고유 ID")]
-    public string uniqueID;
+    [Tooltip("이 부품의 ID")]
+    public string symbol_ID;
 
     // ✨ 두 강물(신호)이 닿았는지 확인하는 변수
     public bool isLive = false;

@@ -5,12 +5,35 @@ using System.Linq;
 public class CircuitSolver : MonoBehaviour
 {
     public static CircuitSolver Instance { get; private set; }
-    private bool isAnalyzing = false; // 재귀 호출 방지 플래그
+    private bool isAnalyzing = false; // 재귀 호출 방지 플래그]
+
+    // 분석 요청 플래그
+    private bool analysisPending = false;
 
     void Awake()
     {
         if (Instance != null) Destroy(gameObject);
         else Instance = this;
+    }
+
+    void Update()
+    {
+        // 시뮬레이션 중이고, 분석 요청이 들어왔을 때만 실행
+        if (SimulationManager.isSimulating && analysisPending)
+        {
+            // 1. 플래그를 *먼저* 내립니다.
+            analysisPending = false;
+
+            // 2. 실제 분석을 실행합니다.
+            AnalyzeCircuit();
+        }
+    }
+    /// <summary>
+    /// 간혹 타이밍 문제로 AnalyzeCircuit()가 호출되지 않을 때 이 함수 호출
+    /// </summary>
+    public void RequestAnalysis()
+    {
+        analysisPending = true;
     }
 
     /// <summary>
@@ -79,6 +102,7 @@ public class CircuitSolver : MonoBehaviour
         UpdateWireColors(allWires, poweredPorts);
 
         isAnalyzing = false; // 분석 완료
+        Debug.Log("분석 완료!");
     }
 
     /// <summary>
@@ -183,7 +207,8 @@ public class CircuitSolver : MonoBehaviour
             // --- ✨ 5. 탐색 2: 직렬 탐색 (부품 내부를 통과하는 이웃) ---
             //    (스위치 상태에 *영향을 받음*)
             bool isCurrentSwitchOff = (currentComponent is Switch switchComp && !switchComp.isOn) ||
-                                      (currentComponent is RelaySwitch contactComp && !contactComp.isOn);
+                                      (currentComponent is RelaySwitch contactComp && !contactComp.isOn) ||
+                                      (currentComponent is TimerSwitch timerComp && !timerComp.isOn);
 
             // 스위치가 켜져 있거나, 스위치가 아니거나, 릴레이가 아니어야만 통과
             if (!isCurrentSwitchOff)

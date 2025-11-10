@@ -16,4 +16,8 @@ public class SymbolData : MonoBehaviour
     public bool useText;
     public string symbolName;
     public NamePosition namePosition;
+
+    public bool useCountNum;
+
+    public string countNum;
 }

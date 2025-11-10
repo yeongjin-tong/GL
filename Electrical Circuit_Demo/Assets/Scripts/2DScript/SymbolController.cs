@@ -78,6 +78,7 @@ public class SymbolController : MonoBehaviour
 
             selectedObject.GetComponent<RectTransform>().anchoredPosition = gridManager.SnapToGrid(localPoint);
 
+            // RedrawWiresForComponent의 반환값(충돌 여부)을 isDragValid에 저장
             if (draggedComponent != null)
             {
                 WireManager.Instance.RedrawWiresForComponent(draggedComponent);
@@ -92,9 +93,9 @@ public class SymbolController : MonoBehaviour
                 if (draggedComponent != null)
                 {
                     CheckForNearbyConnections(draggedComponent);
+                    isDragging = false;
+                    draggedComponent = null;
                 }
-                isDragging = false;
-                draggedComponent = null;
             }
             else if (selectedObject != null) // Case 2: "새 부품"을 배치했을 때 (드래그 중이 아님)
             {

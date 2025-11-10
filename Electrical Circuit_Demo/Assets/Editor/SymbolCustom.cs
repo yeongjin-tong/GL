@@ -15,6 +15,8 @@ public class SymbolCustom : Editor
         SerializedProperty useText = serializedObject.FindProperty("useText");
         SerializedProperty symbolName = serializedObject.FindProperty("symbolName");
         SerializedProperty namePosition = serializedObject.FindProperty("namePosition");
+        SerializedProperty useCountNum = serializedObject.FindProperty("useCountNum");
+        SerializedProperty countNum = serializedObject.FindProperty("countNum");
 
 
         // 3. 'enableExtraText' 체크박스를 인스펙터에 그림
@@ -27,6 +29,16 @@ public class SymbolCustom : Editor
             // 5. 'extraText' 텍스트 필드를 인스펙터에 그림
             EditorGUILayout.PropertyField(symbolName);
             EditorGUILayout.PropertyField(namePosition);
+
+            if(namePosition.enumValueIndex == (int)NamePosition.Center)
+            {
+                EditorGUILayout.PropertyField(useCountNum);
+
+                if(useCountNum.boolValue)
+                {
+                    EditorGUILayout.PropertyField(countNum);
+                }
+            }
         }
 
         // 6. 변경된 모든 사항을 타겟 스크립트에 최종 적용

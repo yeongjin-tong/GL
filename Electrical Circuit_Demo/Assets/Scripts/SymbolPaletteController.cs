@@ -62,11 +62,27 @@ public class SymbolPaletteController : MonoBehaviour
                 txt.color = Color.black;
                 var size = textObj.AddComponent<ContentSizeFitter>();
                 size.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+
+                if(symbolData.useCountNum)
+                {
+                    var countNum = new GameObject("countNum_text");
+                    countNum.transform.parent = currentPlacingPrefab.transform;
+                    countNum.transform.localPosition = new Vector3(50f, 0f, 0f);
+                    countNum.transform.localScale = new Vector3(1, 1, 1);
+
+
+                    var numTxt = countNum.AddComponent<TextMeshProUGUI>();
+                    numTxt.text = symbolData.countNum;
+                    numTxt.color = Color.black;
+
+                    var numSize = countNum.AddComponent<ContentSizeFitter>();
+                    numSize.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+                }
             }
 
             if(currentPlacingPrefab.GetComponent<ElectricalComponent>() != null)
             {
-                currentPlacingPrefab.GetComponent<ElectricalComponent>().PowerOff();
+                currentPlacingPrefab.GetComponent<ElectricalComponent>().symbol_ID = symbolData.symbolName;
             }
 
             scrollrect.enabled = false;

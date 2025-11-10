@@ -47,7 +47,6 @@ public class Battery : ElectricalComponent
     {
         if (isBeingUpdatedByPartner) return;
 
-        Debug.Log($"{gameObject.name} (ID: {uniqueID}) 상태 변경: {isOn}");
         CircuitSolver.Instance?.AnalyzeCircuit();
         OnStateChanged?.Invoke(isOn);
 

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -19,11 +20,13 @@ public class SimulationManager : MonoBehaviour
         {
             ObjectManager.Instance.CleanUpList();
 
-            foreach(GameObject component in ObjectManager.Instance.objects_2d)
+            foreach(GameObject obj in ObjectManager.Instance.objects_2d)
             {
-                if(component.GetComponent<ElectricalComponent>() != null)
+                if(obj.GetComponent<ElectricalComponent>() != null)
                 {
-                    component.GetComponent<ElectricalComponent>().OnSimulationStart();
+                    ElectricalComponent component = obj.GetComponent<ElectricalComponent>();
+                    NameSetting(component);
+                    component.OnSimulationStart();
                     SymbolController.Instance.DeselectAll();
                 }
             }
@@ -47,6 +50,17 @@ public class SimulationManager : MonoBehaviour
             foreach (var wire in allWires)
             {
                 wire.ResetColor();
+            }
+        }
+    }
+
+    private static void NameSetting(ElectricalComponent component)
+    {
+        foreach (TextMeshProUGUI tmp in component.GetComponentsInChildren<TextMeshProUGUI>())
+        {
+            if (tmp.name == "name_text")
+            {
+                component.symbol_ID = tmp.text;
             }
         }
     }

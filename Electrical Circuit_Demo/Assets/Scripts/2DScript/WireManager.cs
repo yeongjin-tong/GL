@@ -2,6 +2,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using System.Net;
+using System;
+using Unity.VisualScripting;
 
 public class WireManager : MonoBehaviour
 {
@@ -35,6 +37,8 @@ public class WireManager : MonoBehaviour
     private GameObject junctionPreview;
     //  가상 접점의 위치
     private Vector3 junctionPoint;
+
+    private bool isPreviewColliding = false;
 
     private int junctionIndex = 0;
     // 가장 가까운 전선으로 감지된 오브젝트의 Transform
@@ -86,6 +90,15 @@ public class WireManager : MonoBehaviour
     {
         if (isDrawing() && junctionPreview != null && nearestWireForPreview != null)
         {
+            if (isPreviewColliding)
+            {
+                Debug.Log("배치 실패: 그리는 중인 선이 충돌 상태입니다.");
+
+                Destroy(currentWire.gameObject); // 빨간색 미리보기 선 파괴
+                ResetState(); // 그리기 취소
+                return; // 연결 로직 실행 중단
+            }
+
             Debug.Log("Junction preview 클릭! 병렬 연결을 시작합니다.");
             ConnectToExistingWire(currentWire, nearestWireForPreview, GetMouseWorldPosition());
             ResetState();
@@ -135,19 +148,15 @@ public class WireManager : MonoBehaviour
             {
                 Debug.Log("전선 클릭!");
 
-                // ✨ [요청 1. 에러 처리] 와이어 유효성 검사 추가
-                Wire targetWire = hit.GetComponent<Wire>();
-                if (targetWire == null || !targetWire.IsValid())
+                if (isPreviewColliding)
                 {
-                    Debug.LogError("연결이 끊어진 '고아 와이어'입니다. 연결할 수 없습니다.");
-                    // UIManager.Instance.ShowErrorPopup("연결이 끊어진 선입니다. 선을 다시 그려주세요.");
+                    Debug.Log("배치 실패: 그리는 중인 선이 충돌 상태입니다.");
 
-                    Destroy(currentWire.gameObject);
-                    ResetState();
-                    return; // ✨ 에러 방지
+                    Destroy(currentWire.gameObject); // 빨간색 미리보기 선 파괴
+                    ResetState(); // 그리기 취소
+                    return; // 연결 로직 실행 중단
                 }
-                // ✨ 유효성 검사 끝
-
+                // (충돌 중이 아닐 때만 아래 연결 로직 실행)
                 ConnectToExistingWire(currentWire, hit.transform, GetMouseWorldPosition());
                 ResetState();
             }
@@ -160,28 +169,43 @@ public class WireManager : MonoBehaviour
         Vector2 endLocalPos = WorldToLocal(endPoint.transform.position);
         Vector2 snappedEndPos = gridManager.SnapToGrid(endLocalPos);
 
-        // 마지막 점을 최종 위치로 고정
-        wire.SetPosition(wire.positionCount - 1, snappedEndPos);
+        // 2. LineRenderer에서 현재까지 그린 경로를 가져옵니다.
+        Vector3[] currentPathPoints = new Vector3[wire.positionCount];
+        wire.GetPositions(currentPathPoints);
 
+        // 3. 경로의 마지막 점을 스냅된 최종 위치로 업데이트합니다.
+        currentPathPoints[wire.positionCount - 1] = snappedEndPos;
+
+        // 4. ✨ [핵심 수정] OptimizePath를 호출하여 경로를 최적화합니다. ✨
+        List<Vector3> optimizedPath = OptimizePath(currentPathPoints.ToList());
+
+        // 5. 최적화된 경로를 LineRenderer에 최종 설정합니다.
+        wire.positionCount = optimizedPath.Count;
+        wire.SetPositions(optimizedPath.ToArray());
+
+        // 마지막 점을 최종 위치로 고정
         wire.name = $"Wire_{startPoint.transform.parent.name}_to_{endPoint.transform.parent.name}";
         wire.gameObject.tag = "Wire";
-
-        ElectricalComponent comp1 = startPoint.parentComponent;
-        ElectricalComponent comp2 = endPoint.parentComponent;
 
         myWire.connectedPoints.Add(endPoint);
 
         // CircuitGraph에 연결 등록
         CircuitGraph.Instance.RegisterConnection(startPoint.parentComponent, endPoint.parentComponent);
 
+        wire.AddComponent<EdgeCollider2D>();
+        currentWire = wire;
         ColliderSetting();
+        currentWire = null;
     }
 
     //콜라이더 세팅
     private void ColliderSetting()
     {
+        if (currentWire == null) return;
+
         // 1. LineRenderer와 같은 게임 오브젝트에 있는 EdgeCollider2D를 가져옵니다.
         EdgeCollider2D edgeCollider = currentWire.GetComponent<EdgeCollider2D>();
+        if (edgeCollider == null) return;
 
         // 2. LineRenderer의 Vector3 좌표를 EdgeCollider2D가 사용하는 Vector2 좌표로 변환합니다.
         Vector2[] colliderPoints = new Vector2[currentWire.positionCount];
@@ -193,6 +217,7 @@ public class WireManager : MonoBehaviour
 
         // 3. 변환된 좌표를 EdgeCollider2D의 points 속성에 설정합니다.
         edgeCollider.points = colliderPoints;
+
     }
 
     private void UpdateWirePreview(LineRenderer wire)
@@ -278,7 +303,13 @@ public class WireManager : MonoBehaviour
         clickIndex = lr.positionCount - 1;
     }
 
-    private void ResetState() { firstPoint = null; currentWire = null; clickIndex = 0; }
+    private void ResetState() 
+    { 
+        firstPoint = null; 
+        currentWire = null; 
+        clickIndex = 0;
+        isPreviewColliding = false;
+    }
     private LineRenderer CreateWire()
     {
         var wireObject = new GameObject("Wire_Preview");
@@ -299,7 +330,7 @@ public class WireManager : MonoBehaviour
         lr.startColor = lineColor; lr.endColor = lineColor;
         lr.sortingOrder = 1;
 
-        wireObject.AddComponent<EdgeCollider2D>();
+        //EdgeCollider2D wireCollider = wireObject.AddComponent<EdgeCollider2D>();
         myWire = wireObject.AddComponent<Wire>();
 
         myWire.connectedPoints.Add(firstPoint);
@@ -582,77 +613,146 @@ public class WireManager : MonoBehaviour
                 newPath = new List<Vector3> { pStart, p1, p2, pEnd };
             }
 
-            // 2점 -> 4점 확장은 OptimizePath가 필요 없습니다.
             lr.positionCount = newPath.Count;
             lr.SetPositions(newPath.ToArray());
         }
         else // ✨ [수정된 CASE 2] : 기존 경로가 3점 이상(꺾임)이었을 때
-    {
-        newPath = currentPath.ToList(); // 기존 경로를 복사
+        {
+            newPath = currentPath.ToList(); // 기존 경로를 복사
 
-        int endIndex = isStartMoving ? 0 : (pointCount - 1);
-        int elbowIndex = isStartMoving ? 1 : (pointCount - 2);
+            int endIndex = isStartMoving ? 0 : (pointCount - 1);
+            int elbowIndex = isStartMoving ? 1 : (pointCount - 2);
 
             Vector3 newElbowPos = Vector3.zero; // 계산된 새 팔꿈치 위치
-        
-        // --- ✨ [핵심 수정] 3점 경로와 4+점 경로의 로직을 분리 ---
-        
-        if (pointCount == 3) // --- 3점 경로("ㄱ", "ㄴ") 전용 로직 ---
-        {
-            // P0(시작점)와 P1(팔꿈치)의 관계가 경로의 "모양"을 결정합니다.
-            // 이 관계는 드래그 중에도 변하지 않으므로, 이 값을 "기억"으로 사용합니다.
-            bool p0_p1_is_horizontal = Mathf.Abs(newPath[0].y - newPath[1].y) < 0.1f;
-            
-            // 고정점(Anchor)은 P0 또는 P2 (움직이지 않는 끝점)입니다.
-            Vector3 staticAnchorPoint = isStartMoving ? newPath[2] : newPath[0];
 
-            if (p0_p1_is_horizontal) // "ㄱ"자 경로 (P0-P1이 수평)
+            if (pointCount == 3) // --- 3점 경로("ㄱ", "ㄴ") 전용 로직 ---
             {
-                // 팔꿈치(P1)의 Y는 P0(Anchor)에 고정, X는 P2(End)를 따름
-                newElbowPos.y = staticAnchorPoint.y;
-                newElbowPos.x = newEndPos.x;
-            }
-            else // "ㄴ"자 경로 (P0-P1이 수직)
-            {
-                // 팔꿈치(P1)의 X는 P0(Anchor)에 고정, Y는 P2(End)를 따름
-                newElbowPos.x = staticAnchorPoint.x;
-                newElbowPos.y = newEndPos.y;
-            }
-        }
-        else // --- 4점+ 경로("Z" 등) 전용 로직 ---
-        {
-            // 4점 이상 경로는 끝에서 2번째 세그먼트(Anchor->Elbow)를 기준으로 합니다.
-            // (이 로직은 4점 이상에서는 안정적으로 작동합니다)
-            Vector3 elbowPos = newPath[elbowIndex];
-            Vector3 staticAnchorPoint = isStartMoving ? newPath[elbowIndex + 1] : newPath[elbowIndex - 1];
-            
-            bool isStaticSegmentVertical = Mathf.Abs(elbowPos.x - staticAnchorPoint.x) < 0.1f;
-            
-            if (isStaticSegmentVertical) // Pn-2 -> Pn-1이 수직
-            {
-                newElbowPos.x = staticAnchorPoint.x; // X는 Pn-2에 고정
-                newElbowPos.y = newEndPos.y;         // Y는 Pn을 따름
-            }
-            else // Pn-2 -> Pn-1이 수평
-            {
-                newElbowPos.x = newEndPos.x;         // X는 Pn을 따름
-                newElbowPos.y = staticAnchorPoint.y; // Y는 Pn-2에 고정
-            }
-        }
-        
-        // 계산된 새 위치를 경로에 반영
-        newPath[elbowIndex] = gridManager.SnapToGrid(newElbowPos);
-        newPath[endIndex] = newEndPos;
-        
-        // 경로 기억 로직: OptimizePath()를 호출하지 않고 점 개수를 유지
-        lr.positionCount = newPath.Count;
-        lr.SetPositions(newPath.ToArray());
-    }
+                Vector3 anchorPoint;
+                Vector3 elbowPoint = newPath[1]; // P1은 항상 팔꿈치
+                bool isStaticSegmentHorizontal;
 
-    // --- 5. 콜라이더 업데이트 ---
-    currentWire = lr;
-    ColliderSetting();
-    currentWire = null;
+                if (isStartMoving) // P0 드래그
+                {
+                    anchorPoint = newPath[2]; // P2가 고정점
+                    isStaticSegmentHorizontal = Mathf.Abs(anchorPoint.y - elbowPoint.y) < 0.1f;
+                }
+                else // P2 드래그
+                {
+                    anchorPoint = newPath[0]; // P0가 고정점
+                    isStaticSegmentHorizontal = Mathf.Abs(anchorPoint.y - elbowPoint.y) < 0.1f;
+                }
+
+                if (isStaticSegmentHorizontal) // "ㄱ" 또는 "г" 형태
+                {
+                    newElbowPos.y = anchorPoint.y;
+                    newElbowPos.x = newEndPos.x;
+                }
+                else // "ㄴ" 또는 "L" 형태
+                {
+                    newElbowPos.x = anchorPoint.x;
+                    newElbowPos.y = newEndPos.y;
+                }
+            }
+            else // --- 4점+ 경로("Z" 등) 전용 로직 ---
+            {
+                Vector3 staticAnchorPoint; // 팔꿈치의 기준점 (P1 또는 P2)
+
+                // ✨ [핵심 버그 수정] : 고정점(Anchor) 인덱스 수정
+                if (isStartMoving)
+                {
+                    // P0 드래그. 팔꿈치(P1)의 고정점은 P2.
+                    staticAnchorPoint = newPath[elbowIndex + 1]; // P2
+                }
+                else
+                {
+                    // Pn 드래그. 팔꿈치(Pn-1)의 고정점은 Pn-2.
+                    staticAnchorPoint = newPath[elbowIndex - 1]; // Pn-2
+                }
+
+                // "메모리"는 가장 바깥쪽 고정 세그먼트를 기준으로 함
+                bool isOutermostStaticSegmentVertical;
+                if (isStartMoving)
+                {
+                    // P0 드래그 시, 메모리는 Pn -> Pn-1 (예: P3->P2)
+                    Vector3 farAnchor = newPath[pointCount - 1];
+                    Vector3 farElbow = newPath[pointCount - 2];
+                    isOutermostStaticSegmentVertical = Mathf.Abs(farAnchor.x - farElbow.x) < 0.1f;
+                }
+                else
+                {
+                    // Pn 드래그 시, 메모리는 P0 -> P1
+                    Vector3 farAnchor = newPath[0];
+                    Vector3 farElbow = newPath[1];
+                    isOutermostStaticSegmentVertical = Mathf.Abs(farAnchor.x - farElbow.x) < 0.1f;
+                }
+
+                // Z 경로는 방향이 *반대*여야 함
+                if (isStartMoving)
+                {
+                    // P0 드래그. 메모리(P3->P2), 팔꿈치(P1), 고정점(P2)
+                    if (isOutermostStaticSegmentVertical) // P3->P2가 수직 (이미지 1의 경우)
+                    {
+                        // P0->P1은 수평이어야 함
+                        newElbowPos.x = newEndPos.x;         // X는 P0 따름
+                        newElbowPos.y = staticAnchorPoint.y; // Y는 P2에 고정 (버그 수정)
+                    }
+                    else // P3->P2가 수평
+                    {
+                        // P0->P1은 수직이어야 함
+                        newElbowPos.x = staticAnchorPoint.x; // X는 P2에 고정
+                        newElbowPos.y = newEndPos.y;         // Y는 P0 따름
+                    }
+                }
+                else // Pn 드래그
+                {
+                    // Pn 드래그. 메모리(P0->P1), 팔꿈치(Pn-1), 고정점(Pn-2)
+                    if (isOutermostStaticSegmentVertical) // P0->P1이 수직
+                    {
+                        // Pn-1->Pn은 수평이어야 함
+                        newElbowPos.x = newEndPos.x;         // X는 Pn 따름
+                        newElbowPos.y = staticAnchorPoint.y; // Y는 Pn-2에 고정
+                    }
+                    else // P0->P1이 수평
+                    {
+                        // Pn-1->Pn은 수직이어야 함
+                        newElbowPos.x = staticAnchorPoint.x; // X는 Pn-2에 고정
+                        newElbowPos.y = newEndPos.y;         // Y는 Pn 따름
+                    }
+                }
+            }
+
+            // 계산된 새 위치를 경로에 반영
+            newPath[elbowIndex] = gridManager.SnapToGrid(newElbowPos);
+            newPath[endIndex] = newEndPos;
+
+            // 경로 기억 로직: OptimizePath()를 호출하지 않고 점 개수를 유지
+            lr.positionCount = newPath.Count;
+            lr.SetPositions(newPath.ToArray());
+        }
+
+        // --- 5. 콜라이더 업데이트 ---
+        currentWire = lr;
+        ColliderSetting();
+        currentWire = null;
+
+        // --- ✨ [핵심 수정] 콜라이더 순서 정렬 ---
+        Collider2D colliderA = staticPoint.GetComponentInParent<Collider2D>();
+        Collider2D colliderB = movedComponent.GetComponent<Collider2D>();
+
+        Collider2D startCollider;
+        Collider2D endCollider;
+
+        // isStartMoving 플래그를 사용해 순서를 *항상* (P0, Pn) 순서로 맞춥니다.
+        if (isStartMoving)
+        {
+            startCollider = colliderB; // Moved (P0)
+            endCollider = colliderA;   // Static (Pn)
+        }
+        else
+        {
+            startCollider = colliderA; // Static (P0)
+            endCollider = colliderB;   // Moved (Pn)
+        }
     }
 
     /// <summary>
@@ -721,7 +821,8 @@ public class WireManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 주어진 경로(path)에서 일직선상에 있는 불필요한 중간 점들을 제거합니다.
+    /// 주어진 경로(path)에서 일직선상에 있는 불필요한 중간 점들과
+    /// 중복된 점들을 모두 제거합니다. (수정된 최종본)
     /// </summary>
     /// <param name="path">최적화할 점들의 리스트</param>
     /// <returns>최적화된 점들의 리스트</returns>
@@ -739,21 +840,41 @@ public class WireManager : MonoBehaviour
         // 1번 인덱스부터 마지막에서 두 번째 점까지 순회 (중간점들만 검사)
         for (int i = 1; i < path.Count - 1; i++)
         {
-            // 이전 점에서 현재 점으로의 방향 벡터
-            Vector3 prevDir = (path[i] - path[i - 1]).normalized;
-            // 현재 점에서 다음 점으로의 방향 벡터
-            Vector3 nextDir = (path[i + 1] - path[i]).normalized;
+            Vector3 lastAddedPoint = optimizedPath.Last();
+            Vector3 currentPoint = path[i];
+            Vector3 nextPoint = path[i + 1];
 
-            // 두 방향 벡터의 거리를 계산하여 방향이 다른지(꺾이는 지점인지) 확인
-            // 거리가 0에 가까우면 같은 방향(일직선)을 의미
-            if (Vector3.Distance(prevDir, nextDir) > 0.01f)
+            if(Vector3.Distance(lastAddedPoint, currentPoint) < 0.001f)
             {
-                // 방향이 다를 경우, 현재 점은 꺾이는 지점이므로 경로에 추가
-                optimizedPath.Add(path[i]);
+                continue;
+            }
+
+            if(Vector3.Distance(currentPoint, nextPoint) < 0.001f)
+            {
+                continue;
+            }
+
+            // 동일 직선 제거
+            // dir1: 마지막 추가된 점 -> 현재 점 벡터
+            Vector3 dir1 = currentPoint - lastAddedPoint;
+
+            // dir2: 현재 점 -> 다음 점 벡터
+            Vector3 dir2 = nextPoint - currentPoint;
+
+            // 두 벡터의 외적 계산
+            // 외적의 크기가 0에 가까우면 두 벡터는 동일 직선상에 있음
+            float crossMagnitude = Vector3.Cross(dir1, dir2).magnitude;
+            
+            // 외적의 크기가 0.01f보다 크다면, 두 벡터는 동일 직선상에 없는 것
+            if(crossMagnitude > 0.01f)
+            {
+                optimizedPath.Add(currentPoint);
             }
         }
-
-        optimizedPath.Add(path.Last()); // 마지막 점은 항상 포함
+        if (Vector3.Distance(optimizedPath.Last(), path.Last()) > 0.001f)
+        {
+            optimizedPath.Add(path.Last());
+        }
 
         return optimizedPath;
     }

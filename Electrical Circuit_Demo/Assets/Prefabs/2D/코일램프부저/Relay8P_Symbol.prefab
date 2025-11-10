@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 2190230773053377127}
   - component: {fileID: 7284830187272540451}
   - component: {fileID: 6748468419066078052}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -145,7 +145,7 @@ GameObject:
   - component: {fileID: 4657810029888441235}
   - component: {fileID: 5531904540491067055}
   - component: {fileID: 1569220569966604531}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: point_Down
   m_TagString: ConnectionPort
   m_Icon: {fileID: 0}
@@ -234,7 +234,7 @@ GameObject:
   - component: {fileID: 3675994551367856303}
   - component: {fileID: 8422549655292258323}
   - component: {fileID: 6875554702067497944}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -397,7 +397,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 15}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &664451439960017822
@@ -481,7 +481,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 85, y: 85}
+  m_Size: {x: 70, y: 70}
   m_EdgeRadius: 0
 --- !u!114 &3504137698222061379
 MonoBehaviour:
@@ -495,12 +495,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af3768fc0e439de438b7f1d3ad4da1e1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  uniqueID: 
+  symbol_ID: 
   isLive: 0
   isGrounded: 0
   isPowered: 0
   isPowerSource: 0
-  relayID: 
 --- !u!114 &1348237095341294802
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -543,7 +542,7 @@ GameObject:
   - component: {fileID: 9045361499590914916}
   - component: {fileID: 1201966708583042692}
   - component: {fileID: 2960081780662113191}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: point_Up
   m_TagString: ConnectionPort
   m_Icon: {fileID: 0}

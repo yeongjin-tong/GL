@@ -172,7 +172,6 @@ public class ButtonController : MonoBehaviour
         {
             foreach (ConnectionPoint obj in allObject)
             {
-                Debug.Log("dddddd: " + obj.name);
                 if (obj.transform.childCount != 0)
                 {
                     obj.transform.GetChild(0).gameObject.SetActive(true);
@@ -184,7 +183,6 @@ public class ButtonController : MonoBehaviour
         {
             foreach (ConnectionPoint obj in allObject)
             {
-                Debug.Log("dddddd: " + obj.name);
                 if (obj.transform.childCount != 0)
                 {
                     obj.transform.GetChild(0).gameObject.SetActive(false);

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 563723482360698074}
   - component: {fileID: 8861043015011954951}
   - component: {fileID: 3675742356147064716}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: point_Up
   m_TagString: ConnectionPort
   m_Icon: {fileID: 0}
@@ -100,7 +100,7 @@ GameObject:
   - component: {fileID: 8689793972367951267}
   - component: {fileID: 1236311136781384003}
   - component: {fileID: 96892707091110258}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: point_Down
   m_TagString: ConnectionPort
   m_Icon: {fileID: 0}
@@ -189,7 +189,7 @@ GameObject:
   - component: {fileID: 3563448508842440222}
   - component: {fileID: 8441436517557562012}
   - component: {fileID: 1231421502179751278}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -515,7 +515,7 @@ GameObject:
   - component: {fileID: 4171457713664407496}
   - component: {fileID: 2969222751779154759}
   - component: {fileID: 6124206993248569712}
-  m_Layer: 8
+  m_Layer: 0
   m_Name: Text (TMP)
   m_TagString: Untagged
   m_Icon: {fileID: 0}

@@ -3,7 +3,7 @@ using System;
 using TMPro;
 using UnityEngine;
 
-public class RelaySwitch : ElectricalComponent
+public class TimerSwitch : ElectricalComponent
 {
     [Tooltip("접점의 현재 ON/OFF 상태. true = ON (Closed)")]
     public bool isOn = false; // 기본값은 '열림' (꺼짐)

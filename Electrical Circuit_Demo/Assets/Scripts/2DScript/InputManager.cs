@@ -94,6 +94,13 @@ public class InputManager : MonoBehaviour
                 OnDeleteKeyPressed?.Invoke();
             }
         }
+        else
+        {
+            if(Input.GetKeyDown(KeyCode.Space))
+            {
+                CircuitSolver.Instance.AnalyzeCircuit();
+            }
+        }
     }
 
     // 2D 물리 오브젝트를 찾는 헬퍼 함수 (GameObject를 반환하도록 수정)
