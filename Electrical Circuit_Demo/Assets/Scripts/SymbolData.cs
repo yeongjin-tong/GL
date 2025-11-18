@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 public enum NamePosition
 {
-    Right, Center
+    Left, Right, Center
 }
 // 이 스크립트는 UI 심볼 이미지에 붙여서, 자신이 어떤 부품인지에 대한 정보만 가집니다.
 [RequireComponent(typeof(Image))]

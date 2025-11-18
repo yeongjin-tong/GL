@@ -13,7 +13,6 @@ public class Timer : ElectricalComponent
     private TextMeshProUGUI countText;
 
     bool isRunning = false;
-    private int lastDisplayedTime = -1;
 
 
     IEnumerator StartTimer()
@@ -29,33 +28,17 @@ public class Timer : ElectricalComponent
 
 
         isRunning = true;
-        Debug.Log("코루틴 시작");
 
-        time = int.Parse(countText.text);
+        time = float.Parse(countText.text);
 
         curTime = time; // 현재 시간을 초기 시간으로 설정
-
-        // [수정] 코루틴 시작 시 텍스트 즉시 업데이트
-        lastDisplayedTime = Mathf.CeilToInt(curTime);
-        if (countText != null)
-        {
-            countText.text = lastDisplayedTime.ToString();
-        }
 
         while (curTime > 0)
         {
             yield return null; // 다음 프레임까지 대기
             curTime -= Time.deltaTime; // 시간 감소
 
-            // [수정] curTime을 정수로 변환 (CeilToInt는 올림)
-            int displayedTime = Mathf.CeilToInt(curTime);
-
-            // 표시된 정수값이 변경되었을 때에만 업데이트
-            if (countText != null && displayedTime != lastDisplayedTime)
-            {
-                countText.text = displayedTime.ToString();
-                lastDisplayedTime = displayedTime;
-            }
+            countText.text = curTime.ToString("N1");
 
             if (curTime <= 0)
             {
@@ -65,7 +48,7 @@ public class Timer : ElectricalComponent
                 // [수정] 텍스트가 0으로 확실히 표시되도록 함
                 if (countText != null) countText.text = "0";
 
-                ControlTimerSwitches(true); // 타이머 스위치 작동
+                ControlLinkedSwitches(true, Type.Timer); // 타이머 스위치 작동
                 yield break; // 코루틴 종료
             }
         }
@@ -76,7 +59,7 @@ public class Timer : ElectricalComponent
     {
         if(isOn)
         {
-            ControlLinkedSwitches(true);
+            ControlLinkedSwitches(true, Type.Relay);
             if (!isRunning)
             {
                 StartCoroutine(StartTimer());
@@ -84,8 +67,8 @@ public class Timer : ElectricalComponent
         }
         else
         {
-            ControlLinkedSwitches(false);
-            ControlTimerSwitches(false);
+            ControlLinkedSwitches(false, Type.Relay);
+            ControlLinkedSwitches(false, Type.Timer);
             StopAllCoroutines();
             isRunning = false;
             if(countText != null)
@@ -112,7 +95,7 @@ public class Timer : ElectricalComponent
     /// <summary>
     /// 이 코일과 연결된 모든 릴레이 스위치를 찾아 상태를 변경합니다.
     /// </summary>
-    private void ControlLinkedSwitches(bool newState)
+    private void ControlLinkedSwitches(bool newState, Type type)
     {
         // 씬에 있는 모든 릴레이 스위치를 찾습니다.
         RelaySwitch[] allSwitches = FindObjectsOfType<RelaySwitch>();
@@ -120,24 +103,22 @@ public class Timer : ElectricalComponent
         foreach (var relay in allSwitches)
         {
             // ID가 일치하는 스위치만 제어합니다.
-            if (relay.symbol_ID == this.symbol_ID)
+            if (relay.symbol_ID == this.symbol_ID && relay.switchType == type)
             {
-                relay.SetContactState(newState);
-            }
-        }
-    }
+                bool initState = relay.GetInitState();
 
-    private void ControlTimerSwitches(bool newState)
-    {
-        // 씬에 있는 모든 릴레이 스위치를 찾습니다.
-        TimerSwitch[] allSwitches = FindObjectsOfType<TimerSwitch>();
+                bool targetState;
 
-        foreach (var timerSwitch in allSwitches)
-        {
-            // ID가 일치하는 스위치만 제어합니다.
-            if (timerSwitch.symbol_ID == this.symbol_ID)
-            {
-                timerSwitch.SetContactState(newState);
+                if (newState)
+                {
+                    targetState = !initState;
+                }
+                else
+                {
+                    targetState = initState;
+                }
+
+                relay.SetContactState(targetState);
             }
         }
     }

@@ -20,16 +20,9 @@ public class SimulationManager : MonoBehaviour
         {
             ObjectManager.Instance.CleanUpList();
 
-            foreach(GameObject obj in ObjectManager.Instance.objects_2d)
-            {
-                if(obj.GetComponent<ElectricalComponent>() != null)
-                {
-                    ElectricalComponent component = obj.GetComponent<ElectricalComponent>();
-                    NameSetting(component);
-                    component.OnSimulationStart();
-                    SymbolController.Instance.DeselectAll();
-                }
-            }
+            StartSetting();
+
+            SymbolController.Instance.DeselectAll();
 
             // 이전과 동일하게 회로를 분석해서 켤 부품들을 찾습니다.
             CircuitSolver.Instance.AnalyzeCircuit();
@@ -51,6 +44,30 @@ public class SimulationManager : MonoBehaviour
             {
                 wire.ResetColor();
             }
+        }
+    }
+
+    private static void StartSetting()
+    {
+        List<ElectricalComponent> componentsToProcess = new List<ElectricalComponent>();
+
+        foreach (GameObject obj in ObjectManager.Instance.objects_2d)
+        {
+            if (obj.GetComponent<ElectricalComponent>() != null)
+            {
+                ElectricalComponent component = obj.GetComponent<ElectricalComponent>();
+                componentsToProcess.Add(component);
+            }
+        }
+
+        foreach (ElectricalComponent component in componentsToProcess)
+        {
+            NameSetting(component);
+        }
+
+        foreach(ElectricalComponent component in componentsToProcess)
+        {
+            component.OnSimulationStart();
         }
     }
 

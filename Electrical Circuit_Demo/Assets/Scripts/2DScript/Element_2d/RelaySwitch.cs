@@ -3,8 +3,17 @@ using System;
 using TMPro;
 using UnityEngine;
 
+public enum Type
+{
+    Relay,
+    Timer,
+    Flicker
+}
+
 public class RelaySwitch : ElectricalComponent
 {
+    public Type switchType;
+
     [Tooltip("접점의 현재 ON/OFF 상태. true = ON (Closed)")]
     public bool isOn = false; // 기본값은 '열림' (꺼짐)
 
@@ -43,5 +52,13 @@ public class RelaySwitch : ElectricalComponent
         isOn = initState;
         OnStateChanged?.Invoke(initState);
         OnStateInit?.Invoke();
+    }
+
+    /// <summary>
+    /// ✨ [새 함수] RelayCoil이 이 접점의 초기 상태(NO/NC)를 읽어갈 수 있도록 합니다.
+    /// </summary>
+    public bool GetInitState()
+    {
+        return initState;
     }
 }

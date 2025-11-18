@@ -9,6 +9,8 @@ public class WireManager : MonoBehaviour
 {
     public static WireManager Instance { get; private set; }
 
+    public Material wireMaterial;
+
     [Tooltip("Wire 생성 위치")]
     public Transform content_2D;
 
@@ -325,8 +327,8 @@ public class WireManager : MonoBehaviour
         lr.positionCount = 2; // 시작점 + 미리보기 끝점
         lr.SetPosition(0, snappedStartPos);
 
-        lr.startWidth = wireWidth; lr.endWidth = wireWidth;         
-        lr.material = new Material(Shader.Find("Legacy Shaders/Particles/Alpha Blended Premultiply"));
+        lr.startWidth = wireWidth; lr.endWidth = wireWidth;
+        lr.material = wireMaterial;
         lr.startColor = lineColor; lr.endColor = lineColor;
         lr.sortingOrder = 1;
 
@@ -518,17 +520,43 @@ public class WireManager : MonoBehaviour
         lr.startColor = lineColor; lr.endColor = lineColor;
         lr.sortingOrder = 1;
 
-        lr.positionCount = pathPoints.Count;
-        lr.SetPositions(pathPoints.ToArray());
+        List<Vector3> optimizedPath = OptimizePath(pathPoints);
 
-        // 3. Wire 컴포넌트 설정
+        Vector2 startPos = gridManager.SnapToGrid(WorldToLocal(startPoint.transform.position));
+        Vector2 endPos = gridManager.SnapToGrid(WorldToLocal(endPoint.transform.position));
+
+        Vector2 pathStartPos = optimizedPath[0];
+        Vector2 pathEndPos = optimizedPath.Last();
+
         var newWire = wireObject.AddComponent<Wire>();
-        newWire.connectedPoints.Add(startPoint);
-        newWire.connectedPoints.Add(endPoint);
+
+        if(Vector2.Distance(startPos, pathStartPos) < 0.1f && Vector2.Distance(endPos, pathEndPos) < 0.1f)
+        {
+            // 정방향 P0 -> Pn (startPoint -> endPoint)
+            newWire.connectedPoints.Add(startPoint);
+            newWire.connectedPoints.Add(endPoint);
+        }
+        else if(Vector2.Distance(startPos, pathEndPos) < 0.1f && Vector2.Distance(endPos, pathStartPos) < 0.1f)
+        {
+            // 역방향 Pn -> P0 (endPoint -> startPoint)
+            optimizedPath.Reverse();
+
+            newWire.connectedPoints.Add(startPoint);
+            newWire.connectedPoints.Add(endPoint);
+        }
+        else
+        {
+            Debug.LogError($"Wire 경로 매칭 실패: {wireObject.name}");
+            newWire.connectedPoints.Add(startPoint);
+            newWire.connectedPoints.Add(endPoint);
+        }
+
+        lr.positionCount = optimizedPath.Count;
+        lr.SetPositions(optimizedPath.ToArray());
 
         // 4. EdgeCollider2D 설정
         var edgeCollider = wireObject.AddComponent<EdgeCollider2D>();
-        Vector2[] colliderPoints = pathPoints.Select(p => new Vector2(p.x, p.y)).ToArray();
+        Vector2[] colliderPoints = optimizedPath.Select(p => new Vector2(p.x, p.y)).ToArray();
         edgeCollider.points = colliderPoints;
 
         // 5. CircuitGraph에 최종 연결 등록

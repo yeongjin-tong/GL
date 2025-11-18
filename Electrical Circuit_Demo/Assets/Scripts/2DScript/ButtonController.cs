@@ -12,6 +12,7 @@ public class ButtonController : MonoBehaviour
     [Header("메인 화면")]
     public Button selectBtn_2d;
     public Button selectBtn_3d;
+    public Button endBtn;
 
     public GameObject content_3d;
     public GameObject modeScreen;
@@ -44,6 +45,7 @@ public class ButtonController : MonoBehaviour
         initBtn.onClick.AddListener(ObjectInit_2d);
         selectBtn_3d.onClick.AddListener(() => ModeSelect(1) );
         selectBtn_2d.onClick.AddListener(() => ModeSelect(2) );
+        endBtn.onClick.AddListener(() => Application.Quit());
         window_2dBtn.onClick.AddListener(WindowScreen_2d);
         backBtn_3d.onClick.AddListener(() => ModeSelect(0));
         backBtn_2d.onClick.AddListener(() => ModeSelect(0));

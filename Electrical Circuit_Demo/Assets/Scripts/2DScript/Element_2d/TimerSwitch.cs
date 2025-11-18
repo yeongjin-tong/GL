@@ -44,4 +44,12 @@ public class TimerSwitch : ElectricalComponent
         OnStateChanged?.Invoke(initState);
         OnStateInit?.Invoke();
     }
+
+    /// <summary>
+    /// ✨ [새 함수] RelayCoil이 이 접점의 초기 상태(NO/NC)를 읽어갈 수 있도록 합니다.
+    /// </summary>
+    public bool GetInitState()
+    {
+        return initState;
+    }
 }

@@ -5,39 +5,40 @@ using System.Linq;
 public class CircuitSolver : MonoBehaviour
 {
     public static CircuitSolver Instance { get; private set; }
-    private bool isAnalyzing = false; // 재귀 호출 방지 플래그]
-
-    // 분석 요청 플래그
+    private bool isAnalyzing = false; // 재귀 호출 방지 플래그
     private bool analysisPending = false;
+
+    // ✨ [새 변수] Nodal Analysis를 위한 넷(Net) 리스트
+    private List<HashSet<ConnectionPoint>> allNets;
+    private HashSet<ConnectionPoint> liveNet;
+    private HashSet<ConnectionPoint> groundNet;
 
     void Awake()
     {
         if (Instance != null) Destroy(gameObject);
         else Instance = this;
+
+        allNets = new List<HashSet<ConnectionPoint>>();
+        liveNet = new HashSet<ConnectionPoint>();
+        groundNet = new HashSet<ConnectionPoint>();
     }
 
     void Update()
     {
-        // 시뮬레이션 중이고, 분석 요청이 들어왔을 때만 실행
         if (SimulationManager.isSimulating && analysisPending)
         {
-            // 1. 플래그를 *먼저* 내립니다.
             analysisPending = false;
-
-            // 2. 실제 분석을 실행합니다.
             AnalyzeCircuit();
         }
     }
-    /// <summary>
-    /// 간혹 타이밍 문제로 AnalyzeCircuit()가 호출되지 않을 때 이 함수 호출
-    /// </summary>
+
     public void RequestAnalysis()
     {
         analysisPending = true;
     }
 
     /// <summary>
-    /// 회로 분석 메인 함수 (ConnectionPoint 기반 경로 탐색)
+    /// ✨ [핵심 수정] Nodal Analysis (Dijkstra/BFS 방식) 메인 함수
     /// </summary>
     public void AnalyzeCircuit()
     {
@@ -50,248 +51,279 @@ public class CircuitSolver : MonoBehaviour
         Wire[] allWires = FindObjectsOfType<Wire>();
         foreach (var wire in allWires) { wire.ResetColor(); }
 
-        // --- ✨ 핵심 수정: ConnectionPoint를 저장 ---
-        // 2. '진입 포트'와 '도착 포트' 찾기
-        var entryPoints = new List<ConnectionPoint>(); // Live 신호가 회로로 들어오는 첫 '포트'
-        var groundTerminals = new List<ConnectionPoint>(); // Ground 신호의 종착 '포트'
-        FindEntryAndGroundPoints(allWires, entryPoints, groundTerminals);
+        // --- 1단계: 모든 "Net" 찾기 (BFS/DFS 탐색) ---
+        allNets.Clear();
+        liveNet.Clear();
+        groundNet.Clear();
+        HashSet<ConnectionPoint> visitedPorts = new HashSet<ConnectionPoint>(); // 전체 방문 기록
 
-        // 3. 모든 '완성된 경로' 찾기 (DFS)
-        //    경로를 List<ConnectionPoint>로 저장
-        var allCompletePaths = new List<List<ConnectionPoint>>();
-        foreach (var startPoint in entryPoints)
-        {
-            FindAllPaths(startPoint, groundTerminals, allWires, allCompletePaths);
-        }
+        ConnectionPoint[] allPoints = FindObjectsOfType<ConnectionPoint>();
 
-        // --- ✨ 핵심 수정: 'Powered Ports' 해시셋 생성 ---
-        // 4. 완성된 경로에 포함된 *모든 포트*를 HashSet에 저장합니다.
-        var poweredPorts = new HashSet<ConnectionPoint>();
-        foreach (var path in allCompletePaths)
+        foreach (var point in allPoints)
         {
-            foreach (var point in path)
+            if (!visitedPorts.Contains(point))
             {
-                poweredPorts.Add(point);
+                // 새 Net을 생성하고, BFS/DFS로 이 Net에 연결된 모든 포트를 찾음
+                HashSet<ConnectionPoint> newNet = new HashSet<ConnectionPoint>();
+                FindNetRecursive(point, newNet, visitedPorts);
+
+                if (newNet.Count > 0)
+                {
+                    allNets.Add(newNet);
+                }
             }
         }
 
-        // 5. 'isPowered' 변수 및 PowerOn/Off 호출
+        // --- 2단계: Live Net과 Ground Net 식별 ---
+        FindLiveAndGroundNets();
+
+        // --- 3단계: 부품 전원 인가 ---
+        var poweredPorts = new HashSet<ConnectionPoint>(); // (와이어 색칠용)
+
         foreach (var component in allComponents)
         {
-            // 부품에 속한 포트 중 하나라도 poweredPorts에 포함되면 켠 것으로 간주
-            // (더 정확하게는 isLive/isGrounded를 포트 기준으로 설정해야 하지만,
-            //  일단 PowerOn/Off는 부품 단위로 처리)
-            bool isComponentPowered = component.GetComponentsInChildren<ConnectionPoint>().Any(p => poweredPorts.Contains(p));
-
-            if (isComponentPowered)
+            // (스위치, 전원 등은 전력 소모 부품이 아니므로 제외)
+            if (component is Switch || component is RelaySwitch || component is Sym_3P4W)
             {
-                // ✨ isLive/isGrounded도 함께 설정 (릴레이 등을 위해)
+                continue;
+            }
+
+            // (RL, Timer, RelayCoil 등 "부하" 부품만 검사)
+            ConnectionPoint[] ports = component.GetComponentsInChildren<ConnectionPoint>();
+            if (ports.Length < 2) continue; // 포트가 2개 미만인 부하는 무시
+
+            // 부하의 양단 포트
+            ConnectionPoint portA = ports[0];
+            ConnectionPoint portB = ports[1];
+
+            // A가 Live이고 B가 Ground인지 확인
+            bool isPoweredAtoB = liveNet.Contains(portA) && groundNet.Contains(portB);
+            // B가 Live이고 A가 Ground인지 확인 (교류 등)
+            bool isPoweredBtoA = liveNet.Contains(portB) && groundNet.Contains(portA);
+
+            if (isPoweredAtoB || isPoweredBtoA)
+            {
+                // 전원 인가 조건 충족!
                 component.isLive = true;
                 component.isGrounded = true;
                 component.isPowered = true;
                 component.PowerOn();
+
+                // 와이어 색칠을 위해 이 부품의 포트들을 poweredPorts에 추가
+                poweredPorts.Add(portA);
+                poweredPorts.Add(portB);
+
+                //poweredPorts.UnionWith(liveNet);
+                //poweredPorts.UnionWith(groundNet);
             }
             else
             {
-                component.isPowered = false; // AnalyzeCircuit 시작 시 이미 초기화됨
+                component.isPowered = false;
                 component.PowerOff();
             }
         }
 
-        // 7. 시각화
-        UpdateWireColors(allWires, poweredPorts);
+        // 4. 와이어 색상 업데이트
+        // (Live Net과 Ground Net에 속한 모든 포트를 poweredPorts에 추가)
+        
+        UpdateWireColors(allWires, allComponents);
 
-        isAnalyzing = false; // 분석 완료
+        isAnalyzing = false;
         Debug.Log("분석 완료!");
     }
 
     /// <summary>
-    /// 전선들을 검사하여 회로의 Live 진입 포트와 Ground 도착 포트를 찾습니다.
+    /// ✨ [새 함수] BFS/DFS로 "Net"을 찾는 재귀 함수
     /// </summary>
-    private void FindEntryAndGroundPoints(Wire[] allWires, List<ConnectionPoint> liveEntryPoints, List<ConnectionPoint> groundTerminals)
+    private void FindNetRecursive(ConnectionPoint currentPoint, HashSet<ConnectionPoint> currentNet, HashSet<ConnectionPoint> visitedPorts)
     {
+        // 1. 이미 방문했거나 유효하지 않으면 중단
+        if (currentPoint == null || visitedPorts.Contains(currentPoint))
+            return;
+
+        // 2. 방문 기록 및 Net에 추가
+        visitedPorts.Add(currentPoint);
+        currentNet.Add(currentPoint);
+
+        ElectricalComponent currentComponent = currentPoint.parentComponent;
+
+        // --- 탐색 1: 병렬 탐색 (전선을 따라가기) ---
+        // (FindObjectsOfType은 매우 느리므로, WireManager가 allWires를 캐시하는 것이 좋음)
+        Wire[] allWires = FindObjectsOfType<Wire>();
         foreach (var wire in allWires)
         {
-            ConnectionPoint sourcePort = null;
-            bool isLiveSource = false;
-            foreach (var point in wire.connectedPoints)
+            if (wire.connectedPoints.Contains(currentPoint))
+            {
+                foreach (var neighborPoint in wire.connectedPoints)
+                {
+                    if (neighborPoint != currentPoint)
+                    {
+                        FindNetRecursive(neighborPoint, currentNet, visitedPorts); // 재귀 호출
+                    }
+                }
+            }
+        }
+
+        // --- 탐색 2: 직렬 탐색 ("닫힌 스위치" 통과하기) ---
+        bool canPassThrough = false;
+
+        if (currentComponent is Switch switchComp && switchComp.isOn) canPassThrough = true;
+        else if (currentComponent is RelaySwitch relayComp && relayComp.isOn) canPassThrough = true;
+
+        if (canPassThrough)
+        {
+            // 닫힌 스위치라면, 반대편 포트로 탐색 계속
+            ConnectionPoint[] allPortsOnComponent = currentComponent.GetComponentsInChildren<ConnectionPoint>();
+            foreach (var internalNeighborPort in allPortsOnComponent)
+            {
+                if (internalNeighborPort != currentPoint)
+                {
+                    FindNetRecursive(internalNeighborPort, currentNet, visitedPorts); // 재귀 호출
+                }
+            }
+        }
+        // (부품이 RL, Coil 등 "부하"이거나 "열린 스위치"면 여기서 탐색 중단)
+    }
+
+    /// <summary>
+    /// ✨ [새 함수] 빌드된 Net 리스트를 순회하며 Live/Ground Net을 식별합니다.
+    /// </summary>
+    private void FindLiveAndGroundNets()
+    {
+        foreach (var net in allNets)
+        {
+            foreach (var point in net)
             {
                 var terminal = point.GetComponent<Terminal>();
                 if (terminal != null)
                 {
                     var parentPowerSource = terminal.GetComponentInParent<Sym_3P4W>();
+
+                    // (Live) 전원 소스 터미널을 포함하는 Net
                     if (terminal.type == Terminal.TerminalType.PowerSource && (parentPowerSource == null || parentPowerSource.isOn))
-                    { sourcePort = point; isLiveSource = true; }
+                    {
+                        liveNet.UnionWith(net); // 이 Net 전체를 Live로 간주
+                        break; // 다음 Net 검사
+                    }
+                    // (Ground) 접지 터미널을 포함하는 Net
                     else if (terminal.type == Terminal.TerminalType.PowerGround)
                     {
-                        // ✨ Ground 터미널 '포트' 자체를 도착점으로 추가
-                        if (!groundTerminals.Contains(point))
-                            groundTerminals.Add(point);
+                        groundNet.UnionWith(net); // 이 Net 전체를 Ground로 간주
+                        break; // 다음 Net 검사
                     }
                 }
             }
+        }
+    }
 
-            if (sourcePort != null && isLiveSource)
+    /// <summary>
+    /// ✨ [수정] "전류가 흐르는" 경로만 빨간색으로 칠합니다.
+    /// </summary>
+    private void UpdateWireColors(Wire[] allWires, ElectricalComponent[] allComponents)
+    {
+        Color liveColor = Color.red;
+
+        // 1. "전류가 흐르는" 포트들만 담을 새 Set을 생성합니다.
+        HashSet<ConnectionPoint> currentCarryingPorts = new HashSet<ConnectionPoint>();
+
+        // 2. BFS(너비 우선 탐색) 큐를 준비합니다.
+        Queue<ConnectionPoint> queue = new Queue<ConnectionPoint>();
+
+        // 3. [시작점 1] 전원이 켜진(isPowered) 모든 부품의 포트를 큐에 추가
+        foreach (var component in allComponents)
+        {
+            if (component.isPowered)
             {
-                foreach (var point in wire.connectedPoints)
+                foreach (var p in component.GetComponentsInChildren<ConnectionPoint>())
                 {
-                    // ✨ 터미널 건너편 '포트'를 진입점으로 추가
-                    if (point != sourcePort && !liveEntryPoints.Contains(point))
-                        liveEntryPoints.Add(point);
+                    if (!currentCarryingPorts.Contains(p))
+                    {
+                        currentCarryingPorts.Add(p);
+                        queue.Enqueue(p);
+                    }
                 }
             }
         }
-    }
 
-    /// <summary>
-    /// DFS 알고리즘을 시작하는 함수 (ConnectionPoint 기준)
-    /// </summary>
-    private void FindAllPaths(ConnectionPoint startNode, List<ConnectionPoint> endNodes, Wire[] allWires, List<List<ConnectionPoint>> allCompletePaths)
-    {
-        var currentPath = new List<ConnectionPoint>();
-        FindPathsRecursive(startNode, null, endNodes, allWires, currentPath, allCompletePaths);
-    }
+        // 4. [시작점 2] Live 전원(R,S,T)과 Ground(N) 터미널 포트도 큐에 추가
+        FindSourceAndGroundTerminals(queue, currentCarryingPorts);
 
-    /// <summary>
-    /// 재귀적으로 경로를 탐색하는 함수 (ConnectionPoint 기준, 직렬/병렬 탐색 분리)
-    /// </summary>
-    private void FindPathsRecursive(
-        ConnectionPoint currentPoint,
-        ConnectionPoint previousPoint, // 이전 포트 정보
-        List<ConnectionPoint> endNodes,
-        Wire[] allWires,
-        List<ConnectionPoint> currentPath, // ConnectionPoint 경로
-        List<List<ConnectionPoint>> allCompletePaths)
-    {
-        // 1. 현재 포트를 경로에 추가 (사이클 방지용)
-        currentPath.Add(currentPoint);
-
-        ElectricalComponent currentComponent = currentPoint.parentComponent;
-
-        // 2. 도착점에 도달했는지 확인
-        if (endNodes.Contains(currentPoint))
+        // 5. BFS 탐색 시작 (Dijkstra와 유사하게 "전류가 흐르는" Net을 탐색)
+        while (queue.Count > 0)
         {
-            allCompletePaths.Add(new List<ConnectionPoint>(currentPath));
-        }
-        else // 도착지가 아니라면 계속 탐색
-        {
-            // 3. 전원 장치(종착역) 확인 - 역류 방지
-            if (currentComponent.GetComponent<Sym_3P4W>() != null)
-            {
-                currentPath.Remove(currentPoint);
-                return;
-            }
+            ConnectionPoint currentPoint = queue.Dequeue();
 
-            // --- ✨ 4. 탐색 1: 병렬 탐색 (전선을 따라가는 이웃) ---
-            //    (스위치 상태와 *상관없이* 항상 탐색)
+            // 6. 탐색 1: (전선) 이 포트에 연결된 모든 전선을 탐색
             foreach (var wire in allWires)
             {
-                // 현재 포트(currentPoint)를 포함하는 전선인지 확인
                 if (wire.connectedPoints.Contains(currentPoint))
                 {
-                    // 이 전선에 연결된 '다른' 포트들(neighborPoint)을 순회
-                    foreach (var neighborPoint in wire.connectedPoints)
+                    foreach (var neighbor in wire.connectedPoints)
                     {
-                        if (neighborPoint == currentPoint) continue; // 자기 자신 건너뛰기
-
-                        // ✨ 핵심: currentPath.Contains()로 사이클 방지
-                        if (!currentPath.Contains(neighborPoint))
+                        if (neighbor != currentPoint && !currentCarryingPorts.Contains(neighbor))
                         {
-                            // 재귀 호출 (현재 포트를 '이전 포트'로 전달)
-                            FindPathsRecursive(neighborPoint, currentPoint, endNodes, allWires, currentPath, allCompletePaths);
+                            currentCarryingPorts.Add(neighbor);
+                            queue.Enqueue(neighbor);
                         }
                     }
                 }
             }
 
-            // --- ✨ 5. 탐색 2: 직렬 탐색 (부품 내부를 통과하는 이웃) ---
-            //    (스위치 상태에 *영향을 받음*)
-            bool isCurrentSwitchOff = (currentComponent is Switch switchComp && !switchComp.isOn) ||
-                                      (currentComponent is RelaySwitch contactComp && !contactComp.isOn) ||
-                                      (currentComponent is TimerSwitch timerComp && !timerComp.isOn);
+            // 7. 탐색 2: (닫힌 스위치) 이 포트가 속한 부품이 "닫힌 스위치"인지 확인
+            ElectricalComponent comp = currentPoint.parentComponent;
+            bool canPassThrough = (comp is Switch s && s.isOn) ||
+                                  (comp is RelaySwitch rs && rs.isOn);
 
-            // 스위치가 켜져 있거나, 스위치가 아니거나, 릴레이가 아니어야만 통과
-            if (!isCurrentSwitchOff)
+            if (canPassThrough)
             {
-                // 현재 부품(currentComponent)에 속한 *다른* 모든 포트를 찾습니다.
-                ConnectionPoint[] allPortsOnComponent = currentComponent.GetComponentsInChildren<ConnectionPoint>();
-
-                foreach (var internalNeighborPort in allPortsOnComponent)
+                foreach (var internalNeighbor in comp.GetComponentsInChildren<ConnectionPoint>())
                 {
-                    // 현재 포트(currentPoint)는 이미 처리했으므로 건너뜁니다.
-                    if (internalNeighborPort == currentPoint) continue;
-
-                    // ✨ 핵심: currentPath.Contains()로 사이클 방지
-                    if (!currentPath.Contains(internalNeighborPort))
+                    if (internalNeighbor != currentPoint && !currentCarryingPorts.Contains(internalNeighbor))
                     {
-                        // 재귀 호출 (현재 포트를 '이전 포트'로 전달)
-                        FindPathsRecursive(internalNeighborPort, currentPoint, endNodes, allWires, currentPath, allCompletePaths);
+                        currentCarryingPorts.Add(internalNeighbor);
+                        queue.Enqueue(internalNeighbor);
                     }
                 }
             }
-        }
+        } // BFS 종료
 
-        // 6. Backtrack
-        currentPath.Remove(currentPoint);
-    }
-
-    // CircuitSolver.cs의 UpdateWireColors 함수 (수정)
-
-    /// <summary>
-    /// isPowered 상태를 기준으로 전선 색상을 변경합니다.
-    /// (✨ '첫 번째 전선'과 '마지막 전선'을 특별 처리)
-    /// </summary>
-    private void UpdateWireColors(Wire[] allWires, HashSet<ConnectionPoint> poweredPorts)
-    {
-        Color liveColor = Color.red;
-
+        // 8. 최종 색칠
         foreach (var wire in allWires)
         {
-            // 1. 전선에 연결된 모든 포트가 poweredPorts에 있는지 확인 (기본 검사)
+            // 와이어의 양 끝점이 *모두* "전류가 흐르는" Set에 포함될 때만
             if (wire.connectedPoints.Count > 0 &&
-                wire.connectedPoints.All(p => poweredPorts.Contains(p)))
-            {
-                wire.SetColor(liveColor);
-                continue; // 이 전선은 칠했으므로 다음 전선으로
-            }
-
-            // --- ✨ 2. '첫 번째/마지막 전선' 특별 검사 ---
-            // (기본 검사에서 실패한 경우에만 실행됨)
-            bool isSourceWire = false;
-            bool isGroundWire = false;
-            bool otherPortIsPowered = false;
-
-            foreach (var point in wire.connectedPoints)
-            {
-                var terminal = point.GetComponent<Terminal>();
-                if (terminal != null)
-                {
-                    // 이 포트가 PowerSource인지 확인
-                    if (terminal.type == Terminal.TerminalType.PowerSource)
-                        isSourceWire = true;
-                    // 이 포트가 PowerGround인지 확인
-                    else if (terminal.type == Terminal.TerminalType.PowerGround)
-                        isGroundWire = true;
-                }
-                // 이 포트가 아닌 '다른' 포트가 poweredPorts에 있는지 확인
-                else if (poweredPorts.Contains(point))
-                {
-                    otherPortIsPowered = true;
-                }
-            }
-
-            // 3. 최종 판정
-            //    (이 선은 Source 선이고, 건너편 포트가 켜져있음)
-            //    || (이 선은 Ground 선이고, 건너편 포트가 켜져있음)
-            if ((isSourceWire || isGroundWire) && otherPortIsPowered)
+                wire.connectedPoints.All(p => currentCarryingPorts.Contains(p)))
             {
                 wire.SetColor(liveColor);
             }
             else
             {
-                wire.ResetColor(); // 두 조건 모두 아니면 회색
+                wire.ResetColor(); // PB1으로 가는 선 등 "Dead" 선은 회색
             }
-            // --- ✨ 특별 검사 끝 ---
+        }
+    }
+
+    /// <summary>
+    /// UpdateWireColors의 BFS 시작점으로 사용될 Live/Ground 터미널 포트를 찾습니다.
+    /// </summary>
+    private void FindSourceAndGroundTerminals(Queue<ConnectionPoint> queue, HashSet<ConnectionPoint> currentCarryingPorts)
+    {
+        Terminal[] allTerminals = FindObjectsOfType<Terminal>();
+        foreach (var terminal in allTerminals)
+        {
+            var parentPowerSource = terminal.GetComponentInParent<Sym_3P4W>();
+            bool isSourceLive = (terminal.type == Terminal.TerminalType.PowerSource && (parentPowerSource == null || parentPowerSource.isOn));
+            bool isGround = (terminal.type == Terminal.TerminalType.PowerGround);
+
+            if (isSourceLive)
+            {
+                ConnectionPoint terminalPort = terminal.GetComponent<ConnectionPoint>();
+                if (terminalPort != null && !currentCarryingPorts.Contains(terminalPort))
+                {
+                    currentCarryingPorts.Add(terminalPort);
+                    queue.Enqueue(terminalPort);
+                }
+            }
         }
     }
 }

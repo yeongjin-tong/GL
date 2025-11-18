@@ -34,7 +34,20 @@ public class RelayCoil : ElectricalComponent
             // ID가 일치하는 스위치만 제어합니다.
             if (relay.symbol_ID == this.symbol_ID)
             {
-                relay.SetContactState(newState);
+                bool initState = relay.GetInitState();
+
+                bool targetState;
+
+                if(newState)
+                {
+                    targetState = !initState;
+                }
+                else
+                {
+                    targetState = initState;
+                }
+
+                relay.SetContactState(targetState);
             }
         }
     }

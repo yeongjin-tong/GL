@@ -54,6 +54,9 @@ public class SymbolPaletteController : MonoBehaviour
                     case NamePosition.Right:
                         textObj.transform.localPosition = new Vector3(50f, 0f, 0f);
                         break;
+                    case NamePosition.Left:
+                        textObj.transform.localPosition = new Vector3(-65f, 0f, 0f);
+                        break;
                 }
                 
                 textObj.transform.localScale = new Vector3(1, 1, 1);

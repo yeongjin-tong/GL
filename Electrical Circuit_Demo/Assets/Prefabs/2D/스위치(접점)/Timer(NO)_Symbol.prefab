@@ -326,8 +326,8 @@ GameObject:
   - component: {fileID: 4578875291581796447}
   - component: {fileID: 5424119448605182245}
   - component: {fileID: 3134442943600434228}
-  - component: {fileID: 971648682460626836}
-  - component: {fileID: 717134636417434235}
+  - component: {fileID: 1124135354135739476}
+  - component: {fileID: 3500765615502168668}
   m_Layer: 8
   m_Name: Timer(NO)_Symbol
   m_TagString: Switch
@@ -455,6 +455,8 @@ MonoBehaviour:
   useText: 1
   symbolName: T
   namePosition: 0
+  useCountNum: 0
+  countNum: 
 --- !u!114 &3134442943600434228
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -470,7 +472,7 @@ MonoBehaviour:
   m_EffectColor: {r: 1, g: 1, b: 0, a: 0.5}
   m_EffectDistance: {x: 3, y: -3}
   m_UseGraphicAlpha: 1
---- !u!114 &971648682460626836
+--- !u!114 &1124135354135739476
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -479,7 +481,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5611926762267563915}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: badca2086f84f874a939860f4a3efa3b, type: 3}
+  m_Script: {fileID: 11500000, guid: f321f8f2d33d4e24eaddb1542aee370d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   symbol_ID: 
@@ -487,8 +489,9 @@ MonoBehaviour:
   isGrounded: 0
   isPowered: 0
   isPowerSource: 0
+  switchType: 1
   isOn: 0
---- !u!114 &717134636417434235
+--- !u!114 &3500765615502168668
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -497,7 +500,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5611926762267563915}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6a6ef3e44d69fe041a04483b4fc0a989, type: 3}
+  m_Script: {fileID: 11500000, guid: 260213ec1945db8428f817fd3505ebfa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   state:

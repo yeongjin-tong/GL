@@ -456,7 +456,8 @@ MonoBehaviour:
   isGrounded: 0
   isPowered: 0
   isPowerSource: 0
-  isOn: 0
+  switchType: 0
+  isOn: 1
 --- !u!114 &5424119448605182245
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -473,6 +474,8 @@ MonoBehaviour:
   useText: 1
   symbolName: X
   namePosition: 0
+  useCountNum: 0
+  countNum: 
 --- !u!114 &5346212084591620469
 MonoBehaviour:
   m_ObjectHideFlags: 0
