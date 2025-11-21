@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using JetBrains.Annotations;
 using TMPro;
 using Unity.VisualScripting;
@@ -17,20 +18,33 @@ public class ButtonController : MonoBehaviour
     public GameObject content_3d;
     public GameObject modeScreen;
 
-    [Header("2D 화면")]
+    [Header("2D 화면(Left)")]
+    public Button menuBtn;
+    public Button memoBtn;
+    public Button templateSaveBtn;
+    public Button templateLoadBtn;
+    public Button printBtn;
     public Button initBtn;
+    public Button backBtn;
+
+
+    [Header("2D 화면(Right)")]
+    public Button colorDivisionBtn;
+    public Button pinNum;
     public Button playBtn;
-    public Button pauseBtn;
     public Button stopBtn;
     public Button helpBtn;
+    public Button underBtn;
+    public Button quitBtn;
+
+    [Header("기타")]
     public Button helpCloseBtn;
-    public Button backBtn_2d;
-    public Button pinNum;
-
-
     private bool pinisOn;
     public Transform space_2d;
     public GameObject helpPanel;
+    public GameObject quitPopup;
+    public Transform popupSpace;
+    private GameObject quitInstant;
     [Header("3D 화면")]
     public Button window_2dBtn;
     public Button backBtn_3d;
@@ -38,7 +52,11 @@ public class ButtonController : MonoBehaviour
 
     private RectTransform panel_2D;
 
+    [DllImport("user32.dll")]
+    private static extern bool ShowWindow(IntPtr hwnd, int nCmdShow);
 
+    [DllImport("user32.dll")]
+    private static extern IntPtr GetActiveWindow();
 
     private void Awake()
     {
@@ -48,17 +66,15 @@ public class ButtonController : MonoBehaviour
         endBtn.onClick.AddListener(() => Application.Quit());
         window_2dBtn.onClick.AddListener(WindowScreen_2d);
         backBtn_3d.onClick.AddListener(() => ModeSelect(0));
-        backBtn_2d.onClick.AddListener(() => ModeSelect(0));
+        menuBtn.onClick.AddListener(() => ModeSelect(0));
         initBtn_3d.onClick.AddListener(ObjectInit);
         pinNum.onClick.AddListener(FindPinNumber);
-        helpBtn.onClick.AddListener(() =>
-        {
-            helpPanel.SetActive(true);
-        });
-        helpCloseBtn.onClick.AddListener(() =>
-        {
-            helpPanel.SetActive(false);
-        });
+        helpBtn.onClick.AddListener(() => helpPanel.SetActive(true) );
+        helpCloseBtn.onClick.AddListener(() => helpPanel.SetActive(false) );
+
+        quitBtn.onClick.AddListener(QuitPopup);
+
+        underBtn.onClick.AddListener(OnMinimizeWindow);
 
         SimulationBtnAdd();
     }
@@ -155,20 +171,8 @@ public class ButtonController : MonoBehaviour
         panel_2D.sizeDelta = new Vector2(1200f, 800f);
     }
 
-    //private void Init_3D()
-    //{
-    //    List<LineRenderer> lines = WireManager_3d.Instance.wireList;
-    //    foreach (LineRenderer lr in lines)
-    //    {
-    //        Destroy(lr.gameObject);
-    //    }
-    //    WireManager_3d.Instance.wireList.Clear();
-    //}
-    
     private void FindPinNumber()
     {
-        
-
         ConnectionPoint[] allObject = space_2d.GetComponentsInChildren<ConnectionPoint>();
         if(!pinisOn)
         {
@@ -192,7 +196,18 @@ public class ButtonController : MonoBehaviour
             }
             pinisOn = false;
         }
-        
     }
 
+    private void OnMinimizeWindow()
+    {
+        ShowWindow(GetActiveWindow(), 2);
+    }
+
+    private void QuitPopup()
+    {
+        if (quitInstant == null)
+        {
+            quitInstant = Instantiate(quitPopup, popupSpace);
+        }
+    }
 }

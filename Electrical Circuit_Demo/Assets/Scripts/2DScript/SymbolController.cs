@@ -9,6 +9,10 @@ public class SymbolController : MonoBehaviour
 {
     public static SymbolController Instance { get; private set; }
 
+    public LineRenderer dottedLine;
+
+    private LineRenderer instantDot;
+
     [Header("Selection Visuals")]
     [Tooltip("선택된 전선 색상")]
     public Color selectionColor = Color.yellow;
@@ -59,6 +63,34 @@ public class SymbolController : MonoBehaviour
         }
     }
 
+    public void ShowGuideLine(GameObject component)
+    {
+        if(instantDot == null)
+        {
+            instantDot = Instantiate(dottedLine, component.transform.parent);
+        }
+        Vector3 position = component.transform.localPosition;
+
+        float currentX = position.x;
+
+        Vector3 startPos = instantDot.GetPosition(0);
+        Vector3 endPos = instantDot.GetPosition(1);
+
+        instantDot.SetPosition(0, new Vector3(currentX, startPos.y, startPos.z));
+        instantDot.SetPosition(1, new Vector3(currentX, endPos.y, endPos.z));
+
+        instantDot.gameObject.SetActive(true);
+    }
+
+    public void HideGuideLine()
+    {
+        if (instantDot != null)
+        {
+            Destroy(instantDot.gameObject);
+            instantDot = null;
+        }
+    }
+
 
     void Update()
     {
@@ -83,6 +115,7 @@ public class SymbolController : MonoBehaviour
             {
                 WireManager.Instance.RedrawWiresForComponent(draggedComponent);
             }
+            ShowGuideLine(selectedObject);
         }
 
         // 드래그 종료 또는 *새 부품 배치* 시
@@ -106,6 +139,8 @@ public class SymbolController : MonoBehaviour
                     CheckForNearbyConnections(comp);
                 }
             }
+
+            HideGuideLine();
         }
     }
 
@@ -200,12 +235,13 @@ public class SymbolController : MonoBehaviour
             draggedComponent = selectedObject.GetComponent<ElectricalComponent>();
             initialMousePos = GetMouseWorldPos();
             initialObjectPos = selectedObject.transform.position;
+
             return;
         }
 
         DeselectAll();
 
-        if (hit != null)
+        if (hit != null && WireManager.Instance.currentWire == null)
         {
             if (hit.gameObject.name.Contains("Clone") || hit.gameObject.CompareTag("Wire"))
             {

@@ -259,7 +259,7 @@ public class WireManager_3d : MonoBehaviour
     {
         lr.startWidth = wireWidth;
         lr.endWidth = wireWidth;
-        lr.material = new Material(Shader.Find("Unlit/Color"));
+        //lr.material = new Material(Shader.Find("Unlit/Color"));
         lr.material.color = wireColor;
         lr.useWorldSpace = true;
     }

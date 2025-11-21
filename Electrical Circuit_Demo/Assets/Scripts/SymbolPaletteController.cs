@@ -118,6 +118,8 @@ public class SymbolPaletteController : MonoBehaviour
             // 3. 스냅된 위치를 생성된 프리팹의 위치로 설정합니다.
             currentPlacingPrefab.GetComponent<RectTransform>().anchoredPosition = snappedPosition;
 
+            SymbolController.Instance.ShowGuideLine(currentPlacingPrefab);
+
             // ✨ 2. 마우스 버튼에서 손을 떼면 (드래그를 끝내면) 배치 또는 파괴를 결정
             if (Input.GetMouseButtonUp(0))
             {
@@ -140,10 +142,11 @@ public class SymbolPaletteController : MonoBehaviour
                     SymbolController.Instance.CheckForNearbyConnections(symbol);
                 }
 
-                
-                
+
+
 
                 // 4. 배치든 파괴든, 작업이 끝났으므로 상태를 초기화
+                SymbolController.Instance.HideGuideLine();
                 currentPlacingPrefab = null;
                 scrollrect.enabled = true;
             }

@@ -112,9 +112,6 @@ public class CircuitSolver : MonoBehaviour
                 // 와이어 색칠을 위해 이 부품의 포트들을 poweredPorts에 추가
                 poweredPorts.Add(portA);
                 poweredPorts.Add(portB);
-
-                //poweredPorts.UnionWith(liveNet);
-                //poweredPorts.UnionWith(groundNet);
             }
             else
             {
@@ -192,24 +189,36 @@ public class CircuitSolver : MonoBehaviour
     {
         foreach (var net in allNets)
         {
+            // 최적화: 이 Net이 Live인지 Ground인지 확인했는지 체크하는 플래그
+            bool isLiveFound = false;
+            bool isGroundFound = false;
+
             foreach (var point in net)
             {
+                // 이미 둘 다 찾았다면 더 이상 루프를 돌 필요 없음 (최적화용)
+                if (isLiveFound && isGroundFound) break;
+
                 var terminal = point.GetComponent<Terminal>();
                 if (terminal != null)
                 {
                     var parentPowerSource = terminal.GetComponentInParent<Sym_3P4W>();
 
-                    // (Live) 전원 소스 터미널을 포함하는 Net
-                    if (terminal.type == Terminal.TerminalType.PowerSource && (parentPowerSource == null || parentPowerSource.isOn))
+                    // (Live) 전원 소스 터미널 확인
+                    if (!isLiveFound && terminal.type == Terminal.TerminalType.PowerSource && (parentPowerSource == null || parentPowerSource.isOn))
                     {
-                        liveNet.UnionWith(net); // 이 Net 전체를 Live로 간주
-                        break; // 다음 Net 검사
+                        liveNet.UnionWith(net); // 이 Net 전체를 Live로 등록
+                        isLiveFound = true;     // 찾았음을 표시
+
+                        // ✨ [수정] 여기서 break를 하면 안 됩니다! 
+                        // 같은 Net 안에 Ground 터미널이 있을 수도 있기 때문입니다.
                     }
-                    // (Ground) 접지 터미널을 포함하는 Net
-                    else if (terminal.type == Terminal.TerminalType.PowerGround)
+                    // (Ground) 접지 터미널 확인
+                    else if (!isGroundFound && terminal.type == Terminal.TerminalType.PowerGround)
                     {
-                        groundNet.UnionWith(net); // 이 Net 전체를 Ground로 간주
-                        break; // 다음 Net 검사
+                        groundNet.UnionWith(net); // 이 Net 전체를 Ground로 등록
+                        isGroundFound = true;     // 찾았음을 표시
+
+                        // ✨ [수정] 여기서도 break 제거 (혹은 위 최적화 if문으로 대체)
                     }
                 }
             }

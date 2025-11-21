@@ -24,10 +24,7 @@ public class Wire : MonoBehaviour
     private void Awake()
     {
         lineRenderer = GetComponent<LineRenderer>();
-        if (lineRenderer != null)
-        {
-            defaultColor = lineRenderer.startColor;
-        }
+        defaultColor = WireManager.Instance.defaultLineColor;
     }
 
     /// <summary>

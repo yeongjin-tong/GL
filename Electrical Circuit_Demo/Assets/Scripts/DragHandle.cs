@@ -10,6 +10,11 @@ public class DragHandle : MonoBehaviour, IDragHandler
         // 부모 오브젝트에서 ResizableWindow 스크립트를 찾아옴
         window = GetComponentInParent<ResizableWindow>();
     }
+    
+    void Start()
+    {
+
+    }
 
     public void OnDrag(PointerEventData eventData)
     {

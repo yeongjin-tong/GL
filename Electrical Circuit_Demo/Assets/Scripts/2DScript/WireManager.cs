@@ -20,14 +20,18 @@ public class WireManager : MonoBehaviour
     public float wireWidth = 0.02f;
 
     private ConnectionPoint firstPoint;
-    private LineRenderer currentWire;
+    public LineRenderer currentWire;
     private GridManager gridManager;
 
-    private Color lineColor;
+    [HideInInspector]
+    public Color defaultLineColor = Color.gray;
+    private Color32 movingLineColor = new Color32(121, 237, 255, 255);      // 현재 하늘색
 
     private Wire myWire;
 
-    private int clickIndex = 0;
+    private int lineIndex = 0;      // 라인 꺾을 때 쓰는 인덱스
+
+    private int clickIndex = 0;     // 클릭 횟수
 
     [Header("Junction Settings")]
     [Tooltip("전선 분기점에 표시될 프리팹 (예: 작은 원 모양의 스프라이트)")]
@@ -55,7 +59,6 @@ public class WireManager : MonoBehaviour
     private void Start()
     {
         gridManager = GridManager.Instance;
-        lineColor = Color.gray;
     }
 
     // 스크립트 활성화 시 이벤트 구독
@@ -81,10 +84,16 @@ public class WireManager : MonoBehaviour
             if(Input.GetMouseButtonDown(1))
             {
                 Destroy(currentWire.gameObject);
+
                 ResetState();
+
+                if (junctionPreview != null)
+                {
+                    Destroy(junctionPreview);
+                    junctionPreview = null;
+                }
             }
         }
-
     }
 
     // InputManager의 방송을 수신하여 처리하는 함수
@@ -107,19 +116,27 @@ public class WireManager : MonoBehaviour
             return; // 여기서 함수를 종료하여 아래 로직이 실행되지 않도록 함
         }
 
-        if (hit == null && firstPoint != null)
+        if (hit == null && firstPoint != null)  // 허공에 클릭해서 선 꺾기
         {
-            // 마우스 위치를 로컬 좌표로 변환하고 그리드에 스냅
-            RectTransformUtility.ScreenPointToLocalPointInRectangle((RectTransform)content_2D, Input.mousePosition, Camera.main, out Vector2 localMousePos);
-            Vector2 snappedLocalPos = gridManager.SnapToGrid(localMousePos);
-
-            AddPointToWire(currentWire);
-
-            if (junctionPreview != null)
+            clickIndex++;
+            if (clickIndex  < 3)
             {
-                Destroy(junctionPreview);
+                // 마우스 위치를 로컬 좌표로 변환하고 그리드에 스냅
+                RectTransformUtility.ScreenPointToLocalPointInRectangle((RectTransform)content_2D, Input.mousePosition, Camera.main, out Vector2 localMousePos);
+                Vector2 snappedLocalPos = gridManager.SnapToGrid(localMousePos);
+
+                AddPointToWire(currentWire);
+
+                if (junctionPreview != null)
+                {
+                    Destroy(junctionPreview);
+                }
             }
-                return;
+            else
+            {
+                Debug.Log("선 연결 실패: 선을 너무 많이 꺾지 마세요.");
+            }
+            return;
         }
 
         if (hit != null)
@@ -190,11 +207,16 @@ public class WireManager : MonoBehaviour
         wire.gameObject.tag = "Wire";
 
         myWire.connectedPoints.Add(endPoint);
+        wire.startColor = defaultLineColor;
+        wire.endColor = defaultLineColor;
 
         // CircuitGraph에 연결 등록
         CircuitGraph.Instance.RegisterConnection(startPoint.parentComponent, endPoint.parentComponent);
 
         wire.AddComponent<EdgeCollider2D>();
+        //Wire wire1 = wire.GetComponent<Wire>();
+        //RedrawWire(wire1, endPoint.parentComponent);        // 가끔 대각선으로 그려질 때가 있어, 한번 더 정리
+
         currentWire = wire;
         ColliderSetting();
         currentWire = null;
@@ -224,6 +246,7 @@ public class WireManager : MonoBehaviour
 
     private void UpdateWirePreview(LineRenderer wire)
     {
+
         Vector3 mouseWorld = GetMouseWorldPosition();
 
         // 마우스의 로컬 좌표를 계산하고 스냅
@@ -267,7 +290,7 @@ public class WireManager : MonoBehaviour
             nearestWireForPreview = null;
         }
 
-        Vector3 lastFixedPoint = wire.GetPosition(clickIndex);
+        Vector3 lastFixedPoint = wire.GetPosition(lineIndex);
 
         //    (이전 경로의 방향을 고려하여 꺾이는 방향 결정)
         Vector3 previousSegment = (wire.positionCount > 2) ? (lastFixedPoint - wire.GetPosition(wire.positionCount - 3)) : Vector3.zero;
@@ -288,13 +311,13 @@ public class WireManager : MonoBehaviour
 
         if(isAligned)
         {
-            wire.positionCount = clickIndex + 2;
+            wire.positionCount = lineIndex + 2;
             wire.SetPosition(wire.positionCount - 1, snappedLocalPos);
         }
         else
         {
 
-            wire.positionCount = clickIndex + 3;
+            wire.positionCount = lineIndex + 3;
             wire.SetPosition(wire.positionCount - 2, corner);
             wire.SetPosition(wire.positionCount - 1, snappedLocalPos);
         }
@@ -302,13 +325,14 @@ public class WireManager : MonoBehaviour
 
     private void AddPointToWire(LineRenderer lr)
     {
-        clickIndex = lr.positionCount - 1;
+        lineIndex = lr.positionCount - 1;
     }
 
     private void ResetState() 
-    { 
+    {
         firstPoint = null; 
         currentWire = null; 
+        lineIndex = 0;
         clickIndex = 0;
         isPreviewColliding = false;
     }
@@ -329,7 +353,7 @@ public class WireManager : MonoBehaviour
 
         lr.startWidth = wireWidth; lr.endWidth = wireWidth;
         lr.material = wireMaterial;
-        lr.startColor = lineColor; lr.endColor = lineColor;
+        lr.startColor = movingLineColor; lr.endColor = movingLineColor;
         lr.sortingOrder = 1;
 
         //EdgeCollider2D wireCollider = wireObject.AddComponent<EdgeCollider2D>();
@@ -517,7 +541,7 @@ public class WireManager : MonoBehaviour
         lr.useWorldSpace = false;
         lr.startWidth = wireWidth; lr.endWidth = wireWidth;
         lr.material = new Material(Shader.Find("Legacy Shaders/Particles/Alpha Blended Premultiply"));
-        lr.startColor = lineColor; lr.endColor = lineColor;
+        lr.startColor = defaultLineColor; lr.endColor = defaultLineColor;
         lr.sortingOrder = 1;
 
         List<Vector3> optimizedPath = OptimizePath(pathPoints);
@@ -902,6 +926,33 @@ public class WireManager : MonoBehaviour
         if (Vector3.Distance(optimizedPath.Last(), path.Last()) > 0.001f)
         {
             optimizedPath.Add(path.Last());
+        }
+
+        int count = optimizedPath.Count;
+
+        if (count >= 3)
+        {
+            int indexPrev = count - 2;
+            int indexPrevPrev = count - 3;
+
+            Vector3 pLast = optimizedPath[count - 1];
+            Vector3 pPrev = optimizedPath[indexPrev];
+            Vector3 pPrevPrev = optimizedPath[indexPrevPrev];
+
+            bool isVertical = Mathf.Abs(pPrev.x - pPrevPrev.x) < 0.001f;
+
+            bool isHorizontal = Mathf.Abs(pPrev.y - pPrevPrev.y) < 0.001f;
+
+            if(isVertical)
+            {
+                pPrev.y = pLast.y;
+            }
+            else if(isHorizontal)
+            {
+                pPrev.x = pLast.x;
+            }
+
+            optimizedPath[indexPrev] = pPrev;
         }
 
         return optimizedPath;

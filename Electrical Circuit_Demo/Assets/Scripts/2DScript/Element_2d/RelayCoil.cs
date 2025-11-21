@@ -9,7 +9,7 @@ public class RelayCoil : ElectricalComponent
     public override void PowerOn()
     {
         base.PowerOn();
-        ControlLinkedSwitches(true);
+        ControlLinkedSwitches(true, Type.Relay);
     }
 
     /// <summary>
@@ -18,13 +18,13 @@ public class RelayCoil : ElectricalComponent
     public override void PowerOff()
     {
         base.PowerOff();
-        ControlLinkedSwitches(false);
+        ControlLinkedSwitches(false, Type.Relay);
     }
 
     /// <summary>
     /// 이 코일과 연결된 모든 릴레이 스위치를 찾아 상태를 변경합니다.
     /// </summary>
-    private void ControlLinkedSwitches(bool newState)
+    private void ControlLinkedSwitches(bool newState, Type type)
     {
         // 씬에 있는 모든 릴레이 스위치를 찾습니다.
         RelaySwitch[] allSwitches = FindObjectsOfType<RelaySwitch>();
@@ -32,7 +32,7 @@ public class RelayCoil : ElectricalComponent
         foreach (var relay in allSwitches)
         {
             // ID가 일치하는 스위치만 제어합니다.
-            if (relay.symbol_ID == this.symbol_ID)
+            if (relay.symbol_ID == this.symbol_ID && relay.switchType == type)
             {
                 bool initState = relay.GetInitState();
 

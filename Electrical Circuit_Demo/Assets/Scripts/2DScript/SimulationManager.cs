@@ -30,6 +30,8 @@ public class SimulationManager : MonoBehaviour
         // 시뮬레이션이 꺼질 때 (수정된 로직)
         else
         {
+            ObjectManager.Instance.CleanUpList();
+
             foreach (GameObject component in ObjectManager.Instance.objects_2d)
             {
                 if (component.GetComponent<ElectricalComponent>() != null)
