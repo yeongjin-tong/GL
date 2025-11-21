@@ -370,7 +370,6 @@ GameObject:
   - component: {fileID: 3205475939724639424}
   - component: {fileID: 1077714501195495771}
   - component: {fileID: 3504137698222061379}
-  - component: {fileID: 1348237095341294802}
   - component: {fileID: 3137953178292859471}
   m_Layer: 8
   m_Name: MC_Symbol
@@ -495,27 +494,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af3768fc0e439de438b7f1d3ad4da1e1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  instanceID: 
   symbol_ID: 
   isLive: 0
   isGrounded: 0
   isPowered: 0
   isPowerSource: 0
---- !u!114 &1348237095341294802
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4229501278534734328}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bb6b2487b1b201e43ab6c3c0fa198afd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  prefabToSpawn_2D: {fileID: 4229501278534734328}
-  useText: 0
-  symbolName: ddd
-  namePosition: 0
 --- !u!114 &3137953178292859471
 MonoBehaviour:
   m_ObjectHideFlags: 0

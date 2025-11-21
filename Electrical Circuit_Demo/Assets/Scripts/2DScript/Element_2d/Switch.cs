@@ -21,8 +21,9 @@ public class Switch : ElectricalComponent
     // initState가 이 스위치의 "비활성" (기본) 상태를 저장합니다.
     private bool initState = false;
 
-    private void Awake()
+    public override void Awake()
     {
+        base.Awake();
         // initState는 스위치의 "기본(Default)" 또는 "비활성(Inactive)" 상태입니다.
         // NO 스위치라면 false, NC 스위치라면 true가 됩니다.
         initState = isOn;

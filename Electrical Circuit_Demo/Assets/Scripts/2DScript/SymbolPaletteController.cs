@@ -85,7 +85,7 @@ public class SymbolPaletteController : MonoBehaviour
 
             if(currentPlacingPrefab.GetComponent<ElectricalComponent>() != null)
             {
-                currentPlacingPrefab.GetComponent<ElectricalComponent>().symbol_ID = symbolData.symbolName;
+                currentPlacingPrefab.GetComponent<ElectricalComponent>().symbol_ID = symbolData.prefabToSpawn_2D.name;
             }
 
             scrollrect.enabled = false;
@@ -141,9 +141,6 @@ public class SymbolPaletteController : MonoBehaviour
                     ElectricalComponent symbol = currentPlacingPrefab.GetComponent<ElectricalComponent>();
                     SymbolController.Instance.CheckForNearbyConnections(symbol);
                 }
-
-
-
 
                 // 4. 배치든 파괴든, 작업이 끝났으므로 상태를 초기화
                 SymbolController.Instance.HideGuideLine();

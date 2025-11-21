@@ -6,6 +6,9 @@ using UnityEngine.UI;
 // abstract: 이 클래스는 직접 사용할 수 없고, 다른 클래스가 상속해야만 함
 public abstract class ElectricalComponent : MonoBehaviour
 {
+    // 저장/불러오기 시 연결 관계를 식별하기 위한 고유 ID
+    [HideInInspector] public string instanceID;
+
     [Tooltip("이 부품의 ID")]
     public string symbol_ID;
 
@@ -18,6 +21,14 @@ public abstract class ElectricalComponent : MonoBehaviour
 
     // 자신이 전력원인지 표시하는 변수
     public bool isPowerSource = false;
+
+    public virtual void Awake()
+    {
+        if(string.IsNullOrEmpty(instanceID))
+        {
+            instanceID = System.Guid.NewGuid().ToString();
+        }
+    }
 
     // 전원을 켜는 함수 (이제 시각적 효과만 담당)
     public virtual void PowerOn()

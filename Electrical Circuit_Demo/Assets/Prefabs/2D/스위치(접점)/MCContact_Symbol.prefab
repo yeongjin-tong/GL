@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 5873000863215449404}
   - component: {fileID: 1555088981447586227}
   - component: {fileID: 2643553052154193346}
-  - component: {fileID: 1865164152157867340}
   - component: {fileID: 4421743567782751056}
   m_Layer: 8
   m_Name: MCContact_Symbol
@@ -142,6 +141,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f321f8f2d33d4e24eaddb1542aee370d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  instanceID: 
   symbol_ID: 
   isLive: 0
   isGrounded: 0
@@ -149,24 +149,6 @@ MonoBehaviour:
   isPowerSource: 0
   switchType: 0
   isOn: 0
---- !u!114 &1865164152157867340
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1547959117227323889}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bb6b2487b1b201e43ab6c3c0fa198afd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  prefabToSpawn_2D: {fileID: 1547959117227323889}
-  useText: 1
-  symbolName: MC
-  namePosition: 0
-  useCountNum: 0
-  countNum: 
 --- !u!114 &4421743567782751056
 MonoBehaviour:
   m_ObjectHideFlags: 0

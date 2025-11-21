@@ -3,24 +3,44 @@
   "WorkspaceRootPath": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{2A23C861-C5DD-A1C6-4B68-15E4F8D110D9}|Assembly-CSharp.csproj|C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\assets\\scripts\\symbolpalettecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2A23C861-C5DD-A1C6-4B68-15E4F8D110D9}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\symbolpalettecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{2A23C861-C5DD-A1C6-4B68-15E4F8D110D9}|Assembly-CSharp.csproj|C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\assets\\scripts\\savemanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2A23C861-C5DD-A1C6-4B68-15E4F8D110D9}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\savemanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{2A23C861-C5DD-A1C6-4B68-15E4F8D110D9}|Assembly-CSharp.csproj|C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\assets\\scripts\\symboldata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2A23C861-C5DD-A1C6-4B68-15E4F8D110D9}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\symboldata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2A23C861-C5DD-A1C6-4B68-15E4F8D110D9}|Assembly-CSharp.csproj|C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\assets\\scripts\\2dscript\\circuitsolver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2A23C861-C5DD-A1C6-4B68-15E4F8D110D9}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\2dscript\\circuitsolver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{2A23C861-C5DD-A1C6-4B68-15E4F8D110D9}|Assembly-CSharp.csproj|c:\\users\\user\\desktop\\work_git\\electrical circuit_demo\\assets\\scripts\\2dscript\\electricalcomponent.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2A23C861-C5DD-A1C6-4B68-15E4F8D110D9}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\2dscript\\electricalcomponent.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{2A23C861-C5DD-A1C6-4B68-15E4F8D110D9}|Assembly-CSharp.csproj|c:\\users\\user\\desktop\\work_git\\electrical circuit_demo\\assets\\scripts\\2dscript\\wiremanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{2A23C861-C5DD-A1C6-4B68-15E4F8D110D9}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\2dscript\\wiremanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
+      "AbsoluteMoniker": "D:0:0:{2A23C861-C5DD-A1C6-4B68-15E4F8D110D9}|Assembly-CSharp.csproj|C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\assets\\scripts\\2dscript\\symbolpalettecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2A23C861-C5DD-A1C6-4B68-15E4F8D110D9}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\2dscript\\symbolpalettecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2A23C861-C5DD-A1C6-4B68-15E4F8D110D9}|Assembly-CSharp.csproj|C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\assets\\scripts\\2dscript\\element_2d\\sym_3p4w.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2A23C861-C5DD-A1C6-4B68-15E4F8D110D9}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\2dscript\\element_2d\\sym_3p4w.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{2A23C861-C5DD-A1C6-4B68-15E4F8D110D9}|Assembly-CSharp.csproj|C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\assets\\scripts\\2dscript\\buttoncontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{2A23C861-C5DD-A1C6-4B68-15E4F8D110D9}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\2dscript\\buttoncontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2A23C861-C5DD-A1C6-4B68-15E4F8D110D9}|Assembly-CSharp.csproj|C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\assets\\scripts\\2dscript\\inputmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2A23C861-C5DD-A1C6-4B68-15E4F8D110D9}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\2dscript\\inputmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2A23C861-C5DD-A1C6-4B68-15E4F8D110D9}|Assembly-CSharp.csproj|C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\assets\\scripts\\2dscript\\element_2d\\circuitgraph.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2A23C861-C5DD-A1C6-4B68-15E4F8D110D9}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\2dscript\\element_2d\\circuitgraph.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2A23C861-C5DD-A1C6-4B68-15E4F8D110D9}|Assembly-CSharp.csproj|C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\assets\\scripts\\2dscript\\connectionpoint.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2A23C861-C5DD-A1C6-4B68-15E4F8D110D9}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\2dscript\\connectionpoint.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2A23C861-C5DD-A1C6-4B68-15E4F8D110D9}|Assembly-CSharp.csproj|C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\assets\\scripts\\2dscript\\circuitsolver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2A23C861-C5DD-A1C6-4B68-15E4F8D110D9}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\2dscript\\circuitsolver.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{2A23C861-C5DD-A1C6-4B68-15E4F8D110D9}|Assembly-CSharp.csproj|C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\assets\\scripts\\2dscript\\simulationmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -33,14 +53,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{2A23C861-C5DD-A1C6-4B68-15E4F8D110D9}|Assembly-CSharp.csproj|C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\assets\\scripts\\2dscript\\wire.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{2A23C861-C5DD-A1C6-4B68-15E4F8D110D9}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\2dscript\\wire.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2A23C861-C5DD-A1C6-4B68-15E4F8D110D9}|Assembly-CSharp.csproj|c:\\users\\user\\desktop\\work_git\\electrical circuit_demo\\assets\\scripts\\2dscript\\symbolcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2A23C861-C5DD-A1C6-4B68-15E4F8D110D9}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\2dscript\\symbolcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2A23C861-C5DD-A1C6-4B68-15E4F8D110D9}|Assembly-CSharp.csproj|c:\\users\\user\\desktop\\work_git\\electrical circuit_demo\\assets\\scripts\\2dscript\\inputmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2A23C861-C5DD-A1C6-4B68-15E4F8D110D9}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\2dscript\\inputmanager.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{2A23C861-C5DD-A1C6-4B68-15E4F8D110D9}|Assembly-CSharp.csproj|C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\assets\\scripts\\resizablewindow.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -65,10 +77,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{2A23C861-C5DD-A1C6-4B68-15E4F8D110D9}|Assembly-CSharp.csproj|C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\assets\\scripts\\2dscript\\element_2d\\flickerrelaycoil.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{2A23C861-C5DD-A1C6-4B68-15E4F8D110D9}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\2dscript\\element_2d\\flickerrelaycoil.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2A23C861-C5DD-A1C6-4B68-15E4F8D110D9}|Assembly-CSharp.csproj|C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\assets\\scripts\\2dscript\\element_2d\\circuitgraph.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2A23C861-C5DD-A1C6-4B68-15E4F8D110D9}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\2dscript\\element_2d\\circuitgraph.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{2A23C861-C5DD-A1C6-4B68-15E4F8D110D9}|Assembly-CSharp.csproj|C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\assets\\scripts\\2dscript\\element_2d\\lamp.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
@@ -115,10 +123,6 @@
       "RelativeMoniker": "D:0:0:{2A23C861-C5DD-A1C6-4B68-15E4F8D110D9}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\3dscript\\linkconnect.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{2A23C861-C5DD-A1C6-4B68-15E4F8D110D9}|Assembly-CSharp.csproj|C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\assets\\scripts\\2dscript\\connectionpoint.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2A23C861-C5DD-A1C6-4B68-15E4F8D110D9}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\2dscript\\connectionpoint.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{2A23C861-C5DD-A1C6-4B68-15E4F8D110D9}|Assembly-CSharp.csproj|C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\assets\\scripts\\2dscript\\element_2d\\battery.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{2A23C861-C5DD-A1C6-4B68-15E4F8D110D9}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\2dscript\\element_2d\\battery.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
@@ -161,6 +165,14 @@
     },
     {
       "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\USER\\Desktop\\Unity\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\CircuitController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\SymbolPaletteController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Assets\\Scripts\\SymbolPaletteController.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\DataCasses.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:Assets\\Scripts\\DataCasses.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -170,76 +182,98 @@
       "DocumentGroups": [
         {
           "DockedWidth": 199,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 4,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "SymbolPaletteController.cs",
-              "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\SymbolPaletteController.cs",
-              "RelativeDocumentMoniker": "Assets\\Scripts\\SymbolPaletteController.cs",
-              "ToolTip": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\SymbolPaletteController.cs",
-              "RelativeToolTip": "Assets\\Scripts\\SymbolPaletteController.cs",
-              "ViewState": "AgIAABoAAAAAAAAAAAAhwCcAAAAJAAAAAAAAAA==",
+              "DocumentIndex": 1,
+              "Title": "ElectricalComponent.cs",
+              "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\ElectricalComponent.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\2DScript\\ElectricalComponent.cs",
+              "ToolTip": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\ElectricalComponent.cs",
+              "RelativeToolTip": "Assets\\Scripts\\2DScript\\ElectricalComponent.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABgAAAAfAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-18T04:24:14.865Z",
+              "WhenOpened": "2025-11-21T08:30:49.277Z",
               "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 43,
+              "Title": "DataCasses.cs",
+              "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\DataCasses.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\DataCasses.cs",
+              "ToolTip": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\DataCasses.cs",
+              "RelativeToolTip": "Assets\\Scripts\\DataCasses.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABQAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-21T06:47:19.356Z"
             },
             {
               "$type": "Document",
               "DocumentIndex": 2,
-              "Title": "CircuitSolver.cs",
-              "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\CircuitSolver.cs",
-              "RelativeDocumentMoniker": "Assets\\Scripts\\2DScript\\CircuitSolver.cs",
-              "ToolTip": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\CircuitSolver.cs",
-              "RelativeToolTip": "Assets\\Scripts\\2DScript\\CircuitSolver.cs",
-              "ViewState": "AgIAALgAAAAAAAAAAAAAwNkAAABJAAAAAAAAAA==",
+              "Title": "WireManager.cs",
+              "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\WireManager.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\2DScript\\WireManager.cs",
+              "ToolTip": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\WireManager.cs",
+              "RelativeToolTip": "Assets\\Scripts\\2DScript\\WireManager.cs",
+              "ViewState": "AgIAACYCAAAAAAAAAAAjwD8CAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-26T08:52:25.975Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "ButtonController.cs",
-              "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\ButtonController.cs",
-              "RelativeDocumentMoniker": "Assets\\Scripts\\2DScript\\ButtonController.cs",
-              "ToolTip": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\ButtonController.cs",
-              "RelativeToolTip": "Assets\\Scripts\\2DScript\\ButtonController.cs",
-              "ViewState": "AgIAAGwAAAAAAAAAAAAAwHcAAAAIAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-30T06:58:22.761Z",
+              "WhenOpened": "2025-11-20T07:31:50.797Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 5,
-              "Title": "SimulationManager.cs",
-              "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\SimulationManager.cs",
-              "RelativeDocumentMoniker": "Assets\\Scripts\\2DScript\\SimulationManager.cs",
-              "ToolTip": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\SimulationManager.cs",
-              "RelativeToolTip": "Assets\\Scripts\\2DScript\\SimulationManager.cs",
-              "ViewState": "AgIAAB8AAAAAAAAAAAAAwDEAAAAEAAAAAAAAAA==",
+              "Title": "ButtonController.cs",
+              "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\ButtonController.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\2DScript\\ButtonController.cs",
+              "ToolTip": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\ButtonController.cs",
+              "RelativeToolTip": "Assets\\Scripts\\2DScript\\ButtonController.cs",
+              "ViewState": "AgIAAD4AAAAAAAAAAAAjwFIAAAAFAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-14T00:10:27.282Z",
+              "WhenOpened": "2025-10-30T06:58:22.761Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "SaveManager.cs",
+              "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\SaveManager.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\SaveManager.cs",
+              "ToolTip": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\SaveManager.cs",
+              "RelativeToolTip": "Assets\\Scripts\\SaveManager.cs",
+              "ViewState": "AgIAAHMAAAAAAAAAAAD4v5MAAABDAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-21T01:53:15.47Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "Wire.cs",
-              "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\Wire.cs",
-              "RelativeDocumentMoniker": "Assets\\Scripts\\2DScript\\Wire.cs",
-              "ToolTip": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\Wire.cs",
-              "RelativeToolTip": "Assets\\Scripts\\2DScript\\Wire.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAAfAAAAAAAAAA==",
+              "DocumentIndex": 4,
+              "Title": "Sym_3P4W.cs",
+              "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\Element_2d\\Sym_3P4W.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\2DScript\\Element_2d\\Sym_3P4W.cs",
+              "ToolTip": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\Element_2d\\Sym_3P4W.cs",
+              "RelativeToolTip": "Assets\\Scripts\\2DScript\\Element_2d\\Sym_3P4W.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-29T08:00:13.913Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-21T05:12:29.401Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 3,
+              "Title": "SymbolPaletteController.cs",
+              "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\SymbolPaletteController.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\2DScript\\SymbolPaletteController.cs",
+              "ToolTip": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\SymbolPaletteController.cs",
+              "RelativeToolTip": "Assets\\Scripts\\2DScript\\SymbolPaletteController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAKUAAABZAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-21T03:43:43.32Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
               "Title": "RelayCoil.cs",
               "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\Element_2d\\RelayCoil.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\2DScript\\Element_2d\\RelayCoil.cs",
@@ -247,64 +281,23 @@
               "RelativeToolTip": "Assets\\Scripts\\2DScript\\Element_2d\\RelayCoil.cs",
               "ViewState": "AgIAABAAAAAAAAAAAAAAwBoAAABAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-11T00:19:29.264Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-11T00:19:29.264Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "SymbolController.cs",
-              "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\SymbolController.cs",
-              "RelativeDocumentMoniker": "Assets\\Scripts\\2DScript\\SymbolController.cs",
-              "ToolTip": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\SymbolController.cs",
-              "RelativeToolTip": "Assets\\Scripts\\2DScript\\SymbolController.cs",
-              "ViewState": "AgIAADgAAAAAAAAAAIA9wFEAAAAuAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-20T02:00:08.76Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 6,
               "Title": "InputManager.cs",
               "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\InputManager.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\2DScript\\InputManager.cs",
               "ToolTip": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\InputManager.cs",
               "RelativeToolTip": "Assets\\Scripts\\2DScript\\InputManager.cs",
-              "ViewState": "AgIAACUAAAAAAAAAAAAAwAgAAAANAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAANAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-20T00:17:27.648Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-11-20T00:17:27.648Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "WireManager.cs",
-              "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\WireManager.cs",
-              "RelativeDocumentMoniker": "Assets\\Scripts\\2DScript\\WireManager.cs",
-              "ToolTip": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\WireManager.cs",
-              "RelativeToolTip": "Assets\\Scripts\\2DScript\\WireManager.cs",
-              "ViewState": "AgIAAKIDAAAAAAAAAAAAwLYDAAANAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-11-20T07:31:50.797Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "SymbolData.cs",
-              "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\SymbolData.cs",
-              "RelativeDocumentMoniker": "Assets\\Scripts\\SymbolData.cs",
-              "ToolTip": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\SymbolData.cs",
-              "RelativeToolTip": "Assets\\Scripts\\SymbolData.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAhAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-30T04:39:01.486Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 13,
               "Title": "ResizableWindow.cs",
               "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\ResizableWindow.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\ResizableWindow.cs",
@@ -312,12 +305,11 @@
               "RelativeToolTip": "Assets\\Scripts\\ResizableWindow.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAZAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-09-23T02:06:26.929Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-09-23T02:06:26.929Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 18,
+              "DocumentIndex": 20,
               "Title": "ObjectManager.cs",
               "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\ObjectManager.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\ObjectManager.cs",
@@ -329,7 +321,31 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 7,
+              "Title": "CircuitGraph.cs",
+              "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\Element_2d\\CircuitGraph.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\2DScript\\Element_2d\\CircuitGraph.cs",
+              "ToolTip": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\Element_2d\\CircuitGraph.cs",
+              "RelativeToolTip": "Assets\\Scripts\\2DScript\\Element_2d\\CircuitGraph.cs",
+              "ViewState": "AgIAAFQAAAAAAAAAAADgv2kAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-15T07:03:45.501Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "Wire.cs",
+              "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\Wire.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\2DScript\\Wire.cs",
+              "ToolTip": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\Wire.cs",
+              "RelativeToolTip": "Assets\\Scripts\\2DScript\\Wire.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABUAAAAfAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-29T08:00:13.913Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
               "Title": "quitPanel.cs",
               "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\quitPanel.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\quitPanel.cs",
@@ -341,7 +357,55 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 15,
+              "DocumentIndex": 8,
+              "Title": "ConnectionPoint.cs",
+              "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\ConnectionPoint.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\2DScript\\ConnectionPoint.cs",
+              "ToolTip": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\ConnectionPoint.cs",
+              "RelativeToolTip": "Assets\\Scripts\\2DScript\\ConnectionPoint.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAEYAAAAWAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-10-27T03:07:45.836Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "SimulationManager.cs",
+              "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\SimulationManager.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\2DScript\\SimulationManager.cs",
+              "ToolTip": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\SimulationManager.cs",
+              "RelativeToolTip": "Assets\\Scripts\\2DScript\\SimulationManager.cs",
+              "ViewState": "AgIAAB8AAAAAAAAAAAAAwDEAAAAEAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-14T00:10:27.282Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "CircuitSolver.cs",
+              "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\CircuitSolver.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\2DScript\\CircuitSolver.cs",
+              "ToolTip": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\CircuitSolver.cs",
+              "RelativeToolTip": "Assets\\Scripts\\2DScript\\CircuitSolver.cs",
+              "ViewState": "AgIAALgAAAAAAAAAAAAAwNkAAABJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-26T08:52:25.975Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 42,
+              "Title": "SymbolPaletteController.cs",
+              "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\SymbolPaletteController.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\SymbolPaletteController.cs",
+              "ToolTip": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\SymbolPaletteController.cs",
+              "RelativeToolTip": "Assets\\Scripts\\SymbolPaletteController.cs",
+              "ViewState": "AgIAABoAAAAAAAAAAAAhwCcAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-18T04:24:14.865Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
               "Title": "FlickerRelayCoil.cs",
               "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\Element_2d\\FlickerRelayCoil.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\2DScript\\Element_2d\\FlickerRelayCoil.cs",
@@ -353,7 +417,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 15,
               "Title": "WireManager_3d.cs",
               "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\3DScript\\WireManager_3d.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\3DScript\\WireManager_3d.cs",
@@ -365,7 +429,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 17,
               "Title": "DragHandle.cs",
               "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\DragHandle.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\DragHandle.cs",
@@ -377,7 +441,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 16,
               "Title": "ScreenManager.cs",
               "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\ScreenManager.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\ScreenManager.cs",
@@ -389,7 +453,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 20,
+              "DocumentIndex": 22,
               "Title": "RelaySwitch.cs",
               "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\Element_2d\\RelaySwitch.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\2DScript\\Element_2d\\RelaySwitch.cs",
@@ -401,7 +465,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 24,
+              "DocumentIndex": 26,
               "Title": "SymbolCustom.cs",
               "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Editor\\SymbolCustom.cs",
               "RelativeDocumentMoniker": "Assets\\Editor\\SymbolCustom.cs",
@@ -413,19 +477,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 16,
-              "Title": "CircuitGraph.cs",
-              "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\Element_2d\\CircuitGraph.cs",
-              "RelativeDocumentMoniker": "Assets\\Scripts\\2DScript\\Element_2d\\CircuitGraph.cs",
-              "ToolTip": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\Element_2d\\CircuitGraph.cs",
-              "RelativeToolTip": "Assets\\Scripts\\2DScript\\Element_2d\\CircuitGraph.cs",
-              "ViewState": "AgIAAEwAAAAAAAAAAAAAAH4AAAAXAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-15T07:03:45.501Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 17,
+              "DocumentIndex": 19,
               "Title": "Lamp.cs",
               "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\Element_2d\\Lamp.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\2DScript\\Element_2d\\Lamp.cs",
@@ -437,7 +489,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 19,
+              "DocumentIndex": 21,
               "Title": "TextEditor.cs",
               "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\TextEditor.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\2DScript\\TextEditor.cs",
@@ -449,7 +501,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 23,
+              "DocumentIndex": 25,
               "Title": "TimerSwitch_2d.cs",
               "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\Element_2d\\TimerSwitch_2d.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\2DScript\\Element_2d\\TimerSwitch_2d.cs",
@@ -460,7 +512,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 21,
+              "DocumentIndex": 23,
               "Title": "TimerSwitch.cs",
               "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\Element_2d\\TimerSwitch.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\2DScript\\Element_2d\\TimerSwitch.cs",
@@ -472,7 +524,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 22,
+              "DocumentIndex": 24,
               "Title": "RelaySwitch_2d.cs",
               "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\Element_2d\\RelaySwitch_2d.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\2DScript\\Element_2d\\RelaySwitch_2d.cs",
@@ -484,7 +536,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 27,
+              "DocumentIndex": 29,
               "Title": "LinkConnect.cs",
               "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\3DScript\\LinkConnect.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\3DScript\\LinkConnect.cs",
@@ -496,7 +548,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 25,
+              "DocumentIndex": 27,
               "Title": "Switch.cs",
               "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\Element_2d\\Switch.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\2DScript\\Element_2d\\Switch.cs",
@@ -508,7 +560,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 26,
+              "DocumentIndex": 28,
               "Title": "Switch_2d.cs",
               "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\Element_2d\\Switch_2d.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\2DScript\\Element_2d\\Switch_2d.cs",
@@ -520,7 +572,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 29,
+              "DocumentIndex": 30,
               "Title": "Battery.cs",
               "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\Element_2d\\Battery.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\2DScript\\Element_2d\\Battery.cs",
@@ -532,19 +584,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 28,
-              "Title": "ConnectionPoint.cs",
-              "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\ConnectionPoint.cs",
-              "RelativeDocumentMoniker": "Assets\\Scripts\\2DScript\\ConnectionPoint.cs",
-              "ToolTip": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\ConnectionPoint.cs",
-              "RelativeToolTip": "Assets\\Scripts\\2DScript\\ConnectionPoint.cs",
-              "ViewState": "AgIAABgAAAAAAAAAAAAAwCsAAAAYAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-27T03:07:45.836Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 30,
+              "DocumentIndex": 31,
               "Title": "VirtualJunction.cs",
               "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\VirtualJunction.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\2DScript\\VirtualJunction.cs",
@@ -556,7 +596,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 31,
+              "DocumentIndex": 32,
               "Title": "Switch3d.cs",
               "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\3DScript\\Element_3d\\Switch3d.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\3DScript\\Element_3d\\Switch3d.cs",
@@ -568,7 +608,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 32,
+              "DocumentIndex": 33,
               "Title": "PrefabSpawner.cs",
               "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\3DScript\\PrefabSpawner.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\3DScript\\PrefabSpawner.cs",
@@ -580,7 +620,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 33,
+              "DocumentIndex": 34,
               "Title": "ObjectConnect.cs",
               "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\ObjectConnect.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\2DScript\\ObjectConnect.cs",
@@ -592,7 +632,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 34,
+              "DocumentIndex": 35,
               "Title": "Battery.cs",
               "DocumentMoniker": "C:\\Users\\USER\\Desktop\\250917\\Assets\\Scripts\\2DScript\\Element_2d\\Battery.cs",
               "RelativeDocumentMoniker": "..\\..\\250917\\Assets\\Scripts\\2DScript\\Element_2d\\Battery.cs",
@@ -604,7 +644,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 35,
+              "DocumentIndex": 36,
               "Title": "ConnectionPoint_3D.cs",
               "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\3DScript\\ConnectionPoint_3D.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\3DScript\\ConnectionPoint_3D.cs",
@@ -616,7 +656,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 37,
+              "DocumentIndex": 38,
               "Title": "Battery_2d.cs",
               "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\Element_2d\\Battery_2d.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\2DScript\\Element_2d\\Battery_2d.cs",
@@ -628,7 +668,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 36,
+              "DocumentIndex": 37,
               "Title": "PowerGround.cs",
               "DocumentMoniker": "C:\\Users\\USER\\Desktop\\250917\\Assets\\Scripts\\2DScript\\Element_2d\\PowerGround.cs",
               "RelativeDocumentMoniker": "..\\..\\250917\\Assets\\Scripts\\2DScript\\Element_2d\\PowerGround.cs",
@@ -640,7 +680,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 40,
+              "DocumentIndex": 41,
               "Title": "CircuitController.cs",
               "DocumentMoniker": "C:\\Users\\USER\\Desktop\\Unity\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\CircuitController.cs",
               "RelativeDocumentMoniker": "..\\..\\Unity\\Electrical Circuit_Demo\\Assets\\Scripts\\2DScript\\CircuitController.cs",
@@ -652,7 +692,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 38,
+              "DocumentIndex": 39,
               "Title": "SceneLoader.cs",
               "DocumentMoniker": "C:\\Users\\USER\\Desktop\\Unity\\Electrical Circuit_Demo\\Assets\\Scripts\\3DScript\\SceneLoader.cs",
               "RelativeDocumentMoniker": "..\\..\\Unity\\Electrical Circuit_Demo\\Assets\\Scripts\\3DScript\\SceneLoader.cs",
@@ -663,7 +703,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 39,
+              "DocumentIndex": 40,
               "Title": "ResizeHandle.cs",
               "DocumentMoniker": "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\Assets\\Scripts\\ResizeHandle.cs",
               "RelativeDocumentMoniker": "Assets\\Scripts\\ResizeHandle.cs",

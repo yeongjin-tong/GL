@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 6036030217623904347}
   - component: {fileID: 35859094115558776}
   - component: {fileID: 558580933648351037}
-  - component: {fileID: 3153499174514366639}
   - component: {fileID: 7410851432828515616}
   m_Layer: 8
   m_Name: SS (NC)_Symbol
@@ -138,29 +137,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2bb460ddea0972c4c9976a044574bc6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  uniqueID: 
+  instanceID: 
+  symbol_ID: 
   isLive: 0
   isGrounded: 0
   isPowered: 0
-  connectedComponents: []
   isPowerSource: 0
   isOn: 1
   linkedPartner: {fileID: 0}
---- !u!114 &3153499174514366639
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1643439366855756127}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bb6b2487b1b201e43ab6c3c0fa198afd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  prefabToSpawn_2D: {fileID: 6338011557449762929, guid: 7398468b8e93bbe4782746e693d2a0d2, type: 3}
-  useText: 0
-  symbolName: 
 --- !u!114 &7410851432828515616
 MonoBehaviour:
   m_ObjectHideFlags: 0

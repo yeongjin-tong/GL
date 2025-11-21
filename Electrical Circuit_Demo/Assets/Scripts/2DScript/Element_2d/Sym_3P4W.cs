@@ -10,8 +10,9 @@ public class Sym_3P4W : ElectricalComponent
     // ✨ 이 부품에 속한 모든 단자(Terminal)들의 목록
     private List<Terminal> terminals = new List<Terminal>();
 
-    void Awake()
+    public override void Awake()
     {
+        base.Awake();
         // 시작할 때 자신의 자식들 중에서 모든 Terminal을 찾아 리스트에 저장
         terminals = GetComponentsInChildren<Terminal>().ToList();
     }

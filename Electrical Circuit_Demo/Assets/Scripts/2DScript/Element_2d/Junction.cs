@@ -8,8 +8,9 @@ public class Junction : ElectricalComponent
 {
     private ConnectionPoint myPoint;
 
-    private void Awake()
+    public override void Awake()
     {
+        base.Awake();
         myPoint = GetComponent<ConnectionPoint>();
     }
 

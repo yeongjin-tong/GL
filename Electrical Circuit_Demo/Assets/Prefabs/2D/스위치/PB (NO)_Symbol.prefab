@@ -104,7 +104,6 @@ GameObject:
   - component: {fileID: 8191594759884713917}
   - component: {fileID: 5074995647228882239}
   - component: {fileID: 1672952727637646392}
-  - component: {fileID: 6235667706018236294}
   m_Layer: 8
   m_Name: PB (NO)_Symbol
   m_TagString: Switch
@@ -243,7 +242,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2bb460ddea0972c4c9976a044574bc6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  uniqueID: 
+  instanceID: 
+  symbol_ID: 
   isLive: 0
   isGrounded: 0
   isPowered: 0
@@ -265,22 +265,6 @@ MonoBehaviour:
   m_EffectColor: {r: 1, g: 1, b: 0, a: 0.5}
   m_EffectDistance: {x: 3, y: -3}
   m_UseGraphicAlpha: 1
---- !u!114 &6235667706018236294
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4436345508037853910}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bb6b2487b1b201e43ab6c3c0fa198afd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  prefabToSpawn_2D: {fileID: 4436345508037853910}
-  useText: 1
-  symbolName: PB
-  namePosition: 0
 --- !u!1 &5130323082924636667
 GameObject:
   m_ObjectHideFlags: 0

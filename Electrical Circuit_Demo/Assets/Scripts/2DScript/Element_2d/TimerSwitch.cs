@@ -16,8 +16,9 @@ public class TimerSwitch : ElectricalComponent
 
     private bool initState = false;
 
-    private void Awake()
+    public override void Awake()
     {
+        base.Awake();
         // 초기화를 해주기 위해 저장하는 초기값
         initState = isOn;
     }

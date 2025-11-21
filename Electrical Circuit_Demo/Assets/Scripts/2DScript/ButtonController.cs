@@ -84,6 +84,16 @@ public class ButtonController : MonoBehaviour
         ModeSelect(0);
         pinisOn = false;
         ModeBtnEvent(false);
+
+        if (SaveManager.instance != null)
+        {
+            templateSaveBtn.onClick.AddListener(SaveManager.instance.SaveCircuit);
+            templateLoadBtn.onClick.AddListener(SaveManager.instance.LoadCircuit);
+        }
+        else
+        {
+            Debug.Log("찾을 수 없습니다.");
+        }
     }
 
     private void ObjectInit_2d()

@@ -7,8 +7,9 @@ public class Lamp_3d : ElectricalComponent
     public Material[] lampColor;
     private MeshRenderer myLight;
 
-    private void Awake()
+    public override void Awake()
     {
+        base.Awake();
         myLight = lamp.GetComponent<MeshRenderer>();
         myLight.material = lampColor[0];
     }

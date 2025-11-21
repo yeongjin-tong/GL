@@ -6,10 +6,11 @@ public class Lamp : ElectricalComponent
     private Image mySprite;
     public Sprite[] state;
 
-    void Awake()
+    public override void Awake()
     {
+        base.Awake();
         mySprite = GetComponent<Image>();
-    }
+    } 
 
     // PowerOn 함수를 재정의하여 빛을 켜는 특별한 행동 추가
     public override void PowerOn()

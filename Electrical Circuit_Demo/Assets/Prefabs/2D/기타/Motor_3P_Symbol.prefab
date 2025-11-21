@@ -14,7 +14,6 @@ GameObject:
   - component: {fileID: 5375234288349782756}
   - component: {fileID: 7563287560995369880}
   - component: {fileID: 8650814657803375231}
-  - component: {fileID: 3583799927446592535}
   m_Layer: 8
   m_Name: Motor_3P_Symbol
   m_TagString: Power
@@ -140,6 +139,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3584507aeeec5824cb295133e3354a53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  instanceID: 
   symbol_ID: 
   isLive: 0
   isGrounded: 0
@@ -159,24 +159,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 340df37e463995f47a53be74441dd601, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &3583799927446592535
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1483824924634728311}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bb6b2487b1b201e43ab6c3c0fa198afd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  prefabToSpawn_2D: {fileID: 3020887711766639630, guid: 094815838a27ccc49a7d78040e384140, type: 3}
-  useText: 0
-  symbolName: 
-  namePosition: 0
-  useCountNum: 0
-  countNum: 
 --- !u!1 &4216408417365718870
 GameObject:
   m_ObjectHideFlags: 0
