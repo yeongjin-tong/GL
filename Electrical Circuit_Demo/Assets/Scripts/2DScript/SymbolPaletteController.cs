@@ -40,57 +40,6 @@ public class SymbolPaletteController : MonoBehaviour
         {
             currentPlacingPrefab = Instantiate(symbolData.prefabToSpawn_2D, spawnParent_2D);
             ObjectManager.Instance.objects_2d.Add(currentPlacingPrefab);
-            // 심볼 이름 생성 시 text 세팅
-            if(symbolData.useText)
-            {
-                var textObj = new GameObject("name_text");
-                textObj.transform.parent = currentPlacingPrefab.transform;
-
-                switch (symbolData.namePosition)     // 심볼 이름 포지션 조정
-                {
-                    case NamePosition.Center:
-                        textObj.transform.localPosition = new Vector3(0f, 0f, 0f);
-                        break;
-                    case NamePosition.Right:
-                        textObj.transform.localPosition = new Vector3(50f, 0f, 0f);
-                        break;
-                    case NamePosition.Left:
-                        textObj.transform.localPosition = new Vector3(-65f, 0f, 0f);
-                        break;
-                }
-                
-                textObj.transform.localScale = new Vector3(1, 1, 1);
-                var txt = textObj.AddComponent<TextMeshProUGUI>();
-                txt.text = symbolData.symbolName;
-                txt.color = Color.black;
-                var size = textObj.AddComponent<ContentSizeFitter>();
-                size.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
-
-                if(symbolData.useCountNum)
-                {
-                    var countNum = new GameObject("countNum_text");
-                    countNum.transform.parent = currentPlacingPrefab.transform;
-                    countNum.transform.localPosition = new Vector3(50f, 0f, 0f);
-                    countNum.transform.localScale = new Vector3(1, 1, 1);
-
-
-                    var numTxt = countNum.AddComponent<TextMeshProUGUI>();
-                    numTxt.text = symbolData.countNum;
-                    numTxt.color = Color.black;
-
-                    var numSize = countNum.AddComponent<ContentSizeFitter>();
-                    numSize.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
-                }
-            }
-
-            if(currentPlacingPrefab.GetComponent<ElectricalComponent>() != null)
-            {
-                currentPlacingPrefab.GetComponent<ElectricalComponent>().symbol_ID = symbolData.prefabToSpawn_2D.name;
-            }
-
-            scrollrect.enabled = false;
-
-
         }
     }
 

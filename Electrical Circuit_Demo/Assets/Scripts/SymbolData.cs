@@ -1,23 +1,10 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-
-public enum NamePosition
-{
-    Left, Right, Center
-}
-// ÀÌ ½ºÅ©¸³Æ®´Â UI ½Éº¼ ÀÌ¹ÌÁö¿¡ ºÙ¿©¼­, ÀÚ½ÅÀÌ ¾î¶² ºÎÇ°ÀÎÁö¿¡ ´ëÇÑ Á¤º¸¸¸ °¡Áı´Ï´Ù.
+// ì´ ìŠ¤í¬ë¦½íŠ¸ëŠ” UI ì‹¬ë³¼ ì´ë¯¸ì§€ì— ë¶™ì–´, ìì‹ ì´ ì–´ë–¤ í”„ë¦¬íŒ¹ì„ ìƒì„±í• ì§€ ì •ì˜í•©ë‹ˆë‹¤.
 [RequireComponent(typeof(Image))]
 public class SymbolData : MonoBehaviour
 {
-    [Tooltip("ÀÌ ½Éº¼À» µå·¡±×ÇßÀ» ¶§ »ı¼ºµÉ 2D ºÎÇ° ÇÁ¸®ÆÕ")]
+    [Tooltip("ì´ ì‹¬ë³¼ì„ ë“œë˜ê·¸í–ˆì„ ë•Œ ìƒì„±ë  2D í”„ë¦¬íŒ¹")]
     public GameObject prefabToSpawn_2D;
-
-    public bool useText;
-    public string symbolName;
-    public NamePosition namePosition;
-
-    public bool useCountNum;
-
-    public string countNum;
 }

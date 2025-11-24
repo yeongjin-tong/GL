@@ -8,7 +8,7 @@ public class SaveManager : MonoBehaviour
 {
     public static SaveManager instance { get; private set; }
 
-    public string adress = "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\streamingAssets";
+    public string address = "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\streamingAssets";
 
     public string saveFileName = "myCircuit.json";      // 저장할 파일 이름
     public Transform content_2D;
@@ -60,6 +60,8 @@ public class SaveManager : MonoBehaviour
                 }
             }
         }
+        GameObject junctionPrefab = WireManager.Instance.junctionPrefab;
+        symbolPrefabMap.Add(junctionPrefab.name, junctionPrefab);
         Debug.Log($"프리팹 맵 초기화 완료: 총 {symbolPrefabMap.Count}개 등록됨.");
     }
 
@@ -71,31 +73,45 @@ public class SaveManager : MonoBehaviour
 
     public void SaveCircuit(string fileName)
     {
+        string path = Path.Combine(address, fileName);
+        SaveCircuitToPath(path); // 아래에 만든 새 함수를 호출
+    }
+
+    // ✨ 2. [추가] 전체 경로를 받아서 저장하는 함수 (FileBrowser용)
+    public void SaveCircuitToPath(string fullPath)
+    {
         CircuitSaveData data = new CircuitSaveData();
 
+        // --- (기존 저장 로직 그대로) ---
         ElectricalComponent[] components = content_2D.GetComponentsInChildren<ElectricalComponent>();
-        foreach(var comp in components)
+        foreach (var comp in components)
         {
             SymbolDataSave symbolData = new SymbolDataSave();
-            symbolData.symbolID = comp.symbol_ID;   // 사용자 정의 ID (예: PB1)
-            // ✨ 프리팹 이름 저장 (Clone 제거)
-            symbolData.prefabName = comp.gameObject.name.Replace("(Clone)", "").Trim();
+            symbolData.symbolID = comp.symbol_Text;
+
+            if (comp.gameObject.name.Contains("Junction"))
+            {
+                symbolData.prefabName = "Junction";
+            }
+            else
+            {
+                symbolData.prefabName = comp.gameObject.name.Replace("(Clone)", "").Trim();
+            }
+
             symbolData.instanceID = comp.instanceID;
-            symbolData.position = comp.GetComponent<RectTransform>().anchoredPosition;  // UI 좌표 사용
+            symbolData.position = comp.GetComponent<RectTransform>().anchoredPosition;
             data.symbols.Add(symbolData);
         }
 
         Wire[] wires = content_2D.GetComponentsInChildren<Wire>();
-        foreach(var wire in wires)
+        foreach (var wire in wires)
         {
             WireDataSave wireData = new WireDataSave();
-            // 시작/끝 연결 정보 저장
             wireData.startComponentID = wire.connectedPoints[0].parentComponent.instanceID;
             wireData.startPortIndex = GetPortIndex(wire.connectedPoints[0]);
             wireData.endComponentID = wire.connectedPoints.Last().parentComponent.instanceID;
             wireData.endPortIndex = GetPortIndex(wire.connectedPoints.Last());
 
-            //경로점 저장
             LineRenderer lr = wire.GetComponent<LineRenderer>();
             Vector3[] positions = new Vector3[lr.positionCount];
             lr.GetPositions(positions);
@@ -103,11 +119,13 @@ public class SaveManager : MonoBehaviour
 
             data.wires.Add(wireData);
         }
+        // ------------------------------
 
         string json = JsonUtility.ToJson(data, true);
-        string path = Path.Combine(adress, fileName);
-        File.WriteAllText(path, json);
-        Debug.Log($"회로 저장 완료: {path}");
+
+        // 파일 쓰기 (전달받은 fullPath 사용)
+        File.WriteAllText(fullPath, json);
+        Debug.Log($"회로 저장 완료: {fullPath}");
     }
 
     // === 불러오기 기능 ===
@@ -118,29 +136,44 @@ public class SaveManager : MonoBehaviour
 
     public void LoadCircuit(string fileName)
     {
-        string path = Path.Combine(adress, fileName);
-        if (!File.Exists(path)) { Debug.LogWarning("저장된 파일이 없습니다."); return; }
+        string path = Path.Combine(address, fileName);
+        LoadCircuitFromPath(path); // 아래에 만든 새 함수를 호출
+    }
 
-        string json = File.ReadAllText(path);
+    public void LoadCircuitFromPath(string fullPath)
+    {
+        if (!File.Exists(fullPath)) { Debug.LogWarning("파일이 없습니다: " + fullPath); return; }
+
+        string json = File.ReadAllText(fullPath);
         CircuitSaveData data = JsonUtility.FromJson<CircuitSaveData>(json);
 
-        // 현재 씬 비우기
-        ClearScene();
+        // --- (기존 불러오기 로직 그대로) ---
+        ClearScene(); // 씬 비우기
 
         Dictionary<string, ElectricalComponent> loadedComponentsMap = new Dictionary<string, ElectricalComponent>();
-        foreach(var symbolData in data.symbols)
+        foreach (var symbolData in data.symbols)
         {
-            // ✨ 저장된 프리팹 이름으로 찾기 (없으면 하위 호환성을 위해 symbolID 사용)
             string key = string.IsNullOrEmpty(symbolData.prefabName) ? symbolData.symbolID : symbolData.prefabName;
 
-            if(symbolPrefabMap.TryGetValue(key, out GameObject prefab))
+            if (symbolPrefabMap.TryGetValue(key, out GameObject prefab))
             {
                 GameObject obj = Instantiate(prefab, content_2D);
                 obj.GetComponent<RectTransform>().anchoredPosition = symbolData.position;
 
+                if(key.Contains("Junction"))
+                {
+                    obj.AddComponent<Junction>();
+                    obj.AddComponent<ConnectionPoint>();
+                }
+                else
+                {
+                    ObjectManager.Instance.objects_2d.Add(obj);
+                }
+
                 ElectricalComponent comp = obj.GetComponent<ElectricalComponent>();
                 comp.instanceID = symbolData.instanceID;
-                comp.symbol_ID = symbolData.symbolID; // ✨ 사용자 정의 ID 복구
+                comp.symbol_Text = symbolData.symbolID;
+                comp.NameSetting(symbolData.symbolID);
                 loadedComponentsMap.Add(comp.instanceID, comp);
             }
             else
@@ -149,31 +182,32 @@ public class SaveManager : MonoBehaviour
             }
         }
 
-        foreach(var wireData in data.wires)
+        foreach (var wireData in data.wires)
         {
-            // 저장된 ID로 시작/끝 부품 찾기
-            ElectricalComponent startComp = loadedComponentsMap[wireData.startComponentID];
-            ElectricalComponent endComp = loadedComponentsMap[wireData.endComponentID];
-            // 포트 인덱스로 정확한 포트 찾기 (헬퍼 함수 사용)
-            ConnectionPoint startPoint = GetPortByIndex(startComp, wireData.startPortIndex);
-            ConnectionPoint endPoint = GetPortByIndex(endComp, wireData.endPortIndex);
+            if (loadedComponentsMap.ContainsKey(wireData.startComponentID) && loadedComponentsMap.ContainsKey(wireData.endComponentID))
+            {
+                ElectricalComponent startComp = loadedComponentsMap[wireData.startComponentID];
+                ElectricalComponent endComp = loadedComponentsMap[wireData.endComponentID];
+                ConnectionPoint startPoint = GetPortByIndex(startComp, wireData.startPortIndex);
+                ConnectionPoint endPoint = GetPortByIndex(endComp, wireData.endPortIndex);
 
-            // WireManager를 이용해 선 생성 (경로 정보 포함 함수 활용)
-            WireManager.Instance.CreateWireWithPath(startPoint, endPoint, wireData.pathPoints);
+                WireManager.Instance.CreateWireWithPath(startPoint, endPoint, wireData.pathPoints);
+            }
         }
+        // ----------------------------------
+        Debug.Log($"회로 불러오기 완료: {fullPath}");
     }
 
     // === 헬퍼 함수들 ===
     // 씬 초기화
     private void ClearScene()
     {
-        for(int i = content_2D.childCount -1; i >= 0; i++)
+        foreach (Transform chird in content_2D)
         {
-            GameObject child = content_2D.GetChild(i).gameObject;
-            Destroy(child);
+            Destroy(chird.gameObject);
         }
 
-        if(CircuitGraph.Instance != null)
+        if (CircuitGraph.Instance != null)
         {
             CircuitGraph.Instance.ClearGraph();
         }
@@ -232,12 +266,12 @@ public class SaveManager : MonoBehaviour
     // === 파일 목록 가져오기 ===
     public List<string> GetSaveFileList()
     {
-        if (!Directory.Exists(adress))
+        if (!Directory.Exists(address))
         {
-            Directory.CreateDirectory(adress);
+            Directory.CreateDirectory(address);
         }
 
-        string[] files = Directory.GetFiles(adress, "*.json");
+        string[] files = Directory.GetFiles(address, "*.json");
         return files.ToList();
     }
 

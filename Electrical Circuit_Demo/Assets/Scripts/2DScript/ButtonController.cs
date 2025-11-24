@@ -87,8 +87,8 @@ public class ButtonController : MonoBehaviour
 
         if (SaveManager.instance != null)
         {
-            templateSaveBtn.onClick.AddListener(SaveManager.instance.SaveCircuit);
-            templateLoadBtn.onClick.AddListener(SaveManager.instance.LoadCircuit);
+            templateSaveBtn.onClick.AddListener(CircuitFileManager.instance.OnClickSaveAs);
+            templateLoadBtn.onClick.AddListener(CircuitFileManager.instance.OnClickLoad);
         }
         else
         {

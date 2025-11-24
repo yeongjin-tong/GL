@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,10 +8,13 @@ using UnityEngine.UI;
 public abstract class ElectricalComponent : MonoBehaviour
 {
     // 저장/불러오기 시 연결 관계를 식별하기 위한 고유 ID
-    [HideInInspector] public string instanceID;
+    public string instanceID;
 
-    [Tooltip("이 부품의 ID")]
-    public string symbol_ID;
+    // 심볼 Text
+    public string symbol_Text;
+
+    // Text 오브젝트
+    public TextMeshProUGUI symbolTextobj;
 
     // ✨ 두 강물(신호)이 닿았는지 확인하는 변수
     public bool isLive = false;
@@ -61,5 +65,13 @@ public abstract class ElectricalComponent : MonoBehaviour
     {
         // 모든 부품은 시뮬레이션이 끝나면 꺼지는 것이 기본 규칙
         PowerOff();
+    }
+
+    public virtual void NameSetting(string name)
+    {
+        if(symbolTextobj != null)
+        {
+            symbolTextobj.text = name;
+        }
     }
 }

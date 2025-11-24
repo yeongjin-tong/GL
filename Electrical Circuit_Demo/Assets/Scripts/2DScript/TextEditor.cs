@@ -6,10 +6,11 @@ public class TextEditor : MonoBehaviour
 {
     [Tooltip("텍스트 수정을 위해 생성할 팝업창 GameObject 프리팹")]
     public GameObject textEditorPopupPrefab; // ✨ InputField가 아닌 GameObject를 받도록 변경
-    public Transform space_2d;
+    public Transform popupSpace;
     private GameObject currentPopup;
     private TMP_InputField currentInputField;
     private TextMeshProUGUI targetText; // TextMeshPro 사용을 권장합니다. (일반 Text는 Text로 변경)
+    private ElectricalComponent selectSymbol;
 
     void Start()
     {
@@ -21,6 +22,11 @@ public class TextEditor : MonoBehaviour
         if (clickedObject == null || currentPopup != null) return;
 
         targetText = clickedObject.GetComponentInChildren<TextMeshProUGUI>();
+
+        if(clickedObject.transform.parent.GetComponent<ElectricalComponent>() != null)
+        {
+            selectSymbol = clickedObject.transform.parent.GetComponent<ElectricalComponent>();
+        }
         
         if (targetText != null)
         {
@@ -31,7 +37,7 @@ public class TextEditor : MonoBehaviour
     void ShowPopup()
     {
         // 1. 팝업창 프리팹을 생성하고 위치를 설정합니다.
-        currentPopup = Instantiate(textEditorPopupPrefab, space_2d);
+        currentPopup = Instantiate(textEditorPopupPrefab, popupSpace);
 
         // ✨ 2. 팝업창 내부에 있는 InputField와 버튼들을 찾아옵니다.
         //    (이름이 정확해야 합니다. 또는 public 변수로 직접 연결해도 좋습니다.)
@@ -59,6 +65,7 @@ public class TextEditor : MonoBehaviour
         if (targetText != null && currentInputField != null)
         {
             targetText.text = currentInputField.text;
+            selectSymbol.symbol_Text = targetText.text;
         }
         ClosePopup();
     }

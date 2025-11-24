@@ -1212,11 +1212,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabToSpawn_2D: {fileID: 3020887711766639630, guid: 094815838a27ccc49a7d78040e384140, type: 3}
-  useText: 0
-  symbolName: 
-  namePosition: 0
-  useCountNum: 0
-  countNum: 
 --- !u!1 &90029717
 GameObject:
   m_ObjectHideFlags: 0
@@ -2281,11 +2276,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabToSpawn_2D: {fileID: 9013922118835243576, guid: d913adfd12fee324f879245c5a267a6d, type: 3}
-  useText: 0
-  symbolName: 
-  namePosition: 0
-  useCountNum: 0
-  countNum: 
 --- !u!114 &177109391
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2299,7 +2289,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   instanceID: 
-  symbol_ID: 
+  symbol_Text: 
+  symbolTextobj: {fileID: 0}
   isLive: 0
   isGrounded: 0
   isPowered: 0
@@ -2615,6 +2606,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3504137698222061379, guid: 4b985b97a87f10241a3adbb40dd3f9eb, type: 3}
+      propertyPath: symbolTextobj
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 4229501278534734328, guid: 4b985b97a87f10241a3adbb40dd3f9eb, type: 3}
       propertyPath: m_Name
       value: Relay8P_Symbol
@@ -2624,7 +2619,8 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 6579114926469681310, guid: 4b985b97a87f10241a3adbb40dd3f9eb, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4b985b97a87f10241a3adbb40dd3f9eb, type: 3}
@@ -2889,7 +2885,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43b1e94290005364890b16dc62b451a1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  adress: C:\Users\USER\Desktop\work_git\Electrical Circuit_Demo\streamingAssets
+  address: C:\Users\USER\Desktop\work_git\Electrical Circuit_Demo\streamingAssets
   saveFileName: myCircuit.json
   content_2D: {fileID: 510223275}
 --- !u!114 &270694117
@@ -2904,14 +2900,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d7db62b8cc4e384cbac79f927cd0de0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  savePanel: {fileID: 0}
-  loadPanel: {fileID: 0}
-  saveNameInput: {fileID: 0}
-  saveConfirmBtn: {fileID: 0}
-  saveCancelBtn: {fileID: 0}
-  fileListContent: {fileID: 0}
-  fileItemPrefab: {fileID: 0}
-  loadCancelBtn: {fileID: 0}
 --- !u!1001 &272386350
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4189,7 +4177,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1697371288}
-  - {fileID: 478976565}
   - {fileID: 987713118}
   - {fileID: 610041251}
   - {fileID: 964808523}
@@ -4495,37 +4482,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 478927257}
   m_CullTransparentMesh: 1
---- !u!1 &478976564
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 478976565}
-  m_Layer: 0
-  m_Name: ScreenManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &478976565
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 478976564}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 442464799}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!224 &481578799 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3337327848979072406, guid: 847db31f4941b1941954bbb560b9593f, type: 3}
@@ -5007,11 +4963,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabToSpawn_2D: {fileID: 3020887711766639630, guid: 094815838a27ccc49a7d78040e384140, type: 3}
-  useText: 0
-  symbolName: 
-  namePosition: 0
-  useCountNum: 0
-  countNum: 
 --- !u!224 &526422554 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3337327848979072406, guid: 847db31f4941b1941954bbb560b9593f, type: 3}
@@ -5704,6 +5655,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3504137698222061379, guid: 4b985b97a87f10241a3adbb40dd3f9eb, type: 3}
+      propertyPath: symbolTextobj
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 4229501278534734328, guid: 4b985b97a87f10241a3adbb40dd3f9eb, type: 3}
       propertyPath: m_Name
       value: Relay8P_Symbol
@@ -5713,7 +5668,8 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 6579114926469681310, guid: 4b985b97a87f10241a3adbb40dd3f9eb, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4b985b97a87f10241a3adbb40dd3f9eb, type: 3}
@@ -8210,6 +8166,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3504137698222061379, guid: 4b985b97a87f10241a3adbb40dd3f9eb, type: 3}
+      propertyPath: symbolTextobj
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 4229501278534734328, guid: 4b985b97a87f10241a3adbb40dd3f9eb, type: 3}
       propertyPath: m_Name
       value: Relay8P_Symbol
@@ -8219,7 +8179,8 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 6579114926469681310, guid: 4b985b97a87f10241a3adbb40dd3f9eb, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4b985b97a87f10241a3adbb40dd3f9eb, type: 3}
@@ -10173,11 +10134,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabToSpawn_2D: {fileID: 3020887711766639630, guid: 094815838a27ccc49a7d78040e384140, type: 3}
-  useText: 0
-  symbolName: 
-  namePosition: 0
-  useCountNum: 0
-  countNum: 
 --- !u!1 &1096072603
 GameObject:
   m_ObjectHideFlags: 0
@@ -10223,7 +10179,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   textEditorPopupPrefab: {fileID: 3438964685216009442, guid: 51784190e91ddca408e110af86f68f35, type: 3}
-  space_2d: {fileID: 91470554}
+  popupSpace: {fileID: 91470554}
 --- !u!1 &1131142208
 GameObject:
   m_ObjectHideFlags: 0
@@ -10750,11 +10706,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabToSpawn_2D: {fileID: 3020887711766639630, guid: 094815838a27ccc49a7d78040e384140, type: 3}
-  useText: 0
-  symbolName: 
-  namePosition: 0
-  useCountNum: 0
-  countNum: 
 --- !u!1 &1193360697
 GameObject:
   m_ObjectHideFlags: 0
@@ -11185,11 +11136,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabToSpawn_2D: {fileID: 9013922118835243576, guid: d913adfd12fee324f879245c5a267a6d, type: 3}
-  useText: 0
-  symbolName: 
-  namePosition: 0
-  useCountNum: 0
-  countNum: 
 --- !u!114 &1223402495
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11203,7 +11149,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   instanceID: 
-  symbol_ID: 
+  symbol_Text: 
+  symbolTextobj: {fileID: 0}
   isLive: 0
   isGrounded: 0
   isPowered: 0
@@ -11604,12 +11551,17 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3504137698222061379, guid: 4b985b97a87f10241a3adbb40dd3f9eb, type: 3}
+      propertyPath: symbolTextobj
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 4229501278534734328, guid: 4b985b97a87f10241a3adbb40dd3f9eb, type: 3}
       propertyPath: m_Name
       value: Relay8P_Symbol
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 6579114926469681310, guid: 4b985b97a87f10241a3adbb40dd3f9eb, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4b985b97a87f10241a3adbb40dd3f9eb, type: 3}
@@ -12356,6 +12308,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3504137698222061379, guid: 4b985b97a87f10241a3adbb40dd3f9eb, type: 3}
+      propertyPath: symbolTextobj
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 4229501278534734328, guid: 4b985b97a87f10241a3adbb40dd3f9eb, type: 3}
       propertyPath: m_Name
       value: Relay8P_Symbol
@@ -12365,7 +12321,8 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 6579114926469681310, guid: 4b985b97a87f10241a3adbb40dd3f9eb, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4b985b97a87f10241a3adbb40dd3f9eb, type: 3}
@@ -13424,6 +13381,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3504137698222061379, guid: 4b985b97a87f10241a3adbb40dd3f9eb, type: 3}
+      propertyPath: symbolTextobj
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 4229501278534734328, guid: 4b985b97a87f10241a3adbb40dd3f9eb, type: 3}
       propertyPath: m_Name
       value: Relay8P_Symbol
@@ -13433,7 +13394,8 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 6579114926469681310, guid: 4b985b97a87f10241a3adbb40dd3f9eb, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4b985b97a87f10241a3adbb40dd3f9eb, type: 3}
@@ -14353,11 +14315,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabToSpawn_2D: {fileID: 3020887711766639630, guid: 094815838a27ccc49a7d78040e384140, type: 3}
-  useText: 0
-  symbolName: 
-  namePosition: 0
-  useCountNum: 0
-  countNum: 
 --- !u!1 &1624204362
 GameObject:
   m_ObjectHideFlags: 0
@@ -14821,11 +14778,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabToSpawn_2D: {fileID: 3020887711766639630, guid: 094815838a27ccc49a7d78040e384140, type: 3}
-  useText: 0
-  symbolName: 
-  namePosition: 0
-  useCountNum: 0
-  countNum: 
 --- !u!1 &1656167587
 GameObject:
   m_ObjectHideFlags: 0
@@ -14988,11 +14940,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabToSpawn_2D: {fileID: 3020887711766639630, guid: 094815838a27ccc49a7d78040e384140, type: 3}
-  useText: 0
-  symbolName: 
-  namePosition: 0
-  useCountNum: 0
-  countNum: 
 --- !u!1 &1697371287
 GameObject:
   m_ObjectHideFlags: 0
@@ -15697,11 +15644,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabToSpawn_2D: {fileID: 3020887711766639630, guid: 094815838a27ccc49a7d78040e384140, type: 3}
-  useText: 0
-  symbolName: 
-  namePosition: 0
-  useCountNum: 0
-  countNum: 
 --- !u!224 &1795295732 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 2706416815441557629, guid: 4b985b97a87f10241a3adbb40dd3f9eb, type: 3}
@@ -16120,11 +16062,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabToSpawn_2D: {fileID: 3020887711766639630, guid: 094815838a27ccc49a7d78040e384140, type: 3}
-  useText: 0
-  symbolName: 
-  namePosition: 0
-  useCountNum: 0
-  countNum: 
 --- !u!1 &1853764451
 GameObject:
   m_ObjectHideFlags: 0
@@ -16703,11 +16640,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabToSpawn_2D: {fileID: 3020887711766639630, guid: 094815838a27ccc49a7d78040e384140, type: 3}
-  useText: 0
-  symbolName: 
-  namePosition: 0
-  useCountNum: 0
-  countNum: 
 --- !u!1 &1946104925
 GameObject:
   m_ObjectHideFlags: 0
@@ -17924,6 +17856,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3504137698222061379, guid: 4b985b97a87f10241a3adbb40dd3f9eb, type: 3}
+      propertyPath: symbolTextobj
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 4229501278534734328, guid: 4b985b97a87f10241a3adbb40dd3f9eb, type: 3}
       propertyPath: m_Name
       value: Relay8P_Symbol
@@ -17933,7 +17869,8 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 6579114926469681310, guid: 4b985b97a87f10241a3adbb40dd3f9eb, type: 3}
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4b985b97a87f10241a3adbb40dd3f9eb, type: 3}
@@ -21369,11 +21306,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabToSpawn_2D: {fileID: 4229501278534734328, guid: 4b985b97a87f10241a3adbb40dd3f9eb, type: 3}
-  useText: 1
-  symbolName: X
-  namePosition: 2
-  useCountNum: 0
-  countNum: 
 --- !u!224 &1376310162869214699
 RectTransform:
   m_ObjectHideFlags: 0
@@ -21569,11 +21501,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabToSpawn_2D: {fileID: 4436345508037853910, guid: f77c86f18b6d7d6439ba1a67bedf4663, type: 3}
-  useText: 1
-  symbolName: PB
-  namePosition: 1
-  useCountNum: 0
-  countNum: 
 --- !u!1 &1441923887415490863
 GameObject:
   m_ObjectHideFlags: 0
@@ -23716,7 +23643,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   instanceID: 
-  symbol_ID: 
+  symbol_Text: 
+  symbolTextobj: {fileID: 0}
   isLive: 0
   isGrounded: 0
   isPowered: 0
@@ -24128,11 +24056,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabToSpawn_2D: {fileID: 5611926762267563915, guid: aeabeeedc825bdb4593534402612f54d, type: 3}
-  useText: 1
-  symbolName: FR
-  namePosition: 1
-  useCountNum: 0
-  countNum: 
 --- !u!1 &3657396113980779021
 GameObject:
   m_ObjectHideFlags: 0
@@ -24540,11 +24463,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabToSpawn_2D: {fileID: 425386748868175235, guid: 916eea2cfb0719f4dbdebcae0921ec8c, type: 3}
-  useText: 1
-  symbolName: PB
-  namePosition: 1
-  useCountNum: 0
-  countNum: 
 --- !u!224 &3906456018855673340
 RectTransform:
   m_ObjectHideFlags: 0
@@ -25162,11 +25080,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabToSpawn_2D: {fileID: 3679301766314417261, guid: 741dfa2b36b83b640b0d0d825866af79, type: 3}
-  useText: 1
-  symbolName: RL
-  namePosition: 2
-  useCountNum: 0
-  countNum: 
 --- !u!222 &4738321195490244112
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -26760,11 +26673,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabToSpawn_2D: {fileID: 5611926762267563915, guid: 249c8ee37ee4f0e48ae69253ac5995fe, type: 3}
-  useText: 1
-  symbolName: T
-  namePosition: 1
-  useCountNum: 0
-  countNum: 
 --- !u!114 &5424119447054174452
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26778,11 +26686,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabToSpawn_2D: {fileID: 5611926762267563915, guid: 6e28fe3198fe1a04381ef224d041b327, type: 3}
-  useText: 1
-  symbolName: X
-  namePosition: 1
-  useCountNum: 0
-  countNum: 
 --- !u!114 &5424119447308829421
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26796,11 +26699,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabToSpawn_2D: {fileID: 5611926762267563915, guid: d6aab2535af55aa448411877896c9a3e, type: 3}
-  useText: 1
-  symbolName: FR
-  namePosition: 1
-  useCountNum: 0
-  countNum: 
 --- !u!114 &5424119447871313742
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26814,11 +26712,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabToSpawn_2D: {fileID: 5611926762267563915, guid: 232e202503f121940a164a44a44e9872, type: 3}
-  useText: 1
-  symbolName: X
-  namePosition: 1
-  useCountNum: 0
-  countNum: 
 --- !u!224 &5450844978277308548
 RectTransform:
   m_ObjectHideFlags: 0
@@ -28163,11 +28056,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabToSpawn_2D: {fileID: 8644077291245097333, guid: 0af1f430db5196b49ad834621e950b01, type: 3}
-  useText: 1
-  symbolName: T
-  namePosition: 2
-  useCountNum: 1
-  countNum: 3
 --- !u!114 &5726946814966137970
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -31166,11 +31054,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabToSpawn_2D: {fileID: 4229501278534734328, guid: cb7f1837f462e0b4492189ab61c25f2b, type: 3}
-  useText: 1
-  symbolName: MC
-  namePosition: 2
-  useCountNum: 0
-  countNum: 
 --- !u!58 &6557547552859970569
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -34503,11 +34386,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabToSpawn_2D: {fileID: 7801693972321909952, guid: e7dbd3de569144647aa4c5ffd44b90af, type: 3}
-  useText: 0
-  symbolName: 
-  namePosition: 0
-  useCountNum: 0
-  countNum: 
 --- !u!1 &8391497037930488972
 GameObject:
   m_ObjectHideFlags: 0
@@ -34744,11 +34622,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabToSpawn_2D: {fileID: 5611926762267563915, guid: 328ace0ac7b85a44a811eb518ca95ce7, type: 3}
-  useText: 1
-  symbolName: T
-  namePosition: 1
-  useCountNum: 0
-  countNum: 
 --- !u!1 &8561458649954416541
 GameObject:
   m_ObjectHideFlags: 0
@@ -35131,11 +35004,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabToSpawn_2D: {fileID: 1547959117227323889, guid: dc7eadbd160df814a99047aab00ae5ba, type: 3}
-  useText: 1
-  symbolName: MC
-  namePosition: 0
-  useCountNum: 0
-  countNum: 
 --- !u!1 &8744933688425546895
 GameObject:
   m_ObjectHideFlags: 0
@@ -35344,7 +35212,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   instanceID: 
-  symbol_ID: 
+  symbol_Text: 
+  symbolTextobj: {fileID: 0}
   isLive: 0
   isGrounded: 0
   isPowered: 0
@@ -35364,11 +35233,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabToSpawn_2D: {fileID: 1483824924634728311, guid: cf9ca1c958258824ca9fd836ca72fc7f, type: 3}
-  useText: 0
-  symbolName: 
-  namePosition: 0
-  useCountNum: 0
-  countNum: 
 --- !u!114 &8929697612662116362
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -35417,11 +35281,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   prefabToSpawn_2D: {fileID: 4229501278534734328, guid: 1480e00ae7b7c29409166105a1eac439, type: 3}
-  useText: 1
-  symbolName: FR
-  namePosition: 2
-  useCountNum: 1
-  countNum: 3
 --- !u!222 &9004029176543072178
 CanvasRenderer:
   m_ObjectHideFlags: 0

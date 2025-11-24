@@ -32,7 +32,7 @@ public class RelayCoil : ElectricalComponent
         foreach (var relay in allSwitches)
         {
             // ID가 일치하는 스위치만 제어합니다.
-            if (relay.symbol_ID == this.symbol_ID && relay.switchType == type)
+            if (relay.symbol_Text == this.symbol_Text && relay.switchType == type)
             {
                 bool initState = relay.GetInitState();
 

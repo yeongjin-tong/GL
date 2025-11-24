@@ -85,7 +85,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pointDirection: 0
+  portIndex: 0
   parentCollider: {fileID: 0}
+  parentComponent: {fileID: 0}
 --- !u!1 &3020887711766639630
 GameObject:
   m_ObjectHideFlags: 0
@@ -151,7 +153,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -224,11 +226,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3584507aeeec5824cb295133e3354a53, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  uniqueID: 
+  instanceID: 
+  symbol_ID: 
+  symbol_Text: 
   isLive: 0
   isGrounded: 0
   isPowered: 0
-  connectedComponents: []
   isPowerSource: 0
   isOn: 0
   linkedPartner: {fileID: 0}
@@ -463,4 +466,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pointDirection: 1
+  portIndex: 0
   parentCollider: {fileID: 0}
+  parentComponent: {fileID: 0}

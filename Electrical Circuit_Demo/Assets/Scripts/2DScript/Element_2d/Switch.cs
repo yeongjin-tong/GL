@@ -15,7 +15,7 @@ public class Switch : ElectricalComponent
     [HideInInspector]
     public Switch linkedPartner;
 
-    // symbol_ID를 기반으로 모든 스위치를 그룹화하는 정적(static) 딕셔너리
+    // symbol_Text를 기반으로 모든 스위치를 그룹화하는 정적(static) 딕셔너리
     private static Dictionary<string, List<Switch>> switchGroups = new Dictionary<string, List<Switch>>();
 
     // initState가 이 스위치의 "비활성" (기본) 상태를 저장합니다.
@@ -31,13 +31,13 @@ public class Switch : ElectricalComponent
 
     private void OnDisable()
     {
-        if (string.IsNullOrEmpty(symbol_ID)) return;
-        if (switchGroups.ContainsKey(symbol_ID))
+        if (string.IsNullOrEmpty(symbol_Text)) return;
+        if (switchGroups.ContainsKey(symbol_Text))
         {
-            switchGroups[symbol_ID].Remove(this);
-            if (switchGroups[symbol_ID].Count == 0)
+            switchGroups[symbol_Text].Remove(this);
+            if (switchGroups[symbol_Text].Count == 0)
             {
-                switchGroups.Remove(symbol_ID);
+                switchGroups.Remove(symbol_Text);
             }
         }
     }
@@ -51,7 +51,7 @@ public class Switch : ElectricalComponent
         if (!SimulationManager.isSimulating) return;
 
         // 1. 이 스위치가 속한 그룹을 찾습니다.
-        if (string.IsNullOrEmpty(symbol_ID) || !switchGroups.ContainsKey(symbol_ID))
+        if (string.IsNullOrEmpty(symbol_Text) || !switchGroups.ContainsKey(symbol_Text))
         {
             // 그룹이 없으면 자기 자신만 상태 변경
             bool targetState = setActive ? !initState : initState;
@@ -60,7 +60,7 @@ public class Switch : ElectricalComponent
         else
         {
             // 2. 그룹이 있으면, 그룹의 *모든* 스위치 상태 변경
-            List<Switch> group = new List<Switch>(switchGroups[symbol_ID]);
+            List<Switch> group = new List<Switch>(switchGroups[symbol_Text]);
 
             foreach (Switch partnerSwitch in group)
             {
@@ -96,12 +96,12 @@ public class Switch : ElectricalComponent
     public override void OnSimulationStart()
     {
         base.OnSimulationStart();
-        if (string.IsNullOrEmpty(symbol_ID)) return;
-        if (!switchGroups.ContainsKey(symbol_ID))
+        if (string.IsNullOrEmpty(symbol_Text)) return;
+        if (!switchGroups.ContainsKey(symbol_Text))
         {
-            switchGroups[symbol_ID] = new List<Switch>();
+            switchGroups[symbol_Text] = new List<Switch>();
         }
-        switchGroups[symbol_ID].Add(this);
+        switchGroups[symbol_Text].Add(this);
     }
 
     public override void OnSimulationStop()

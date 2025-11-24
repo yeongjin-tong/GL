@@ -61,7 +61,7 @@ public class FlickerRelayCoil : ElectricalComponent
 
         foreach (RelaySwitch relay in allSwitches)
         {
-            if(relay.symbol_ID == this.symbol_ID && (relay.switchType == Type.Relay || relay.switchType == Type.Flicker))
+            if(relay.symbol_Text == this.symbol_Text && (relay.switchType == Type.Relay || relay.switchType == Type.Flicker))
             {
                 relaySwitches.Add(relay);
             }

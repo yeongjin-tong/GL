@@ -79,7 +79,7 @@ public class SimulationManager : MonoBehaviour
         {
             if (tmp.name == "name_text")
             {
-                component.symbol_ID = tmp.text;
+                component.symbol_Text = tmp.text;
             }
         }
     }
