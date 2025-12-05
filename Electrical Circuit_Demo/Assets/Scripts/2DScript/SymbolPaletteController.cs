@@ -40,6 +40,7 @@ public class SymbolPaletteController : MonoBehaviour
         {
             currentPlacingPrefab = Instantiate(symbolData.prefabToSpawn_2D, spawnParent_2D);
             ObjectManager.Instance.objects_2d.Add(currentPlacingPrefab);
+            scrollrect.enabled = false;
         }
     }
 

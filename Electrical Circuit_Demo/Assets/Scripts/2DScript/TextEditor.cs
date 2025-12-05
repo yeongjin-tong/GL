@@ -30,7 +30,8 @@ public class TextEditor : MonoBehaviour
         
         if (targetText != null)
         {
-            ShowPopup();
+            //ShowPopup();
+            PopupManager.Instance.CreatePopup(clickedObject);
         }
     }
 

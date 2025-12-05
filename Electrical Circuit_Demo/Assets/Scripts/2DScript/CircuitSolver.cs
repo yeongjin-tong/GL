@@ -56,7 +56,6 @@ public class CircuitSolver : MonoBehaviour
         liveNet.Clear();
         groundNet.Clear();
         HashSet<ConnectionPoint> visitedPorts = new HashSet<ConnectionPoint>(); // 전체 방문 기록
-
         ConnectionPoint[] allPoints = FindObjectsOfType<ConnectionPoint>();
 
         foreach (var point in allPoints)
@@ -65,7 +64,7 @@ public class CircuitSolver : MonoBehaviour
             {
                 // 새 Net을 생성하고, BFS/DFS로 이 Net에 연결된 모든 포트를 찾음
                 HashSet<ConnectionPoint> newNet = new HashSet<ConnectionPoint>();
-                FindNetRecursive(point, newNet, visitedPorts);
+                FindNetRecursive(point, newNet, visitedPorts, allWires);
 
                 if (newNet.Count > 0)
                 {
@@ -78,13 +77,45 @@ public class CircuitSolver : MonoBehaviour
         FindLiveAndGroundNets();
 
         // --- 3단계: 부품 전원 인가 ---
-        var poweredPorts = new HashSet<ConnectionPoint>(); // (와이어 색칠용)
-
         foreach (var component in allComponents)
         {
             // (스위치, 전원 등은 전력 소모 부품이 아니므로 제외)
             if (component is Switch || component is RelaySwitch || component is Sym_3P4W)
             {
+                continue;
+            }
+
+            // ✨ [추가] 모터(Motor) 전용 로직
+            if (component is Motor)
+            {
+                int liveConnectionCount = 0;
+
+                ConnectionPoint[] motorPorts = component.GetComponentsInChildren<ConnectionPoint>();
+
+                foreach (var port in motorPorts)
+                {
+                    if (liveNet.Contains(port))
+                    {
+                        liveConnectionCount++;
+                    }
+                }
+
+                // 3상(R,S,T)이 모두 연결되어야 작동
+                if (liveConnectionCount >= 3)
+                {
+                    component.isPowered = true;
+                    component.PowerOn();
+
+                    // ✨ [중요] 모터가 켜지면 모터의 포트들도 '전류가 흐르는 곳'으로 등록되어야
+                    // 색칠 BFS가 모터를 통과하지 못하더라도(부하니까) 모터까지의 선은 칠해짐
+                    // (AnalyzeCircuit에서는 poweredPorts를 쓰지 않고 component.isPowered만 켜두면, 
+                    //  UpdateWireColors가 알아서 처리합니다.)
+                }
+                else
+                {
+                    component.isPowered = false;
+                    component.PowerOff();
+                }
                 continue;
             }
 
@@ -96,22 +127,24 @@ public class CircuitSolver : MonoBehaviour
             ConnectionPoint portA = ports[0];
             ConnectionPoint portB = ports[1];
 
-            // A가 Live이고 B가 Ground인지 확인
-            bool isPoweredAtoB = liveNet.Contains(portA) && groundNet.Contains(portB);
-            // B가 Live이고 A가 Ground인지 확인 (교류 등)
-            bool isPoweredBtoA = liveNet.Contains(portB) && groundNet.Contains(portA);
+            bool isA_Live = liveNet.Contains(portA);
+            bool isA_Ground = groundNet.Contains(portA);
+            bool isB_Live = liveNet.Contains(portB);
+            bool isB_Ground = groundNet.Contains(portB);
 
-            if (isPoweredAtoB || isPoweredBtoA)
+            // ✨ [핵심 수정] 전원 인가 조건 완화 (Line-to-Line 허용)
+            // 조건: 양쪽 다 전압(Live/Ground)이 들어와야 하며, 둘 다 Ground인 경우는 제외
+            // (즉, Live-Ground (220V) 또는 Live-Live (380V, R-T 연결) 모두 허용)
+            bool hasPotentialDifference = (isA_Live || isA_Ground) &&
+                                          (isB_Live || isB_Ground) &&
+                                          !(isA_Ground && isB_Ground);
+
+            if (hasPotentialDifference)
             {
-                // 전원 인가 조건 충족!
                 component.isLive = true;
                 component.isGrounded = true;
                 component.isPowered = true;
                 component.PowerOn();
-
-                // 와이어 색칠을 위해 이 부품의 포트들을 poweredPorts에 추가
-                poweredPorts.Add(portA);
-                poweredPorts.Add(portB);
             }
             else
             {
@@ -130,23 +163,18 @@ public class CircuitSolver : MonoBehaviour
     }
 
     /// <summary>
-    /// ✨ [새 함수] BFS/DFS로 "Net"을 찾는 재귀 함수
+    /// BFS/DFS로 "Net"을 찾는 재귀 함수 (allWires 인자 추가됨)
     /// </summary>
-    private void FindNetRecursive(ConnectionPoint currentPoint, HashSet<ConnectionPoint> currentNet, HashSet<ConnectionPoint> visitedPorts)
+    private void FindNetRecursive(ConnectionPoint currentPoint, HashSet<ConnectionPoint> currentNet, HashSet<ConnectionPoint> visitedPorts, Wire[] allWires)
     {
-        // 1. 이미 방문했거나 유효하지 않으면 중단
-        if (currentPoint == null || visitedPorts.Contains(currentPoint))
-            return;
+        if (currentPoint == null || visitedPorts.Contains(currentPoint)) return;
 
-        // 2. 방문 기록 및 Net에 추가
         visitedPorts.Add(currentPoint);
         currentNet.Add(currentPoint);
 
         ElectricalComponent currentComponent = currentPoint.parentComponent;
 
-        // --- 탐색 1: 병렬 탐색 (전선을 따라가기) ---
-        // (FindObjectsOfType은 매우 느리므로, WireManager가 allWires를 캐시하는 것이 좋음)
-        Wire[] allWires = FindObjectsOfType<Wire>();
+        // 탐색 1: 전선 따라가기
         foreach (var wire in allWires)
         {
             if (wire.connectedPoints.Contains(currentPoint))
@@ -155,90 +183,73 @@ public class CircuitSolver : MonoBehaviour
                 {
                     if (neighborPoint != currentPoint)
                     {
-                        FindNetRecursive(neighborPoint, currentNet, visitedPorts); // 재귀 호출
+                        FindNetRecursive(neighborPoint, currentNet, visitedPorts, allWires);
                     }
                 }
             }
         }
 
-        // --- 탐색 2: 직렬 탐색 ("닫힌 스위치" 통과하기) ---
+        // 탐색 2: 닫힌 스위치 통과
         bool canPassThrough = false;
-
         if (currentComponent is Switch switchComp && switchComp.isOn) canPassThrough = true;
         else if (currentComponent is RelaySwitch relayComp && relayComp.isOn) canPassThrough = true;
 
+        else if (currentComponent is EOCR) canPassThrough = true;
+        else if (currentComponent is Fuse) canPassThrough = true;
+        else if (currentComponent is EOCRCoil) canPassThrough = true;
+
         if (canPassThrough)
         {
-            // 닫힌 스위치라면, 반대편 포트로 탐색 계속
             ConnectionPoint[] allPortsOnComponent = currentComponent.GetComponentsInChildren<ConnectionPoint>();
             foreach (var internalNeighborPort in allPortsOnComponent)
             {
                 if (internalNeighborPort != currentPoint)
                 {
-                    FindNetRecursive(internalNeighborPort, currentNet, visitedPorts); // 재귀 호출
+                    FindNetRecursive(internalNeighborPort, currentNet, visitedPorts, allWires);
                 }
             }
         }
-        // (부품이 RL, Coil 등 "부하"이거나 "열린 스위치"면 여기서 탐색 중단)
     }
 
-    /// <summary>
-    /// ✨ [새 함수] 빌드된 Net 리스트를 순회하며 Live/Ground Net을 식별합니다.
-    /// </summary>
     private void FindLiveAndGroundNets()
     {
         foreach (var net in allNets)
         {
-            // 최적화: 이 Net이 Live인지 Ground인지 확인했는지 체크하는 플래그
-            bool isLiveFound = false;
-            bool isGroundFound = false;
+            bool isThisNetLive = false;
+            bool isThisNetGround = false;
 
             foreach (var point in net)
             {
-                // 이미 둘 다 찾았다면 더 이상 루프를 돌 필요 없음 (최적화용)
-                if (isLiveFound && isGroundFound) break;
+                if (isThisNetLive && isThisNetGround) break;
 
                 var terminal = point.GetComponent<Terminal>();
                 if (terminal != null)
                 {
                     var parentPowerSource = terminal.GetComponentInParent<Sym_3P4W>();
 
-                    // (Live) 전원 소스 터미널 확인
-                    if (!isLiveFound && terminal.type == Terminal.TerminalType.PowerSource && (parentPowerSource == null || parentPowerSource.isOn))
+                    if (!isThisNetLive && terminal.type == Terminal.TerminalType.PowerSource && (parentPowerSource == null || parentPowerSource.isOn))
                     {
-                        liveNet.UnionWith(net); // 이 Net 전체를 Live로 등록
-                        isLiveFound = true;     // 찾았음을 표시
-
-                        // ✨ [수정] 여기서 break를 하면 안 됩니다! 
-                        // 같은 Net 안에 Ground 터미널이 있을 수도 있기 때문입니다.
+                        isThisNetLive = true;
                     }
-                    // (Ground) 접지 터미널 확인
-                    else if (!isGroundFound && terminal.type == Terminal.TerminalType.PowerGround)
+                    else if (!isThisNetGround && terminal.type == Terminal.TerminalType.PowerGround)
                     {
-                        groundNet.UnionWith(net); // 이 Net 전체를 Ground로 등록
-                        isGroundFound = true;     // 찾았음을 표시
-
-                        // ✨ [수정] 여기서도 break 제거 (혹은 위 최적화 if문으로 대체)
+                        isThisNetGround = true;
                     }
                 }
             }
+
+            if (isThisNetLive) liveNet.UnionWith(net);
+            if (isThisNetGround) groundNet.UnionWith(net);
         }
     }
 
-    /// <summary>
-    /// ✨ [수정] "전류가 흐르는" 경로만 빨간색으로 칠합니다.
-    /// </summary>
     private void UpdateWireColors(Wire[] allWires, ElectricalComponent[] allComponents)
     {
         Color liveColor = Color.red;
-
-        // 1. "전류가 흐르는" 포트들만 담을 새 Set을 생성합니다.
         HashSet<ConnectionPoint> currentCarryingPorts = new HashSet<ConnectionPoint>();
-
-        // 2. BFS(너비 우선 탐색) 큐를 준비합니다.
         Queue<ConnectionPoint> queue = new Queue<ConnectionPoint>();
 
-        // 3. [시작점 1] 전원이 켜진(isPowered) 모든 부품의 포트를 큐에 추가
+        // BFS 시작점 1: 켜진 부품들
         foreach (var component in allComponents)
         {
             if (component.isPowered)
@@ -254,15 +265,14 @@ public class CircuitSolver : MonoBehaviour
             }
         }
 
-        // 4. [시작점 2] Live 전원(R,S,T)과 Ground(N) 터미널 포트도 큐에 추가
+        // BFS 시작점 2: 전원 및 접지 터미널
         FindSourceAndGroundTerminals(queue, currentCarryingPorts);
 
-        // 5. BFS 탐색 시작 (Dijkstra와 유사하게 "전류가 흐르는" Net을 탐색)
         while (queue.Count > 0)
         {
             ConnectionPoint currentPoint = queue.Dequeue();
 
-            // 6. 탐색 1: (전선) 이 포트에 연결된 모든 전선을 탐색
+            // 전선 탐색
             foreach (var wire in allWires)
             {
                 if (wire.connectedPoints.Contains(currentPoint))
@@ -278,11 +288,13 @@ public class CircuitSolver : MonoBehaviour
                 }
             }
 
-            // 7. 탐색 2: (닫힌 스위치) 이 포트가 속한 부품이 "닫힌 스위치"인지 확인
+            // 닫힌 스위치 탐색
             ElectricalComponent comp = currentPoint.parentComponent;
             bool canPassThrough = (comp is Switch s && s.isOn) ||
-                                  (comp is RelaySwitch rs && rs.isOn);
-
+                                  (comp is RelaySwitch rs && rs.isOn) ||
+                                  (comp is EOCR) ||
+                                  (comp is EOCRCoil) ||
+                                  (comp is Fuse);
             if (canPassThrough)
             {
                 foreach (var internalNeighbor in comp.GetComponentsInChildren<ConnectionPoint>())
@@ -294,12 +306,10 @@ public class CircuitSolver : MonoBehaviour
                     }
                 }
             }
-        } // BFS 종료
+        }
 
-        // 8. 최종 색칠
         foreach (var wire in allWires)
         {
-            // 와이어의 양 끝점이 *모두* "전류가 흐르는" Set에 포함될 때만
             if (wire.connectedPoints.Count > 0 &&
                 wire.connectedPoints.All(p => currentCarryingPorts.Contains(p)))
             {
@@ -307,14 +317,11 @@ public class CircuitSolver : MonoBehaviour
             }
             else
             {
-                wire.ResetColor(); // PB1으로 가는 선 등 "Dead" 선은 회색
+                wire.ResetColor();
             }
         }
     }
 
-    /// <summary>
-    /// UpdateWireColors의 BFS 시작점으로 사용될 Live/Ground 터미널 포트를 찾습니다.
-    /// </summary>
     private void FindSourceAndGroundTerminals(Queue<ConnectionPoint> queue, HashSet<ConnectionPoint> currentCarryingPorts)
     {
         Terminal[] allTerminals = FindObjectsOfType<Terminal>();
@@ -324,7 +331,7 @@ public class CircuitSolver : MonoBehaviour
             bool isSourceLive = (terminal.type == Terminal.TerminalType.PowerSource && (parentPowerSource == null || parentPowerSource.isOn));
             bool isGround = (terminal.type == Terminal.TerminalType.PowerGround);
 
-            if (isSourceLive)
+            if (isSourceLive || isGround)
             {
                 ConnectionPoint terminalPort = terminal.GetComponent<ConnectionPoint>();
                 if (terminalPort != null && !currentCarryingPorts.Contains(terminalPort))

@@ -20,16 +20,16 @@ public class ButtonController : MonoBehaviour
 
     [Header("2D 화면(Left)")]
     public Button menuBtn;
-    public Button memoBtn;
+    public Button newTemplateBtn;
     public Button templateSaveBtn;
     public Button templateLoadBtn;
     public Button printBtn;
     public Button initBtn;
     public Button backBtn;
+    public Button frontBtn;
 
 
     [Header("2D 화면(Right)")]
-    public Button colorDivisionBtn;
     public Button pinNum;
     public Button playBtn;
     public Button stopBtn;
@@ -42,9 +42,7 @@ public class ButtonController : MonoBehaviour
     private bool pinisOn;
     public Transform space_2d;
     public GameObject helpPanel;
-    public GameObject quitPopup;
     public Transform popupSpace;
-    private GameObject quitInstant;
     [Header("3D 화면")]
     public Button window_2dBtn;
     public Button backBtn_3d;
@@ -60,17 +58,17 @@ public class ButtonController : MonoBehaviour
 
     private void Awake()
     {
-        initBtn.onClick.AddListener(ObjectInit_2d);
-        selectBtn_3d.onClick.AddListener(() => ModeSelect(1) );
-        selectBtn_2d.onClick.AddListener(() => ModeSelect(2) );
+        initBtn.onClick.AddListener(InitPopup);
+        selectBtn_3d.onClick.AddListener(() => ModeSelect(1));
+        selectBtn_2d.onClick.AddListener(() => ModeSelect(2));
         endBtn.onClick.AddListener(() => Application.Quit());
         window_2dBtn.onClick.AddListener(WindowScreen_2d);
         backBtn_3d.onClick.AddListener(() => ModeSelect(0));
-        menuBtn.onClick.AddListener(() => ModeSelect(0));
+        menuBtn.onClick.AddListener(MenuPopup);
         initBtn_3d.onClick.AddListener(ObjectInit);
         pinNum.onClick.AddListener(FindPinNumber);
-        helpBtn.onClick.AddListener(() => helpPanel.SetActive(true) );
-        helpCloseBtn.onClick.AddListener(() => helpPanel.SetActive(false) );
+        helpBtn.onClick.AddListener(() => helpPanel.SetActive(true));
+        helpCloseBtn.onClick.AddListener(() => helpPanel.SetActive(false));
 
         quitBtn.onClick.AddListener(QuitPopup);
 
@@ -87,6 +85,7 @@ public class ButtonController : MonoBehaviour
 
         if (SaveManager.instance != null)
         {
+            newTemplateBtn.onClick.AddListener(NewTemplatePopup);
             templateSaveBtn.onClick.AddListener(CircuitFileManager.instance.OnClickSaveAs);
             templateLoadBtn.onClick.AddListener(CircuitFileManager.instance.OnClickLoad);
         }
@@ -98,8 +97,8 @@ public class ButtonController : MonoBehaviour
 
     private void ObjectInit_2d()
     {
-        
-        foreach(Transform chird in space_2d)
+
+        foreach (Transform chird in space_2d)
         {
             Destroy(chird.gameObject);
         }
@@ -111,7 +110,7 @@ public class ButtonController : MonoBehaviour
         GameObject[] allObjects = FindObjectsOfType<GameObject>();
         foreach (GameObject obj in allObjects)
         {
-            if(obj.name.Contains("Clone"))
+            if (obj.name.Contains("Clone"))
             {
                 Destroy(obj);
             }
@@ -133,7 +132,7 @@ public class ButtonController : MonoBehaviour
     private void ModeBtnEvent(bool isPlay)
     {
         SimulationManager.ToggleSimulation(isPlay);
-        
+
         if (isPlay == false)
         {
             playBtn.interactable = true;
@@ -184,7 +183,7 @@ public class ButtonController : MonoBehaviour
     private void FindPinNumber()
     {
         ConnectionPoint[] allObject = space_2d.GetComponentsInChildren<ConnectionPoint>();
-        if(!pinisOn)
+        if (!pinisOn)
         {
             foreach (ConnectionPoint obj in allObject)
             {
@@ -215,9 +214,47 @@ public class ButtonController : MonoBehaviour
 
     private void QuitPopup()
     {
-        if (quitInstant == null)
+        PopupManager.Instance.ShowCommonPopup("종료하시겠습니까?", () =>
         {
-            quitInstant = Instantiate(quitPopup, popupSpace);
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
+        });
+    }
+
+    private void MenuPopup()
+    {
+        PopupManager.Instance.ShowCommonPopup("메인 메뉴로 돌아가시겠습니까?", () =>
+        {
+            ObjectInit_2d();
+            ModeSelect(0);
+        });
+    }
+
+    private void InitPopup()
+    {
+        if (space_2d.childCount > 0)
+        {
+            PopupManager.Instance.ShowCommonPopup("초기화 하시겠습니까?", () =>
+            {
+                ObjectInit_2d();
+            });
+        }
+    }
+
+    private void NewTemplatePopup()
+    {
+        if(space_2d.childCount > 0)
+        {
+            PopupManager.Instance.ShowCommonPopup("저장 하시겠습니까?", () =>
+            {
+                CircuitFileManager.instance.OnClickSaveAs();
+            }, () =>
+            {
+                ObjectInit_2d();
+            });
         }
     }
 }

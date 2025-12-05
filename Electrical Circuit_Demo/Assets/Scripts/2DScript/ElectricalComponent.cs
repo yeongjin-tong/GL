@@ -72,6 +72,7 @@ public abstract class ElectricalComponent : MonoBehaviour
         if(symbolTextobj != null)
         {
             symbolTextobj.text = name;
+            symbol_Text = name;
         }
     }
 }

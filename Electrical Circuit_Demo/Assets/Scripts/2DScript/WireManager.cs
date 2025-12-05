@@ -99,32 +99,66 @@ public class WireManager : MonoBehaviour
     // InputManager의 방송을 수신하여 처리하는 함수
     private void HandlePhysicsClick(Collider2D hit)
     {
+        // 1. [핵심 수정] 포트(ConnectionPoint) 클릭을 최우선으로 처리합니다.
+        // (그리던 중이든 아니든, 포트를 클릭했다면 분기점이 아니라 포트 연결입니다.)
+        if (hit != null)
+        {
+            ConnectionPoint point = hit.GetComponent<ConnectionPoint>();
+            if (point != null)
+            {
+                // A. 선을 처음 그리기 시작할 때
+                if (firstPoint == null)
+                {
+                    firstPoint = point;
+                    currentWire = CreateWire();
+                }
+                // B. 선을 그리던 중, 다른 포트에 도착했을 때 (연결 확정)
+                else if (point != firstPoint)
+                {
+                    if (point.transform.parent == firstPoint.transform.parent)
+                    {
+                        // 같은 부품 내 연결 금지 (취소)
+                        Destroy(currentWire.gameObject);
+                        ResetState();
+                        return;
+                    }
+
+                    // ✨ 여기서 분기점 생성 로직을 타지 않고 바로 FinalizeWire로 갑니다.
+                    FinalizeWire(currentWire, firstPoint, point);
+                    ResetState();
+
+
+                }
+                return; // 포트 클릭 처리가 끝났으므로 함수 종료
+            }
+        }
+
+        // 2. [기존 로직] 분기점(Junction) 프리뷰 클릭 처리
+        // (위에서 포트 클릭을 먼저 걸러냈으므로, 여기는 '허공에 있는 전선'을 클릭했을 때만 실행됩니다)
         if (isDrawing() && junctionPreview != null && nearestWireForPreview != null)
         {
             if (isPreviewColliding)
             {
                 Debug.Log("배치 실패: 그리는 중인 선이 충돌 상태입니다.");
-
-                Destroy(currentWire.gameObject); // 빨간색 미리보기 선 파괴
-                ResetState(); // 그리기 취소
-                return; // 연결 로직 실행 중단
+                Destroy(currentWire.gameObject);
+                ResetState();
+                return;
             }
 
             Debug.Log("Junction preview 클릭! 병렬 연결을 시작합니다.");
             ConnectToExistingWire(currentWire, nearestWireForPreview, GetMouseWorldPosition());
             ResetState();
-            return; // 여기서 함수를 종료하여 아래 로직이 실행되지 않도록 함
+            return;
         }
 
-        if (hit == null && firstPoint != null)  // 허공에 클릭해서 선 꺾기
+        // 3. [기존 로직] 허공 클릭 (선 꺾기)
+        if (hit == null && firstPoint != null)
         {
             clickIndex++;
-            if (clickIndex  < 3)
+            if (clickIndex < 3)
             {
-                // 마우스 위치를 로컬 좌표로 변환하고 그리드에 스냅
-                RectTransformUtility.ScreenPointToLocalPointInRectangle((RectTransform)content_2D, Input.mousePosition, Camera.main, out Vector2 localMousePos);
+                Vector2 localMousePos = WorldToLocal(Input.mousePosition);
                 Vector2 snappedLocalPos = gridManager.SnapToGrid(localMousePos);
-
                 AddPointToWire(currentWire);
 
                 if (junctionPreview != null)
@@ -139,45 +173,25 @@ public class WireManager : MonoBehaviour
             return;
         }
 
+        // 4. [기존 로직] 전선 몸통 클릭 (분기 시작)
         if (hit != null)
         {
-            ConnectionPoint point = hit.GetComponent<ConnectionPoint>();
-            if (point != null)
+            // (이미 위에서 ConnectionPoint는 걸러졌음)
+
+            // 전선(Wire)을 클릭했다면 분기 시작
+            if (!isDrawing() && hit.CompareTag("Wire"))
             {
-                if (firstPoint == null)
+                // (그리던 중이 아닐 때 전선을 클릭하면 분기 시작 - 현재 기획에 맞는지 확인 필요)
+                // 만약 '그리던 중'에 전선을 클릭해서 분기하고 싶다면 조건을 isDrawing()으로 바꿔야 함.
+                // 현재 코드 문맥상 isDrawing()일 때 분기하는 로직은 위 2번(junctionPreview)에서 처리됨.
+
+                // 만약 "선이 없는 곳에서 시작해서 전선 중간에 붙이는" 기능을 원한다면:
+                if (isDrawing())
                 {
-                    firstPoint = point;
-                    currentWire = CreateWire();
-                }
-                else if (point != firstPoint)
-                {
-                    if (point.transform.parent == firstPoint.transform.parent)
-                    {
-                        Destroy(currentWire.gameObject);
-                        ResetState();
-                        return;
-                    }
-                    FinalizeWire(currentWire, firstPoint, point);
+                    if (isPreviewColliding) { /*...*/ return; }
+                    ConnectToExistingWire(currentWire, hit.transform, GetMouseWorldPosition());
                     ResetState();
                 }
-                return;
-            }
-
-            if (isDrawing() && hit.CompareTag("Wire"))
-            {
-                Debug.Log("전선 클릭!");
-
-                if (isPreviewColliding)
-                {
-                    Debug.Log("배치 실패: 그리는 중인 선이 충돌 상태입니다.");
-
-                    Destroy(currentWire.gameObject); // 빨간색 미리보기 선 파괴
-                    ResetState(); // 그리기 취소
-                    return; // 연결 로직 실행 중단
-                }
-                // (충돌 중이 아닐 때만 아래 연결 로직 실행)
-                ConnectToExistingWire(currentWire, hit.transform, GetMouseWorldPosition());
-                ResetState();
             }
         }
     }
@@ -220,6 +234,9 @@ public class WireManager : MonoBehaviour
         currentWire = wire;
         ColliderSetting();
         currentWire = null;
+
+        // ✨ [추가] 생성 커맨드 등록 (생성 행동 = true)
+        CommandManager.Instance.AddCommand(new Command_ToggleActive(wire.gameObject, true));
     }
 
     //콜라이더 세팅
@@ -335,6 +352,12 @@ public class WireManager : MonoBehaviour
         lineIndex = 0;
         clickIndex = 0;
         isPreviewColliding = false;
+
+        if (junctionPreview != null)
+        {
+            Destroy(junctionPreview);
+            junctionPreview = null;
+        }
     }
     private LineRenderer CreateWire()
     {

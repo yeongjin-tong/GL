@@ -6,7 +6,7 @@ using UnityEngine.Video;
 
 public class Junction : ElectricalComponent
 {
-    private ConnectionPoint myPoint;
+    public ConnectionPoint myPoint;
 
     public override void Awake()
     {
@@ -21,6 +21,11 @@ public class Junction : ElectricalComponent
     public void CheckAndHeal()
     {
         Wire[] allWires = FindObjectsOfType<Wire>();
+
+        if(myPoint == null)
+        {
+            myPoint = GetComponent<ConnectionPoint>();
+        }
 
         List<Wire> connectedWires = allWires
             .Where(w => w.connectedPoints.Contains(myPoint))

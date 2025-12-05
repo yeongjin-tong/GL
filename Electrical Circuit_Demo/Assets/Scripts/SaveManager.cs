@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 using System.Linq;
+using Unity.VisualScripting;
 
 public class SaveManager : MonoBehaviour
 {
     public static SaveManager instance { get; private set; }
 
-    public string address = "C:\\Users\\USER\\Desktop\\work_git\\Electrical Circuit_Demo\\streamingAssets";
+    public string address;
 
     public string saveFileName = "myCircuit.json";      // 저장할 파일 이름
     public Transform content_2D;
@@ -23,6 +24,8 @@ public class SaveManager : MonoBehaviour
             return;
         }
         instance = this;
+
+        address = Application.streamingAssetsPath;
     }
 
     private void Start()
@@ -100,6 +103,17 @@ public class SaveManager : MonoBehaviour
 
             symbolData.instanceID = comp.instanceID;
             symbolData.position = comp.GetComponent<RectTransform>().anchoredPosition;
+
+            if(comp.GetComponent<ITimerControl>() != null)
+            {
+                symbolData.timerNum = comp.GetComponent<ITimerControl>().GetTime();
+            }
+
+            foreach(ConnectionPoint port in comp.GetComponentsInChildren<ConnectionPoint>())
+            {
+                symbolData.portAndIndex.Add(port.name, port.portIndex);
+            }
+
             data.symbols.Add(symbolData);
         }
 
@@ -108,9 +122,9 @@ public class SaveManager : MonoBehaviour
         {
             WireDataSave wireData = new WireDataSave();
             wireData.startComponentID = wire.connectedPoints[0].parentComponent.instanceID;
-            wireData.startPortIndex = GetPortIndex(wire.connectedPoints[0]);
+            wireData.startPortIndex = GetPortID(wire.connectedPoints[0]);
             wireData.endComponentID = wire.connectedPoints.Last().parentComponent.instanceID;
-            wireData.endPortIndex = GetPortIndex(wire.connectedPoints.Last());
+            wireData.endPortIndex = GetPortID(wire.connectedPoints.Last());
 
             LineRenderer lr = wire.GetComponent<LineRenderer>();
             Vector3[] positions = new Vector3[lr.positionCount];
@@ -172,9 +186,21 @@ public class SaveManager : MonoBehaviour
 
                 ElectricalComponent comp = obj.GetComponent<ElectricalComponent>();
                 comp.instanceID = symbolData.instanceID;
-                comp.symbol_Text = symbolData.symbolID;
                 comp.NameSetting(symbolData.symbolID);
+                if (comp.GetComponent<ITimerControl>() != null)
+                {
+                    comp.GetComponent<ITimerControl>().SetTime(symbolData.timerNum);
+                }
                 loadedComponentsMap.Add(comp.instanceID, comp);
+
+                foreach(ConnectionPoint port in comp.GetComponentsInChildren<ConnectionPoint>())
+                {
+                    if(symbolData.portAndIndex.ContainsKey(port.name))
+                    {
+                        port.portIndex = symbolData.portAndIndex[port.name];
+                    }
+                }
+
             }
             else
             {
@@ -188,8 +214,8 @@ public class SaveManager : MonoBehaviour
             {
                 ElectricalComponent startComp = loadedComponentsMap[wireData.startComponentID];
                 ElectricalComponent endComp = loadedComponentsMap[wireData.endComponentID];
-                ConnectionPoint startPoint = GetPortByIndex(startComp, wireData.startPortIndex);
-                ConnectionPoint endPoint = GetPortByIndex(endComp, wireData.endPortIndex);
+                ConnectionPoint startPoint = GetPortByID(startComp, wireData.startPortIndex);
+                ConnectionPoint endPoint = GetPortByID(endComp, wireData.endPortIndex);
 
                 WireManager.Instance.CreateWireWithPath(startPoint, endPoint, wireData.pathPoints);
             }
@@ -219,48 +245,31 @@ public class SaveManager : MonoBehaviour
     }
 
     // 포트가 부품의 몇번째 자식인지 인덱스 반환
-    private int GetPortIndex(ConnectionPoint point)
+    // ✨ [수정] 포트의 ID(string)를 반환하는 함수로 변경
+    private string GetPortID(ConnectionPoint point)
     {
-        if (point == null || point.parentComponent == null)
-        {
-            Debug.LogError("GetPortIndex 실패: 유효하지 않은 포인트입니다.");
-            return -1;
-        }
-
-        ConnectionPoint[] allPorts = point.parentComponent.GetComponentsInChildren<ConnectionPoint>(true);
-
-        for(int i = 0; i < allPorts.Length; i++)
-        {
-            if (allPorts[i] == point)
-            {
-                return i;
-            }
-        }
-
-        Debug.LogError($"GetPortIndex 오류: {point.parentComponent.name}에서 해당 포트를 찾을 수 없습니다.");
-        return -1;
+        if (point == null) return "";
+        return point.portIndex;
     }
 
-    // 인덱스로 포트 찾기
-    private ConnectionPoint GetPortByIndex(ElectricalComponent comp, int index)
+    // ✨ [수정] ID(string)로 포트를 찾는 함수로 변경
+    private ConnectionPoint GetPortByID(ElectricalComponent comp, string id)
     {
-        if(comp == null)
-        {
-            Debug.LogError($"GetPortByIndex 실패: 컴포넌트가 null입니다.");
-            return null;
-        }
+        if (comp == null) return null;
 
         ConnectionPoint[] allPorts = comp.GetComponentsInChildren<ConnectionPoint>(true);
 
-        if(index >= 0 && index < allPorts.Length)
+        foreach (var port in allPorts)
         {
-            return allPorts[index];
+            // 저장된 ID와 포트의 ID가 같은지 확인
+            if (port.portIndex == id)
+            {
+                return port;
+            }
         }
-        else
-        {
-            Debug.LogError($"GetPortByIndex 오류: {comp.name}의 포트 인덱스({index})가 범위를 벗어났습니다. (총 개수: {allPorts.Length})");
-            return null;
-        }
+
+        Debug.LogError($"GetPortByID 오류: {comp.name}에서 ID가 '{id}'인 포트를 찾을 수 없습니다.");
+        return null;
     }
 
     // === 파일 목록 가져오기 ===

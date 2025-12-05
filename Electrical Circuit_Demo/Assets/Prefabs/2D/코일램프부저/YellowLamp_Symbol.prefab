@@ -463,7 +463,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   instanceID: 
-  symbol_Text: 
+  symbol_Text: YR
   symbolTextobj: {fileID: 8468730149858054341}
   isLive: 0
   isGrounded: 0

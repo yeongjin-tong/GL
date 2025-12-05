@@ -8,9 +8,9 @@ public class ConnectionPoint : MonoBehaviour
     public Direction pointDirection = Direction.None;
 
     [Tooltip("같은 방향의 포트가 여러 개일 경우 구분하기 위한 번호")]
-    public int portIndex = 0;
+    public string portIndex = "0";
 
-    private TextMeshProUGUI pinNum;
+    private TMP_InputField pinNum;
     
     [HideInInspector]
     public Collider2D parentCollider;
@@ -23,7 +23,7 @@ public class ConnectionPoint : MonoBehaviour
         // GetComponentInParent는 부모 계층을 따라 올라가며 컴포넌트를 찾으므로 2D/3D 모두에서 잘 작동합니다.
         parentComponent = GetComponentInParent<ElectricalComponent>();
 
-        pinNum = GetComponentInChildren<TextMeshProUGUI>();
+        pinNum = GetComponentInChildren<TMP_InputField>();
         
     }
 
@@ -72,5 +72,10 @@ public class ConnectionPoint : MonoBehaviour
     {
         pinNum.text = portIndex.ToString();
         Debug.Log("핀번호 세팅 완료!");
+    }
+
+    public void TextToPinSet(string num)
+    {
+        portIndex = num;
     }
 }

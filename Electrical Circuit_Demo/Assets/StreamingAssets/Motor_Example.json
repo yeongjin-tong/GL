@@ -1,0 +1,809 @@
+{
+    "symbols": [
+        {
+            "symbolID": "",
+            "prefabName": "3P 4W_Symbol",
+            "instanceID": "6302a800-4e00-4129-97e4-4b46fbae882b",
+            "position": {
+                "x": -368.0,
+                "y": 320.0,
+                "z": 0.0
+            },
+            "timerNum": 0.0,
+            "_portKeys": [
+                "point_None",
+                "point_None_2",
+                "point_None_3",
+                "point_None_4"
+            ],
+            "_portValues": [
+                "0",
+                "1",
+                "2",
+                "3"
+            ]
+        },
+        {
+            "symbolID": "MC1",
+            "prefabName": "MCContact_Symbol",
+            "instanceID": "c37e5d74-39df-47a0-93c6-0f4cc450a45c",
+            "position": {
+                "x": -384.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "timerNum": 0.0,
+            "_portKeys": [
+                "point_Up",
+                "point_Up_2",
+                "point_Up_3",
+                "point_Down",
+                "point_Down_2",
+                "point_Down_3"
+            ],
+            "_portValues": [
+                "2",
+                "4",
+                "6",
+                "8",
+                "10",
+                "12"
+            ]
+        },
+        {
+            "symbolID": "M",
+            "prefabName": "Motor_3P_Symbol",
+            "instanceID": "9a29211e-1d01-41da-8609-17450215e0f8",
+            "position": {
+                "x": -384.0,
+                "y": -176.0,
+                "z": 0.0
+            },
+            "timerNum": 0.0,
+            "_portKeys": [
+                "point_Up",
+                "point_Up_2",
+                "point_Up_3",
+                "point_None"
+            ],
+            "_portValues": [
+                "0",
+                "1",
+                "2",
+                "0"
+            ]
+        },
+        {
+            "symbolID": "M",
+            "prefabName": "Motor_3P_Symbol",
+            "instanceID": "9420baf0-e22f-4454-b8f9-5f0cbb854ead",
+            "position": {
+                "x": -224.0,
+                "y": -176.0,
+                "z": 0.0
+            },
+            "timerNum": 0.0,
+            "_portKeys": [
+                "point_Up",
+                "point_Up_2",
+                "point_Up_3",
+                "point_None"
+            ],
+            "_portValues": [
+                "0",
+                "1",
+                "2",
+                "0"
+            ]
+        },
+        {
+            "symbolID": "MC2",
+            "prefabName": "MCContact_Symbol",
+            "instanceID": "2f00b76a-0ad9-4f3f-ace0-35ebdb168450",
+            "position": {
+                "x": -224.0,
+                "y": 0.0,
+                "z": 0.0
+            },
+            "timerNum": 0.0,
+            "_portKeys": [
+                "point_Up",
+                "point_Up_2",
+                "point_Up_3",
+                "point_Down",
+                "point_Down_2",
+                "point_Down_3"
+            ],
+            "_portValues": [
+                "1",
+                "3",
+                "5",
+                "7",
+                "9",
+                "11"
+            ]
+        },
+        {
+            "symbolID": "",
+            "prefabName": "Junction",
+            "instanceID": "0d00e909-a130-4cf3-96ff-40be79e630f4",
+            "position": {
+                "x": -416.0,
+                "y": 80.0,
+                "z": 0.0
+            },
+            "timerNum": 0.0,
+            "_portKeys": [
+                "Junction_1"
+            ],
+            "_portValues": [
+                "0"
+            ]
+        },
+        {
+            "symbolID": "",
+            "prefabName": "Junction",
+            "instanceID": "6facc4e0-ffa9-435d-a985-b30a10617b7a",
+            "position": {
+                "x": -384.0,
+                "y": 96.0,
+                "z": 0.0
+            },
+            "timerNum": 0.0,
+            "_portKeys": [
+                "Junction_2"
+            ],
+            "_portValues": [
+                "0"
+            ]
+        },
+        {
+            "symbolID": "",
+            "prefabName": "Junction",
+            "instanceID": "badc7e41-4e02-4a43-ba37-92530c37680c",
+            "position": {
+                "x": -352.0,
+                "y": 112.0,
+                "z": 0.0
+            },
+            "timerNum": 0.0,
+            "_portKeys": [
+                "Junction_3"
+            ],
+            "_portValues": [
+                "0"
+            ]
+        },
+        {
+            "symbolID": "PB1",
+            "prefabName": "PB (NO)_Symbol",
+            "instanceID": "c3e02ef9-b600-4ffa-9e88-6cc2c3689b8f",
+            "position": {
+                "x": 16.0,
+                "y": 112.0,
+                "z": 0.0
+            },
+            "timerNum": 0.0,
+            "_portKeys": [
+                "point_Up",
+                "point_Down"
+            ],
+            "_portValues": [
+                "A1",
+                "A2"
+            ]
+        },
+        {
+            "symbolID": "",
+            "prefabName": "Junction",
+            "instanceID": "ec773e2a-cc45-4aa9-b3fa-315e7f34f743",
+            "position": {
+                "x": -416.0,
+                "y": 256.0,
+                "z": 0.0
+            },
+            "timerNum": 0.0,
+            "_portKeys": [
+                "Junction_4"
+            ],
+            "_portValues": [
+                "0"
+            ]
+        },
+        {
+            "symbolID": "MC1",
+            "prefabName": "MC_Symbol",
+            "instanceID": "ece127fd-cd96-40e5-af5f-1b7b9647dee3",
+            "position": {
+                "x": 16.0,
+                "y": -32.0,
+                "z": 0.0
+            },
+            "timerNum": 0.0,
+            "_portKeys": [
+                "point_Up",
+                "point_Down"
+            ],
+            "_portValues": [
+                "0",
+                "1"
+            ]
+        },
+        {
+            "symbolID": "MC2",
+            "prefabName": "MC_Symbol",
+            "instanceID": "a2814002-b3fb-461f-a3b6-b64fc4cd6038",
+            "position": {
+                "x": 160.0,
+                "y": -32.0,
+                "z": 0.0
+            },
+            "timerNum": 0.0,
+            "_portKeys": [
+                "point_Up",
+                "point_Down"
+            ],
+            "_portValues": [
+                "0",
+                "1"
+            ]
+        },
+        {
+            "symbolID": "PB2",
+            "prefabName": "PB (NO)_Symbol",
+            "instanceID": "be366806-ca38-4a08-a7dd-d1d35d9068a4",
+            "position": {
+                "x": 160.0,
+                "y": 112.0,
+                "z": 0.0
+            },
+            "timerNum": 0.0,
+            "_portKeys": [
+                "point_Up",
+                "point_Down"
+            ],
+            "_portValues": [
+                "가",
+                "나"
+            ]
+        },
+        {
+            "symbolID": "",
+            "prefabName": "Junction",
+            "instanceID": "bf119521-e176-4c3a-a560-26df12ba263a",
+            "position": {
+                "x": -352.0,
+                "y": 160.0,
+                "z": 0.0
+            },
+            "timerNum": 0.0,
+            "_portKeys": [
+                "Junction_5"
+            ],
+            "_portValues": [
+                "0"
+            ]
+        },
+        {
+            "symbolID": "",
+            "prefabName": "Junction",
+            "instanceID": "5a06c907-48aa-4e08-adb8-1b5710e41c87",
+            "position": {
+                "x": 16.0,
+                "y": 256.0,
+                "z": 0.0
+            },
+            "timerNum": 0.0,
+            "_portKeys": [
+                "Junction_6"
+            ],
+            "_portValues": [
+                "0"
+            ]
+        },
+        {
+            "symbolID": "",
+            "prefabName": "Junction",
+            "instanceID": "68bd7b6a-4417-499a-96b5-e77fafe4c95f",
+            "position": {
+                "x": 16.0,
+                "y": -144.0,
+                "z": 0.0
+            },
+            "timerNum": 0.0,
+            "_portKeys": [
+                "Junction_7"
+            ],
+            "_portValues": [
+                "0"
+            ]
+        }
+    ],
+    "wires": [
+        {
+            "startComponentID": "c37e5d74-39df-47a0-93c6-0f4cc450a45c",
+            "startPortIndex": "8",
+            "endComponentID": "9a29211e-1d01-41da-8609-17450215e0f8",
+            "endPortIndex": "0",
+            "pathPoints": [
+                {
+                    "x": -416.0,
+                    "y": -48.0,
+                    "z": 0.0
+                },
+                {
+                    "x": -416.0,
+                    "y": -176.0,
+                    "z": 0.0
+                }
+            ]
+        },
+        {
+            "startComponentID": "9a29211e-1d01-41da-8609-17450215e0f8",
+            "startPortIndex": "1",
+            "endComponentID": "c37e5d74-39df-47a0-93c6-0f4cc450a45c",
+            "endPortIndex": "10",
+            "pathPoints": [
+                {
+                    "x": -384.0,
+                    "y": -176.0,
+                    "z": 0.0
+                },
+                {
+                    "x": -384.0,
+                    "y": -48.0,
+                    "z": 0.0
+                }
+            ]
+        },
+        {
+            "startComponentID": "c37e5d74-39df-47a0-93c6-0f4cc450a45c",
+            "startPortIndex": "12",
+            "endComponentID": "9a29211e-1d01-41da-8609-17450215e0f8",
+            "endPortIndex": "2",
+            "pathPoints": [
+                {
+                    "x": -352.0,
+                    "y": -48.0,
+                    "z": 0.0
+                },
+                {
+                    "x": -352.0,
+                    "y": -176.0,
+                    "z": 0.0
+                }
+            ]
+        },
+        {
+            "startComponentID": "2f00b76a-0ad9-4f3f-ace0-35ebdb168450",
+            "startPortIndex": "7",
+            "endComponentID": "9420baf0-e22f-4454-b8f9-5f0cbb854ead",
+            "endPortIndex": "0",
+            "pathPoints": [
+                {
+                    "x": -256.0,
+                    "y": -48.0,
+                    "z": 0.0
+                },
+                {
+                    "x": -256.0,
+                    "y": -176.0,
+                    "z": 0.0
+                }
+            ]
+        },
+        {
+            "startComponentID": "9420baf0-e22f-4454-b8f9-5f0cbb854ead",
+            "startPortIndex": "1",
+            "endComponentID": "2f00b76a-0ad9-4f3f-ace0-35ebdb168450",
+            "endPortIndex": "9",
+            "pathPoints": [
+                {
+                    "x": -224.0,
+                    "y": -176.0,
+                    "z": 0.0
+                },
+                {
+                    "x": -224.0,
+                    "y": -48.0,
+                    "z": 0.0
+                }
+            ]
+        },
+        {
+            "startComponentID": "2f00b76a-0ad9-4f3f-ace0-35ebdb168450",
+            "startPortIndex": "11",
+            "endComponentID": "9420baf0-e22f-4454-b8f9-5f0cbb854ead",
+            "endPortIndex": "2",
+            "pathPoints": [
+                {
+                    "x": -192.0,
+                    "y": -48.0,
+                    "z": 0.0
+                },
+                {
+                    "x": -192.0,
+                    "y": -176.0,
+                    "z": 0.0
+                }
+            ]
+        },
+        {
+            "startComponentID": "c37e5d74-39df-47a0-93c6-0f4cc450a45c",
+            "startPortIndex": "2",
+            "endComponentID": "0d00e909-a130-4cf3-96ff-40be79e630f4",
+            "endPortIndex": "0",
+            "pathPoints": [
+                {
+                    "x": -416.0,
+                    "y": 48.0,
+                    "z": 0.0
+                },
+                {
+                    "x": -416.0,
+                    "y": 80.0,
+                    "z": 0.0
+                }
+            ]
+        },
+        {
+            "startComponentID": "2f00b76a-0ad9-4f3f-ace0-35ebdb168450",
+            "startPortIndex": "1",
+            "endComponentID": "0d00e909-a130-4cf3-96ff-40be79e630f4",
+            "endPortIndex": "0",
+            "pathPoints": [
+                {
+                    "x": -256.0,
+                    "y": 48.0,
+                    "z": 0.0
+                },
+                {
+                    "x": -256.0,
+                    "y": 80.0,
+                    "z": 0.0
+                },
+                {
+                    "x": -416.0,
+                    "y": 80.0,
+                    "z": 0.0
+                }
+            ]
+        },
+        {
+            "startComponentID": "c37e5d74-39df-47a0-93c6-0f4cc450a45c",
+            "startPortIndex": "4",
+            "endComponentID": "6facc4e0-ffa9-435d-a985-b30a10617b7a",
+            "endPortIndex": "0",
+            "pathPoints": [
+                {
+                    "x": -384.0,
+                    "y": 48.0,
+                    "z": 0.0
+                },
+                {
+                    "x": -384.0,
+                    "y": 96.0,
+                    "z": 0.0
+                }
+            ]
+        },
+        {
+            "startComponentID": "6302a800-4e00-4129-97e4-4b46fbae882b",
+            "startPortIndex": "1",
+            "endComponentID": "6facc4e0-ffa9-435d-a985-b30a10617b7a",
+            "endPortIndex": "0",
+            "pathPoints": [
+                {
+                    "x": -384.0,
+                    "y": 320.0,
+                    "z": 0.0
+                },
+                {
+                    "x": -384.0,
+                    "y": 96.0,
+                    "z": 0.0
+                }
+            ]
+        },
+        {
+            "startComponentID": "2f00b76a-0ad9-4f3f-ace0-35ebdb168450",
+            "startPortIndex": "3",
+            "endComponentID": "6facc4e0-ffa9-435d-a985-b30a10617b7a",
+            "endPortIndex": "0",
+            "pathPoints": [
+                {
+                    "x": -224.0,
+                    "y": 48.0,
+                    "z": 0.0
+                },
+                {
+                    "x": -224.0,
+                    "y": 96.0,
+                    "z": 0.0
+                },
+                {
+                    "x": -384.0,
+                    "y": 96.0,
+                    "z": 0.0
+                }
+            ]
+        },
+        {
+            "startComponentID": "c37e5d74-39df-47a0-93c6-0f4cc450a45c",
+            "startPortIndex": "6",
+            "endComponentID": "badc7e41-4e02-4a43-ba37-92530c37680c",
+            "endPortIndex": "0",
+            "pathPoints": [
+                {
+                    "x": -352.0,
+                    "y": 48.0,
+                    "z": 0.0
+                },
+                {
+                    "x": -352.0,
+                    "y": 112.0,
+                    "z": 0.0
+                }
+            ]
+        },
+        {
+            "startComponentID": "2f00b76a-0ad9-4f3f-ace0-35ebdb168450",
+            "startPortIndex": "5",
+            "endComponentID": "badc7e41-4e02-4a43-ba37-92530c37680c",
+            "endPortIndex": "0",
+            "pathPoints": [
+                {
+                    "x": -192.0,
+                    "y": 48.0,
+                    "z": 0.0
+                },
+                {
+                    "x": -192.0,
+                    "y": 112.0,
+                    "z": 0.0
+                },
+                {
+                    "x": -352.0,
+                    "y": 112.0,
+                    "z": 0.0
+                }
+            ]
+        },
+        {
+            "startComponentID": "6302a800-4e00-4129-97e4-4b46fbae882b",
+            "startPortIndex": "0",
+            "endComponentID": "ec773e2a-cc45-4aa9-b3fa-315e7f34f743",
+            "endPortIndex": "0",
+            "pathPoints": [
+                {
+                    "x": -416.0,
+                    "y": 320.0,
+                    "z": 0.0
+                },
+                {
+                    "x": -416.0,
+                    "y": 256.0,
+                    "z": 0.0
+                }
+            ]
+        },
+        {
+            "startComponentID": "0d00e909-a130-4cf3-96ff-40be79e630f4",
+            "startPortIndex": "0",
+            "endComponentID": "ec773e2a-cc45-4aa9-b3fa-315e7f34f743",
+            "endPortIndex": "0",
+            "pathPoints": [
+                {
+                    "x": -416.0,
+                    "y": 80.0,
+                    "z": 0.0
+                },
+                {
+                    "x": -416.0,
+                    "y": 256.0,
+                    "z": 0.0
+                }
+            ]
+        },
+        {
+            "startComponentID": "c3e02ef9-b600-4ffa-9e88-6cc2c3689b8f",
+            "startPortIndex": "A2",
+            "endComponentID": "ece127fd-cd96-40e5-af5f-1b7b9647dee3",
+            "endPortIndex": "0",
+            "pathPoints": [
+                {
+                    "x": 16.0,
+                    "y": 64.0,
+                    "z": 0.0
+                },
+                {
+                    "x": 16.0,
+                    "y": 16.0,
+                    "z": 0.0
+                }
+            ]
+        },
+        {
+            "startComponentID": "6302a800-4e00-4129-97e4-4b46fbae882b",
+            "startPortIndex": "2",
+            "endComponentID": "bf119521-e176-4c3a-a560-26df12ba263a",
+            "endPortIndex": "0",
+            "pathPoints": [
+                {
+                    "x": -352.0,
+                    "y": 320.0,
+                    "z": 0.0
+                },
+                {
+                    "x": -352.0,
+                    "y": 160.0,
+                    "z": 0.0
+                }
+            ]
+        },
+        {
+            "startComponentID": "badc7e41-4e02-4a43-ba37-92530c37680c",
+            "startPortIndex": "0",
+            "endComponentID": "bf119521-e176-4c3a-a560-26df12ba263a",
+            "endPortIndex": "0",
+            "pathPoints": [
+                {
+                    "x": -352.0,
+                    "y": 112.0,
+                    "z": 0.0
+                },
+                {
+                    "x": -352.0,
+                    "y": 160.0,
+                    "z": 0.0
+                }
+            ]
+        },
+        {
+            "startComponentID": "c3e02ef9-b600-4ffa-9e88-6cc2c3689b8f",
+            "startPortIndex": "A1",
+            "endComponentID": "5a06c907-48aa-4e08-adb8-1b5710e41c87",
+            "endPortIndex": "0",
+            "pathPoints": [
+                {
+                    "x": 16.0,
+                    "y": 160.0,
+                    "z": 0.0
+                },
+                {
+                    "x": 16.0,
+                    "y": 256.0,
+                    "z": 0.0
+                }
+            ]
+        },
+        {
+            "startComponentID": "ec773e2a-cc45-4aa9-b3fa-315e7f34f743",
+            "startPortIndex": "0",
+            "endComponentID": "5a06c907-48aa-4e08-adb8-1b5710e41c87",
+            "endPortIndex": "0",
+            "pathPoints": [
+                {
+                    "x": -416.0,
+                    "y": 256.0,
+                    "z": 0.0
+                },
+                {
+                    "x": 16.0,
+                    "y": 256.0,
+                    "z": 0.0
+                }
+            ]
+        },
+        {
+            "startComponentID": "be366806-ca38-4a08-a7dd-d1d35d9068a4",
+            "startPortIndex": "가",
+            "endComponentID": "5a06c907-48aa-4e08-adb8-1b5710e41c87",
+            "endPortIndex": "0",
+            "pathPoints": [
+                {
+                    "x": 160.0,
+                    "y": 160.0,
+                    "z": 0.0
+                },
+                {
+                    "x": 160.0,
+                    "y": 256.0,
+                    "z": 0.0
+                },
+                {
+                    "x": 16.0,
+                    "y": 256.0,
+                    "z": 0.0
+                }
+            ]
+        },
+        {
+            "startComponentID": "be366806-ca38-4a08-a7dd-d1d35d9068a4",
+            "startPortIndex": "나",
+            "endComponentID": "a2814002-b3fb-461f-a3b6-b64fc4cd6038",
+            "endPortIndex": "0",
+            "pathPoints": [
+                {
+                    "x": 160.0,
+                    "y": 64.0,
+                    "z": 0.0
+                },
+                {
+                    "x": 160.0,
+                    "y": 16.0,
+                    "z": 0.0
+                }
+            ]
+        },
+        {
+            "startComponentID": "ece127fd-cd96-40e5-af5f-1b7b9647dee3",
+            "startPortIndex": "1",
+            "endComponentID": "68bd7b6a-4417-499a-96b5-e77fafe4c95f",
+            "endPortIndex": "0",
+            "pathPoints": [
+                {
+                    "x": 16.0,
+                    "y": -80.0,
+                    "z": 0.0
+                },
+                {
+                    "x": 16.0,
+                    "y": -144.0,
+                    "z": 0.0
+                }
+            ]
+        },
+        {
+            "startComponentID": "bf119521-e176-4c3a-a560-26df12ba263a",
+            "startPortIndex": "0",
+            "endComponentID": "68bd7b6a-4417-499a-96b5-e77fafe4c95f",
+            "endPortIndex": "0",
+            "pathPoints": [
+                {
+                    "x": -352.0,
+                    "y": 160.0,
+                    "z": 0.0
+                },
+                {
+                    "x": -112.0,
+                    "y": 160.0,
+                    "z": 0.0
+                },
+                {
+                    "x": -112.0,
+                    "y": -144.0,
+                    "z": 0.0
+                },
+                {
+                    "x": 16.0,
+                    "y": -144.0,
+                    "z": 0.0
+                }
+            ]
+        },
+        {
+            "startComponentID": "a2814002-b3fb-461f-a3b6-b64fc4cd6038",
+            "startPortIndex": "1",
+            "endComponentID": "68bd7b6a-4417-499a-96b5-e77fafe4c95f",
+            "endPortIndex": "0",
+            "pathPoints": [
+                {
+                    "x": 160.0,
+                    "y": -80.0,
+                    "z": 0.0
+                },
+                {
+                    "x": 160.0,
+                    "y": -144.0,
+                    "z": 0.0
+                },
+                {
+                    "x": 16.0,
+                    "y": -144.0,
+                    "z": 0.0
+                }
+            ]
+        }
+    ]
+}

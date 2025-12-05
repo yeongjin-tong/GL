@@ -6,9 +6,9 @@ using System.Runtime.CompilerServices;
 using TMPro;
 using UnityEngine;
 
-public class FlickerRelayCoil : ElectricalComponent
+public class FlickerRelayCoil : ElectricalComponent, ITimerControl
 {
-    [SerializeField] private float time;
+    [SerializeField] private float time = 3f;
     [SerializeField] private float curTime;
 
     private TextMeshProUGUI countText;
@@ -19,6 +19,11 @@ public class FlickerRelayCoil : ElectricalComponent
     private List<RelaySwitch> relaySwitches = new List<RelaySwitch>();
 
     private bool currentFlickerState = false;
+
+    public float GetTime()
+    {
+        return this.time;
+    }
 
     public override void OnSimulationStart()
     {
@@ -50,7 +55,7 @@ public class FlickerRelayCoil : ElectricalComponent
         isRunning = false;
         if(countText!= null)
         {
-            countText.text = time.ToString();
+            countText.text = time.ToString("N1");
         }
         ControlLinkedSwitches(false, true);
     }
@@ -128,6 +133,27 @@ public class FlickerRelayCoil : ElectricalComponent
 
                 relay.SetContactState(initState);
             }
+        }
+    }
+
+    public void SetTime(float newTime)
+    {
+        time = newTime;
+        if (countText == null)
+        {
+            foreach (TextMeshProUGUI tmp in GetComponentsInChildren<TextMeshProUGUI>())
+            {
+                if (tmp.name == "countNum_text")
+                {
+                    countText = tmp;
+                    break;
+                }
+            }
+        }
+
+        if (countText != null)
+        {
+            countText.text = time.ToString("N1");
         }
     }
 }

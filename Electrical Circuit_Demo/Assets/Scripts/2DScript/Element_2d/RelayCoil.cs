@@ -1,8 +1,16 @@
 using TMPro;
 using UnityEngine;
 
+public enum CoilType
+{
+    Relay,
+    MC
+}
+
 public class RelayCoil : ElectricalComponent
 {
+    public CoilType coilType;
+
     /// <summary>
     /// CircuitSolver에 의해 isLive와 isGrounded가 모두 true일 때 호출됩니다.
     /// </summary>
@@ -10,6 +18,10 @@ public class RelayCoil : ElectricalComponent
     {
         base.PowerOn();
         ControlLinkedSwitches(true, Type.Relay);
+        if(coilType == CoilType.MC)
+        {
+            ControlLinkedSwitches(true, Type.MC);
+        }
     }
 
     /// <summary>
@@ -19,6 +31,10 @@ public class RelayCoil : ElectricalComponent
     {
         base.PowerOff();
         ControlLinkedSwitches(false, Type.Relay);
+        if (coilType == CoilType.MC)
+        {
+            ControlLinkedSwitches(false, Type.MC);
+        }
     }
 
     /// <summary>
@@ -50,5 +66,7 @@ public class RelayCoil : ElectricalComponent
                 relay.SetContactState(targetState);
             }
         }
+
+
     }
 }

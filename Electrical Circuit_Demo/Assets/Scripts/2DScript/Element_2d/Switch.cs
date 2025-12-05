@@ -112,4 +112,30 @@ public class Switch : ElectricalComponent
         OnStateChanged?.Invoke(initState);      // 2d 또는 3d 부품 상태 이미지 변경
         OnStateInit?.Invoke();                  // 2d 또는 3d 부품에게 초기화 신호 전달 (각 부품에서 초기화할 부분 알아서 변경)
     }
+
+    /// <summary>
+    /// ✨ [추가] 토글 방식: 그룹 내 모든 스위치의 상태를 반전시킵니다. (ON <-> OFF)
+    /// (MCCB, 토글 스위치용)
+    /// </summary>
+    public void TriggerGroupToggle()
+    {
+        if (!SimulationManager.isSimulating) return;
+
+        // 1. 이 스위치가 속한 그룹 찾기
+        if (string.IsNullOrEmpty(symbol_Text) || !switchGroups.ContainsKey(symbol_Text))
+        {
+            // 그룹 없으면 나만 반전
+            SetState(!isOn, true);
+        }
+        else
+        {
+            // 2. 그룹 있으면 모두 반전
+            List<Switch> group = new List<Switch>(switchGroups[symbol_Text]);
+            foreach (Switch partnerSwitch in group)
+            {
+                // 현재 상태의 반대값으로 설정
+                partnerSwitch.SetState(!partnerSwitch.isOn, true);
+            }
+        }
+    }
 }

@@ -1,5 +1,4 @@
-﻿// RelayContact.cs (새 스크립트 파일)
-using System;
+﻿using System;
 using TMPro;
 using UnityEngine;
 
@@ -7,7 +6,9 @@ public enum Type
 {
     Relay,
     Timer,
-    Flicker
+    Flicker,
+    MC,
+    EOCR
 }
 
 public class RelaySwitch : ElectricalComponent

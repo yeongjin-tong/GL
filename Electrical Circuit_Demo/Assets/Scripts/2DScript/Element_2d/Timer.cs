@@ -5,15 +5,19 @@ using System.ComponentModel;
 using TMPro;
 using UnityEngine;
 
-public class Timer : ElectricalComponent
+public class Timer : ElectricalComponent, ITimerControl
 {
-    [SerializeField] private float time;
+    [SerializeField] private float time = 3.0f;
     [SerializeField] private float curTime;
 
     private TextMeshProUGUI countText;
 
     bool isRunning = false;
 
+    public float GetTime()
+    {
+        return this.time;
+    }
 
     IEnumerator StartTimer()
     {
@@ -31,25 +35,25 @@ public class Timer : ElectricalComponent
 
         time = float.Parse(countText.text);
 
-        curTime = time; // ÇöÀç ½Ã°£À» ÃÊ±â ½Ã°£À¸·Î ¼³Á¤
+        curTime = time; // í˜„ì¬ ì‹œê°„ì„ ì´ˆê¸° ì‹œê°„ìœ¼ë¡œ ì„¤ì •
 
         while (curTime > 0)
         {
-            yield return null; // ´ÙÀ½ ÇÁ·¹ÀÓ±îÁö ´ë±â
-            curTime -= Time.deltaTime; // ½Ã°£ °¨¼Ò
+            yield return null; // ë‹¤ìŒ í”„ë ˆì„ê¹Œì§€ ëŒ€ê¸°
+            curTime -= Time.deltaTime; // ì‹œê°„ ê°ì†Œ
 
             countText.text = curTime.ToString("N1");
 
             if (curTime <= 0)
             {
-                Debug.Log("½Ã°£ Á¾·á");
+                Debug.Log("ì‹œê°„ ì¢…ë£Œ");
                 curTime = 0;
 
-                // [¼öÁ¤] ÅØ½ºÆ®°¡ 0À¸·Î È®½ÇÈ÷ Ç¥½ÃµÇµµ·Ï ÇÔ
+                // [ìˆ˜ì •] í…ìŠ¤íŠ¸ê°€ 0ìœ¼ë¡œ í™•ì‹¤íˆ í‘œì‹œë˜ë„ë¡ í•¨
                 if (countText != null) countText.text = "0";
 
-                ControlLinkedSwitches(true, Type.Timer); // Å¸ÀÌ¸Ó ½ºÀ§Ä¡ ÀÛµ¿
-                yield break; // ÄÚ·çÆ¾ Á¾·á
+                ControlLinkedSwitches(true, Type.Timer); // íƒ€ì´ë¨¸ ìŠ¤ìœ„ì¹˜ ì‘ë™
+                yield break; // ì½”ë£¨í‹´ ì¢…ë£Œ
             }
         }
     }
@@ -73,14 +77,14 @@ public class Timer : ElectricalComponent
             isRunning = false;
             if(countText != null)
             {
-                countText.text = time.ToString();
+                countText.text = time.ToString("N1");
             }
         }
     }
 
     public override void PowerOn()
     {
-        Debug.Log("ÆÄ¿ö¿Â È£Ãâ");
+        Debug.Log("íŒŒì›Œì˜¨ í˜¸ì¶œ");
         base.PowerOn();
         StateSetting(true);
     }
@@ -93,16 +97,16 @@ public class Timer : ElectricalComponent
     }
 
     /// <summary>
-    /// ÀÌ ÄÚÀÏ°ú ¿¬°áµÈ ¸ğµç ¸±·¹ÀÌ ½ºÀ§Ä¡¸¦ Ã£¾Æ »óÅÂ¸¦ º¯°æÇÕ´Ï´Ù.
+    /// ì´ ì½”ì¼ê³¼ ì—°ê²°ëœ ëª¨ë“  ë¦´ë ˆì´ ìŠ¤ìœ„ì¹˜ë¥¼ ì°¾ì•„ ìƒíƒœë¥¼ ë³€ê²½í•©ë‹ˆë‹¤.
     /// </summary>
     private void ControlLinkedSwitches(bool newState, Type type)
     {
-        // ¾À¿¡ ÀÖ´Â ¸ğµç ¸±·¹ÀÌ ½ºÀ§Ä¡¸¦ Ã£½À´Ï´Ù.
+        // ì”¬ì— ìˆëŠ” ëª¨ë“  ë¦´ë ˆì´ ìŠ¤ìœ„ì¹˜ë¥¼ ì°¾ìŠµë‹ˆë‹¤.
         RelaySwitch[] allSwitches = FindObjectsOfType<RelaySwitch>();
 
         foreach (var relay in allSwitches)
         {
-            // ID°¡ ÀÏÄ¡ÇÏ´Â ½ºÀ§Ä¡¸¸ Á¦¾îÇÕ´Ï´Ù.
+            // IDê°€ ì¼ì¹˜í•˜ëŠ” ìŠ¤ìœ„ì¹˜ë§Œ ì œì–´í•©ë‹ˆë‹¤.
             if (relay.symbol_Text == this.symbol_Text && relay.switchType == type)
             {
                 bool initState = relay.GetInitState();
@@ -120,6 +124,27 @@ public class Timer : ElectricalComponent
 
                 relay.SetContactState(targetState);
             }
+        }
+    }
+
+    public void SetTime(float newTime)
+    {
+        time = newTime;
+        if (countText == null)
+        {
+            foreach (TextMeshProUGUI tmp in GetComponentsInChildren<TextMeshProUGUI>())
+            {
+                if (tmp.name == "countNum_text")
+                {
+                    countText = tmp;
+                    break;
+                }
+            }
+        }
+        
+        if (countText != null)
+        {
+            countText.text = time.ToString("N1");
         }
     }
 }

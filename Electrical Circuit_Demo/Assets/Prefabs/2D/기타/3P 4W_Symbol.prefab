@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 6424661890134220319}
   - component: {fileID: 7800077169057809882}
   m_Layer: 0
-  m_Name: point_None_1
+  m_Name: point_None_2
   m_TagString: ConnectionPort
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -101,7 +101,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 08e4d55c42453544c822c4f4a45f02d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  type: 3
+  type: 0
   parentComponent: {fileID: 0}
 --- !u!1 &2440916365756730791
 GameObject:
@@ -116,7 +116,7 @@ GameObject:
   - component: {fileID: 8207912396861898795}
   - component: {fileID: 8156280717266192496}
   m_Layer: 0
-  m_Name: point_None_3
+  m_Name: point_None_4
   m_TagString: ConnectionPort
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -204,7 +204,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 08e4d55c42453544c822c4f4a45f02d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  type: 2
+  type: 1
   parentComponent: {fileID: 0}
 --- !u!1 &3092424027681780804
 GameObject:
@@ -322,7 +322,7 @@ GameObject:
   - component: {fileID: 455185459179144721}
   - component: {fileID: 605772825627648937}
   m_Layer: 0
-  m_Name: point_None_2
+  m_Name: point_None_3
   m_TagString: ConnectionPort
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -410,7 +410,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 08e4d55c42453544c822c4f4a45f02d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  type: 1
+  type: 0
   parentComponent: {fileID: 0}
 --- !u!1 &7801693972321909952
 GameObject:
@@ -453,8 +453,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -4.2445, y: 0}
-  m_SizeDelta: {x: 110, y: 100}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 256, y: 256}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6093208910618140885
 CanvasRenderer:
@@ -484,7 +484,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: dff037b83333dd74388a414bbb1b7c4b, type: 3}
+  m_Sprite: {fileID: 21300000, guid: de320c0b6b3e77647beb5c7b8ab16810, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -526,7 +526,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 23.4}
+  m_Offset: {x: -0.7206726, y: 24.82928}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -537,7 +537,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 109, y: 28.418304}
+  m_Size: {x: 116.14996, y: 31.276863}
   m_EdgeRadius: 0
 --- !u!114 &-6410872961572038026
 MonoBehaviour:
@@ -552,8 +552,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   instanceID: 
-  symbol_ID: 
   symbol_Text: 
+  symbolTextobj: {fileID: 0}
   isLive: 0
   isGrounded: 0
   isPowered: 0

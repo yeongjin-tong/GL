@@ -40,7 +40,7 @@ public class InputManager : MonoBehaviour
         Vector3 mouse = GetMouseWorldPosition();
 
         // 시뮬레이션 모드가 아닐 때만 (편집 모드일 때만) 아래의 입력 감지를 실행합니다.
-        if (!SimulationManager.isSimulating)
+        if (!SimulationManager.isSimulating && PopupManager.Instance.currentPopup == null)
         {
             // --- 마우스 왼쪽 클릭 감지 ---
             if (Input.GetMouseButtonDown(0))
@@ -48,15 +48,19 @@ public class InputManager : MonoBehaviour
                 // 더블클릭 시!
                 if (Time.time - clickedTime < interval)
                 {
-                    if (IsPointerOverUIObject(out GameObject clickedObject))
+                    Vector3 mouseWorld = GetMouseWorldPosition();
+                    Collider2D hit = Physics2D.OverlapCircle(mouseWorld, 0.01f);
+                    if (hit != null)
                     {
                         // 2D_Space 아래에 있는 오브젝트만 더블클릭 기능 제공
-                        Transform currentParent = clickedObject.transform.parent;
+                        Transform currentParent = hit.transform.parent;
                         while (currentParent != null)
                         {
                             if (currentParent.name.Contains("2D_Space"))
                             {
-                                OnDoubleClick?.Invoke(clickedObject);
+                                PopupManager.Instance.CreatePopup(hit.gameObject);
+                                //OnDoubleClick?.Invoke(hit.gameObject);
+                                return;
                             }
 
                             currentParent = currentParent.parent;
@@ -78,7 +82,11 @@ public class InputManager : MonoBehaviour
                 else
                 {
                     Vector3 mouseWorld = GetMouseWorldPosition();
-                    Collider2D hit = Physics2D.OverlapCircle(mouseWorld, 0.01f);
+
+                    Collider2D hit = SelectPriorityObject();
+
+                    //Collider2D hit = Physics2D.OverlapCircle(mouseWorld, 0.01f);
+                    
                     OnPhysicsObjectClicked?.Invoke(hit);
 
                     if (hit != null)
@@ -94,6 +102,40 @@ public class InputManager : MonoBehaviour
                 OnDeleteKeyPressed?.Invoke();
             }
         }
+    }
+
+    private Collider2D SelectPriorityObject()
+    {
+        Vector3 mousePos = GetMouseWorldPosition();
+
+        // 클릭 위치의 모든 콜라이더를 배열로 가져옴
+        Collider2D[] hits = Physics2D.OverlapCircleAll(mousePos, 0.01f);
+
+        Collider2D selectedObj = null;
+        int highestPriority = -1;
+
+        foreach (var hit in hits)
+        {
+            GameObject obj = hit.gameObject;
+            int currentPriority = 0;
+
+            // 태그나 컴포넌트를 이용해 우선순위 점수 부여
+            if (obj.GetComponent<ConnectionPoint>() != null) currentPriority = 100;      // 포트 (가장 높음)
+            else if (obj.GetComponent<ElectricalComponent>() != null) currentPriority = 50;    // 부품
+
+            // 현재까지 찾은 것보다 우선순위가 높으면 교체
+            if (currentPriority > highestPriority)
+            {
+                highestPriority = currentPriority;
+                selectedObj = hit;
+            }
+        }
+        if (selectedObj != null)
+        {
+            Debug.Log("선택된 최우선 객체: " + selectedObj.name);
+            // 여기서 선택 로직 수행
+        }
+        return selectedObj;
     }
 
     // 2D 물리 오브젝트를 찾는 헬퍼 함수 (GameObject를 반환하도록 수정)
